@@ -1,32 +1,34 @@
 # Anonymous Certificate Enrollment protocol (ACE)
 
-This protocol is loosley based on the Enrolment over Secure Transport (EST) (RFC7030) protocol. 
-https://tools.ietf.org/html/rfc7030
+This protocol is loosley based on the Enrolment over Secure Transport (EST) (RFC7030) protocol.   
+https://tools.ietf.org/html/rfc7030  
 
-Abstract
+Abstract  
+--------
 
-RFC7030 (EST) provides a secure method for creating, retrieving and verifying certificates.
+RFC7030 (EST) provides a secure method for creating, retrieving and verifying certificates.  
 
-The ACE protocol is designed (as is EST) to provide an automated method for creating, retrieving and verifying certificates. However this protocol removes all requirement for identification, other than the verification that a certificate is bound to an anonymous alias.
+The ACE protocol is designed (as is EST) to provide an automated method for creating, retrieving and verifying certificates. However this protocol removes all requirement for identification, other than the verification that a certificate is bound to an anonymous alias.  
 
-This protocol has been designed to facilitate an end-to-end encrypted communication such that the private key associated with an alias never leaves the client device and that the device is associated with an anonymous alias and nothing more.
+This protocol has been designed to facilitate an end-to-end encrypted communication such that the private key associated with an alias never leaves the client device and that the device is associated with an anonymous alias and nothing more.  
 
-The assumption being that to communicate securely and anonymously using an end-to-end encryption protocol that can be securly verified all one needs to know is the `alias` of the destination individual.
+The assumption being that to communicate securely and anonymously using an end-to-end encryption protocol that can be securly verified all one needs to know is the `alias` of the destination individual.  
 
 Implementation
+--------------
 
-Thw ACE protocol uses the same REST API mechanism as EST and provides the following endpoints:
+Thw ACE protocol uses the same REST API mechanism as EST and provides the following endpoints:  
+  
+`GET /cacerts`  
+`POST /simpleenroll`  
+  
+Because the EST protocol does not provide a mechanism for the retrieval of public keys, the extra endpoint has been implemented:  
 
-`GET /cacerts`
-`POST /simpleenroll`
+`GET /cert/alias`  
 
-Because the EST protocol does not provide a mechanism for the retrieval of public keys, the extra endpoint has been implemented:
+And for testing and convinence the following endpoint has been provided to allow certs to be issued by the server that include a private key:  
 
-`GET /cert/alias`
-
-And for testing and convinence the following endpoint has been provided to allow certs to be issued by the server that include a private key:
-
-`POST /serverkeygen`
+`POST /serverkeygen`  
 
 
 
