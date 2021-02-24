@@ -24,7 +24,7 @@ Thw ACE protocol uses the same REST API mechanism as EST and provides the follow
   
 Because the EST protocol does not provide a mechanism for the retrieval of public keys, the extra endpoint has been implemented:  
 
-`GET /cert/alias`  
+`GET /cert/``alias`  
 
 And for testing and convinence the following endpoint has been provided to allow certs to be issued by the server that include a private key:  
 
