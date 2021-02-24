@@ -30,6 +30,39 @@ And for testing and convinence the following endpoint has been provided to allow
 
 `POST /serverkeygen`  
 
+Specifiction
+------------
+
+### GET /cacerts  
+
+Returns a PKCS#12 certificate of the CA root signing authority for this server. 
+
+*Return format:*  
+
+application/x-pkcs12  
+
+
+### POST /simpleenroll    
+
+POST BODY  
+
+*Post format:*  
+
+application/json    
+
+```
+{  
+  "key"     : "public key in PEM format"  *mandatory*
+  "0"       : "optional information 0" *optional*  
+  "1"       : "optional information 1" *optional*
+  ..
+  "65534"   : "optional information 65534" *optional*
+}
+```
+
+
+
+
 
 
 
