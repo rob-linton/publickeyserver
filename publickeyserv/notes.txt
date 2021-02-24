@@ -1,0 +1,50 @@
+﻿publickeyserv
+-------------
+
+--------------------------------------------------------------
+- POST /
+
+{
+    "pubkey":"[base64 public key]",
+    "api":"[api of app],
+    "appname":"[name of app]",
+}
+
+- Actions
+    - saves certificate with handle
+
+- Returns
+
+{
+    "cert":"[base64 encoded cert]",
+    "alias":"[three word alias]",
+    "api":"[api of app],
+    "appname":"[name of app]"
+}
+
+200 OK
+400 FAIL
+
+    
+--------------------------------------------------------------
+- GET /[alias]
+
+- Returns
+
+{
+    "cert":"[base64 encoded cert]",
+    "alias":"[three word alias]",
+    "api":"[api of app],
+    "appname":"[name of app]"
+}
+
+200 OK
+400 FAIL
+
+
+--------------------------------------------------------------
+
+
+
+
+

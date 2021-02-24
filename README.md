@@ -8,6 +8,6 @@ The underlying principle of this protocol is to allow an individual to obtain a 
 
 This project makes no assumptions regarding the use of such certificates after they have been issued.
 
-This source code runs in production at https://publickeyserver.org.
+This source code runs in production at https://publickeyserver.org
 
 
