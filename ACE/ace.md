@@ -30,10 +30,9 @@ And for testing and convinence the following endpoint has been provided to allow
 
 `POST /serverkeygen`  
 
-Specifiction
-------------
 
-### GET /cacerts  
+GET /cacerts  
+------------
 
 Returns a PKCS#12 certificate of the CA root signing authority for this server. 
 
@@ -42,7 +41,8 @@ Returns a PKCS#12 certificate of the CA root signing authority for this server.
 application/x-pkcs12  
 
 
-### POST /simpleenroll    
+POST /simpleenroll    
+------------------
 
 POST BODY  
 
