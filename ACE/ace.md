@@ -33,24 +33,23 @@ And for testing and convinence the following endpoint has been provided to allow
 
 GET /cacerts  
 ------------
-
 Returns a PKCS#12 certificate of the CA root signing authority for this server. 
-
-*Return format:*  
-
-application/x-pkcs12  
-
+```
+Return format:  
+  application/x-pkcs12  
+```
 
 POST /simpleenroll    
 ------------------
-
-POST BODY  
-
-*Post format:*  
-
-application/json    
+Creates a certificate and returns it in PKCS#12 format  
 
 ```
+POST BODY  
+
+Post format:  
+  application/json    
+
+
 {  
   "key"     : "public key in PEM format"  *mandatory*
   "0"       : "optional information 0" *optional*  
@@ -58,6 +57,11 @@ application/json
   ..
   "65534"   : "optional information 65534" *optional*
 }
+```
+
+```
+Return format:  
+  application/x-pkcs12  
 ```
 
 
