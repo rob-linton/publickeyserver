@@ -62,10 +62,18 @@ Post format:
 ```
 Return format:  
   application/x-pkcs12  
+  
+  OID 1.3.6.1.4.57055.0 = "optional information 0"
+  OID 1.3.6.1.4.57055.1 = "optional information 1"
+  
 ```
 
 
+POST GET /cert/{alias}
+----------------------
 
+```
+alias = generated alias
 
 
 
