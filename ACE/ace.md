@@ -63,6 +63,7 @@ Post format:
 Return format:  
   application/x-pkcs12  
   
+  with embedded OID's:
   OID 1.3.6.1.4.57055.0 = "optional information 0"
   OID 1.3.6.1.4.57055.1 = "optional information 1"
   
@@ -71,9 +72,18 @@ Return format:
 
 POST GET /cert/{alias}
 ----------------------
+Returns the associated certificate with the alias.
 
 ```
 alias = generated alias
+```  
+
+```
+Return format:  
+  application/x-pkcs12  
+```  
+
+
 
 
 
