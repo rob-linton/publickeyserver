@@ -12,14 +12,33 @@ The ACE protocol is designed (as is EST) to provide an automated method for crea
 
 This protocol has been designed to facilitate an end-to-end encrypted communication such that the private key associated with an alias never leaves the client device and that the device is associated with an anonymous alias and nothing more.  
 
-The assumption being that to communicate securely and anonymously using an end-to-end encryption protocol that can be securly verified all one needs to know is the `alias` of the destination individual.  
+The assumption being, that to communicate securely and anonymously using an end-to-end encryption protocol that can be securly verified by all parties, all one needs to know is the `alias` of the destination individual.  
 
 Detail
 ------
 
 The ACE protocol is designed to be as simple as possible with very little (if any) customisation options.
 
-The 
+RSA key pairs are RSA2048.  
+
+X.509 certificates are signed using the following algorithm:
+
+`SHA512WITHRSA`  
+
+Alias's are automatically assigned and are a random group of three words.
+
+eg:
+  marlin spike coil
+
+Optional extra information may be baked into an X.509 certificate. The base OID is as follows:
+
+`iso.org.dod.internet.private.enterprise.publickerserver (1.3.6.1.4.1.57055)`
+
+Optional information may be ascii with the following characters allowed:
+
+[a..z|A..Z|:|/|;|.|?|&|#|!|$|%|^|*|(|)|[|]|{|}|<|>|,|_|-|+|=|@|~|
+
+Optional information may be base64 encoded by prefixing the base64 string with 
 
 Implementation
 --------------
@@ -54,7 +73,7 @@ Post format:
 
 
 {  
-  "key"     : "public key in PEM format"  *mandatory*
+  "key"     : "public key in PEM format (RSA2048)"  *mandatory*
   "0"       : "optional information 0" *optional*  
   "1"       : "optional information 1" *optional*
   ..
