@@ -13,7 +13,7 @@ Security
 
 While this project is simple and opinionated, some effort has been made to ensure server security including CA certificate storage.
 
-CA certificate storage is within an offcloud certified SafeNet HSM, server security makes use of standard Amazon AWS standards, with the source code publically available here in Github.
+CA certificate storage is within an offcloud certified HSM, server security makes use of standard Amazon AWS standards, with the source code publically available here in Github.
 
 This source code runs in production at https://publickeyserver.org.
 
