@@ -8,6 +8,8 @@ Abstract
 
 RFC7030 (EST) provides a secure method for creating, retrieving and verifying certificates.  
 
+The ACE protocol is a simple, opinionated distilled version of EST, developed for the very specific purpose of creating, providing and validating anonymous certificates that may be used for encryption without identity.
+
 The ACE protocol is designed (as is EST) to provide an automated method for creating, retrieving and verifying certificates. However this protocol removes all requirement for identification, other than the verification that a certificate is bound to an anonymous alias.  
 
 This protocol has been designed to facilitate an end-to-end encrypted communication such that the private key associated with an alias never leaves the client device and that the device is associated with an anonymous alias and nothing more.  
