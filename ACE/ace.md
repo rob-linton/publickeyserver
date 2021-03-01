@@ -42,6 +42,13 @@ Optional information may be ascii with the following characters allowed:
 
 Optional information may also be provided base64 encoded, no assumption is made as to the data format provided.
 
+
+Authentication
+--------------
+
+No authentication will be used to access a server providing the ACE protocol.
+
+
 Implementation
 --------------
 
