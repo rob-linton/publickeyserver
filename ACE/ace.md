@@ -14,6 +14,13 @@ This protocol has been designed to facilitate an end-to-end encrypted communicat
 
 The assumption being that to communicate securely and anonymously using an end-to-end encryption protocol that can be securly verified all one needs to know is the `alias` of the destination individual.  
 
+Detail
+------
+
+The ACE protocol is designed to be as simple as possible with very little (if any) customisation options.
+
+The 
+
 Implementation
 --------------
 
