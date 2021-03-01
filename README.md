@@ -1,6 +1,6 @@
 ## Public Key Server
 
-This project implements the Anonymous Certificate Enrolment protocol [ACE](https://github.com/rob-linton/publickeyserver/blob/main/ACE/ace.md) which is loosley based on the Enrolment over Secure Transport (EST) (RFC7030) protocol.
+This project implements the Anonymous Certificate Enrolment protocol [ACE](https://github.com/rob-linton/publickeyserver/blob/main/ACE/ace.md) which is loosley based on the Enrolment over Secure Transport [EST](https://tools.ietf.org/html/rfc7030) (RFC7030) protocol.
 
 The Public Key Server Project provides a simple and opinionated method for an anonymous individual to obtain a certificate associated with an anonymous alias and have it validated by a third party.  This project provides a simple yet functional anonymous certificate management protocol which allows unidentified individuals to know with certainty that they have identified the public key associated with an alias. 
 
