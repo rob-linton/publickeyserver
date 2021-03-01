@@ -36,9 +36,11 @@ Optional extra information may be baked into an X.509 certificate. The base OID 
 
 Optional information may be ascii with the following characters allowed:
 
-[a..z|A..Z|:|/|;|.|?|&|#|!|$|%|^|*|(|)|[|]|{|}|<|>|,|_|-|+|=|@|~|
+```
+[a..z|A..Z|[0..9]:|/|;|.|?|&|#|!|$|%|^|*|(|)|[|]|{|}|<|>|,|_|-|+|=|@|~|
+```  
 
-Optional information may be base64 encoded by prefixing the base64 string with 
+Optional information may also be provided base64 encoded, no assumption is made as to the data format provided.
 
 Implementation
 --------------
