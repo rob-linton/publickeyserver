@@ -26,10 +26,6 @@ Because the EST protocol does not provide a mechanism for the retrieval of publi
 
 `GET /cert/` `alias`  
 
-And for testing and convinence the following endpoint has been provided to allow certs to be issued by the server that include a private key:  
-
-`POST /serverkeygen`  
-
 
 GET /cacerts  
 ------------
