@@ -68,7 +68,7 @@ Return format:
 
 POST GET /cert/{alias}
 ----------------------
-Returns the associated certificate with the alias.
+Returns the associated certificate with the alias in PKCS#12 format.  
 
 ```
 alias = generated alias
