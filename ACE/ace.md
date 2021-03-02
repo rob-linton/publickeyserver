@@ -85,7 +85,6 @@ Post format:
 
 {  
   "key"     : "public key in PEM format (RSA2048)"  *mandatory*
-  "0"       : "optional information 0" *optional*  
   "1"       : "optional information 1" *optional*
   ..
   "65534"   : "optional information 65534" *optional*
@@ -97,8 +96,8 @@ Return format:
   application/x-pkcs12  
   
   with embedded OID's:
-  OID 1.3.6.1.4.57055.0 = "optional information 0"
   OID 1.3.6.1.4.57055.1 = "optional information 1"
+  OID 1.3.6.1.4.57055.65534 = "optional information 65534"
   
 ```
 
