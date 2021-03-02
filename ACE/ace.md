@@ -34,7 +34,7 @@ eg:
 
 Optional extra information may be baked into an X.509 certificate. The base OID is as follows:
 
-`iso.org.dod.internet.private.enterprise.publickerserver (1.3.6.1.4.1.57055)`
+`iso.org.dod.internet.private.enterprise.publickeyrserver (1.3.6.1.4.1.57055)`
 
 Optional information may be ascii with the following characters allowed:
 
