@@ -11,7 +11,8 @@ This project makes no assumptions regarding the use of such certificates after t
 Certificate Lifecycle
 ---------------------
 
-It is expected 
+It is expected that certificates will be short lived and disposable.  
+
 Security
 --------
 
