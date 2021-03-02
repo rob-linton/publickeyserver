@@ -13,110 +13,136 @@ using Microsoft.Extensions.Logging;
 using RandomDataGenerator.FieldOptions;
 using RandomDataGenerator.Randomizers;
 using System.Text;
+using Serilog;
+using Amazon.S3.Model;
+using Newtonsoft.Json.Linq;
+
+using System.Security.Cryptography.X509Certificates;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.Pkcs;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Operators;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Prng;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Pkcs;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Utilities.Net;
 
 namespace publickeyserv.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class KeyController : ControllerBase
-    {
-        
-        private readonly ILogger<Controller> _logger;
+	[ApiController]
+	//[Route("[controller]")]
+	public class KeyController : ControllerBase
+	{
 
-        public KeyController(ILogger<Controller> logger)
-        {
-            _logger = logger;
-        }
+		private readonly ILogger<Controller> _logger;
 
-        // ---------------------------------------------------------------------
-        [HttpGet]
-        public PublicKey Get(string alias)
-        {
-            PublicKey cert = new PublicKey();
+		public KeyController(ILogger<Controller> logger)
+		{
+			_logger = logger;
+		}
 
-            cert.name = "test";
-            cert.api = "https://google.com";
-            cert.alias = "trevor freddy gotcha";
-            cert.api = "";
+		// ---------------------------------------------------------------------
+		[Route("cacert")]
+		[HttpGet]
+		public Stream cacert()
+		{
+			byte[] byteArray = Encoding.ASCII.GetBytes("");
+			MemoryStream stream = new MemoryStream(byteArray);
 
-            return cert;
-            
-        }
-        // ---------------------------------------------------------------------
-        [HttpPost]
-        public async Task<Stream> Post([FromBody] CreateKey createkey)
-        {
+			return stream;
+		}
+		// ---------------------------------------------------------------------
+		[Route("cert")]
+		[HttpGet]
+		public Stream cert(string alias)
+		{
+			byte[] byteArray = Encoding.ASCII.GetBytes(alias);
+			MemoryStream stream = new MemoryStream(byteArray);
 
-            string key = createkey.key;
-            string name = createkey.name;
-            string api = createkey.api;
+			return stream;
+		}
+		// ---------------------------------------------------------------------
+		[Route("simpleenroll")]
+		[HttpPost]
+		public Stream simpleenroll()
+		{
 
-            string alias = "";
-            while (true)
-            {
-                // Generate a random first name
-                var randomizerFirstName = RandomizerFactory.GetRandomizer(new FieldOptionsTextWords { Min = 3, Max = 3 });
-                alias = randomizerFirstName.Generate();
+			dynamic body = Misc.GetRequestBodyDynamic(Request);
 
-                // check if exists in s3
-                using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
-                {
-                   var tExists = AwsHelper.Exists(client, alias);
-                    await tExists;
+			string key = body["key"];
 
-                    if (!tExists.Result)
-                        break;
-                    
-                };
-            }
+			foreach (JProperty kv in body)
+			{
+				if (kv.Name.ToLower().Trim() != "key")
+				{
+					Log.Information("OID => {0} : {1}", kv.Name, kv.Value);
+				}
 
-            byte[] byteArray = Encoding.ASCII.GetBytes(alias);
-            MemoryStream stream = new MemoryStream(byteArray);
+			}
 
-            return stream;
 
-            //
-            // create the certificate
-            //
+			string alias = "";
 
-            //
-            // save the certificate and the api details
-            //
-            using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
-            {
-                using (var newMemoryStream = new MemoryStream())
-                {
-                    IFormFile file; // ** placeholder
-                    file.CopyTo(newMemoryStream);
+			using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+			{
+				while (true)
+				{
+					// Generate a random first name
+					var randomizerFirstName = RandomizerFactory.GetRandomizer(new FieldOptionsTextWords { Min = 3, Max = 3 });
+					alias = randomizerFirstName.Generate();
 
-                    var uploadRequest = new TransferUtilityUploadRequest
-                    {
-                        InputStream = newMemoryStream,
-                        Key = file.FileName,
-                        BucketName = "yourBucketName",
-                        CannedACL = S3CannedACL.PublicRead
-                    };
+					// check if exists in s3
 
-                    var fileTransferUtility = new TransferUtility(client);
-                    fileTransferUtility.UploadAsync(uploadRequest);
-                }
+					//bool exists = AwsHelper.Exists(client, alias).Result;
+					bool exists = false;
+					
+					if (!exists)
+						break;
+				};
+				
+			}
+		
 
-            };
+			byte[] byteArray = Encoding.ASCII.GetBytes(alias);
+			MemoryStream stream = new MemoryStream(byteArray);
 
 
 
-            PublicKey cert = new PublicKey();
+			//
+			// create the certificate
+			//
 
-            cert.name = "test";
-            cert.api = "https://google.com";
-            cert.alias = "trevor freddy gotcha";
-            cert.api = "";
+			string x509Base64 = ""; // final certificate base64 encoded
 
-            //return cert;
+			// temporarily create a new CA self signed certificate
+			(X509Certificate2 x509CA, AsymmetricKeyParameter myCAprivateKey) = BouncyCastleHelper.InitCA("publickeyserver");
 
-        }
-        // ---------------------------------------------------------------------
-    }
+			// create a new certificate
+			X509Certificate2 certificate = BouncyCastleHelper.CreateSelfSignedCertificateBasedOnCertificateAuthorityPrivateKey("CN=" + alias, "CN=" + "publickeyserver" + "CA", myCAprivateKey);
+
+			//
+			// save the certificate and the api details
+			//
+			using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+			{
+				bool exists = AwsHelper.Put(client, alias, x509Base64).Result;
+			};
+
+
+			return stream;
+
+
+			//return cert;
+
+		}
+		// ---------------------------------------------------------------------
+	}
 }
 
 /*

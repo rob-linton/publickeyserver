@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 namespace publickeyserv
 {
@@ -26,16 +28,16 @@ namespace publickeyserv
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowSpecificOrigin",
-                                  builder => builder.WithOrigins("*").AllowAnyMethod().WithHeaders("Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers", "x-ijt", "Authorization"));
-            });
+            
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "publickeyserv", Version = "v1" });
+            });
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
             });
         }
 
@@ -49,12 +51,20 @@ namespace publickeyserv
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "publickeyserv v1"));
             }
 
+            app.UseSerilogRequestLogging();
+
             app.UseHttpsRedirection();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseCors(x => x
+                .SetIsOriginAllowed(origin => true) // allow any origin conditionally
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+            );
 
             app.UseAuthorization();
 

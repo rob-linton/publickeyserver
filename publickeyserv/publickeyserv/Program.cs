@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace publickeyserv
 {
@@ -21,7 +22,7 @@ namespace publickeyserv
     {
         public static void Main(string[] args)
         {
-            if (args.Length != 3)
+            if (args.Length != 4)
             {
                 Console.WriteLine("usage: [s3key] [s3secret] [s3endpoint] [s3bucket]");
                 return;
@@ -35,11 +36,27 @@ namespace publickeyserv
             }
 
 
+            // Initialise SeriLog
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File(
+                    "C:\\shared\\log\\log_restapi.txt",
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [Thread: {ThreadId}] [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                    rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true,
+                    shared: true,
+                    flushToDiskInterval: TimeSpan.FromSeconds(2)) // a full disk flush will be performed every 2 seconds
+                .CreateLogger();
+
+
+
             CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+             .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
