@@ -81,7 +81,7 @@ namespace publickeyserv.Controllers
 			{
 				if (kv.Name.ToLower().Trim() != "key")
 				{
-					Log.Information("OID => {0} : {1}", kv.Name, kv.Value);
+					Log.Information("OID => {0} : {1}", kv.Name, kv.Value.ToString());
 				}
 
 			}

@@ -141,7 +141,7 @@ namespace publickeyserv
 			RsaPrivateCrtKeyParameters rsaparams = new RsaPrivateCrtKeyParameters(
 				rsa.Modulus, rsa.PublicExponent, rsa.PrivateExponent, rsa.Prime1, rsa.Prime2, rsa.Exponent1, rsa.Exponent2, rsa.Coefficient);
 
-			x509.PrivateKey = DotNetUtilities.ToRSA(rsaparams);
+			//x509.PrivateKey = DotNetUtilities.ToRSA(rsaparams);
 			return x509;
 
 		}
