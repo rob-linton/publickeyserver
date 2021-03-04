@@ -1,1 +1,26 @@
-﻿
+﻿Create a public private key pair on MacOS
+-----------------------------------------
+
+openssl genpkey -algorithm RSA -aes-256-cbc -outform PEM -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+
+chmod 0400 private_key.pem
+
+ssh-keygen -e -m PEM -f private_key.pem > public_key.pem
+
+
+Sample POSTS
+------------
+
+POST /simpleenroll
+
+{
+    "key" : "-----BEGIN RSA PUBLIC KEY-----
+MIIBCgKCAQEAtnAKRhgaxhTUec0T6e/2hje+vFuCGs155godjYkejC4xQskZOHFy
+HMYsOfpcHKPJxdYEm7ycYYhSsBmHXzSMxomz4SXp6nc7hiLsl/ScJkLyfmgDscjI
+Li/DVtHtwkXZ/hIU8QQbJToM6+Mts29SXIuERdMhqU5wjN3NHmGnT7QMQhDCjDRM
+8bdmvQFKuJ9PZ6axEa4Rhx9ox1F1jyaW+L/KqESJFiGyKsBFLBV0/An95raIixcS
+OJam3J3J9kybVfh6OAbT4JssXG6dOjeJS8A9pThDBCJbktpiFL8RqtlnGw/xkl/E
+8o98dvlAX6MJVNpXOA/kKqm6rz+m3vuj8wIDAQAB
+-----END RSA PUBLIC KEY-----",
+    "1" : "data for OID 1"
+}
