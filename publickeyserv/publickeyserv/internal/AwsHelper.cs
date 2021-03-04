@@ -45,6 +45,7 @@ namespace publickeyserv
 		// ---------------------------------------------------------------------
 		public static async Task<bool> Put(Amazon.S3.AmazonS3Client client, string key, string body)
 		{
+			string safeKey = key.Replace(" ", "-");
 
 			try
 			{
@@ -52,7 +53,7 @@ namespace publickeyserv
 				PutObjectRequest request = new PutObjectRequest
 				{
 					BucketName = GLOBALS.s3bucket,
-					Key = key,
+					Key = safeKey,
 					ContentBody = body
 				};
 

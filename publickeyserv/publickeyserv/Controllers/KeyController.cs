@@ -69,10 +69,22 @@ namespace publickeyserv.Controllers
 		}
 		// ---------------------------------------------------------------------
 		[Route("simpleenroll")]
-		[HttpPost]
+		[Produces("application/x-pkcs12")]
+		[HttpGet]
 		public Stream simpleenroll()
 		{
 
+			string key = @"-----BEGIN RSA PUBLIC KEY-----
+MIIBCgKCAQEAtnAKRhgaxhTUec0T6e/2hje+vFuCGs155godjYkejC4xQskZOHFy
+HMYsOfpcHKPJxdYEm7ycYYhSsBmHXzSMxomz4SXp6nc7hiLsl/ScJkLyfmgDscjI
+Li/DVtHtwkXZ/hIU8QQbJToM6+Mts29SXIuERdMhqU5wjN3NHmGnT7QMQhDCjDRM
+8bdmvQFKuJ9PZ6axEa4Rhx9ox1F1jyaW+L/KqESJFiGyKsBFLBV0/An95raIixcS
+OJam3J3J9kybVfh6OAbT4JssXG6dOjeJS8A9pThDBCJbktpiFL8RqtlnGw/xkl/E
+8o98dvlAX6MJVNpXOA/kKqm6rz+m3vuj8wIDAQAB
+-----END RSA PUBLIC KEY-----";
+
+
+			/*
 			dynamic body = Misc.GetRequestBodyDynamic(Request);
 
 			string key = body["key"];
@@ -85,7 +97,7 @@ namespace publickeyserv.Controllers
 				}
 
 			}
-
+			*/
 
 			string alias = "";
 
@@ -99,8 +111,8 @@ namespace publickeyserv.Controllers
 
 					// check if exists in s3
 
-					//bool exists = AwsHelper.Exists(client, alias).Result;
-					bool exists = false;
+					bool exists = AwsHelper.Exists(client, alias).Result;
+					//bool exists = false;
 					
 					if (!exists)
 						break;
@@ -109,22 +121,33 @@ namespace publickeyserv.Controllers
 			}
 		
 
-			byte[] byteArray = Encoding.ASCII.GetBytes(alias);
-			MemoryStream stream = new MemoryStream(byteArray);
-
-
-
 			//
 			// create the certificate
 			//
 
-			string x509Base64 = ""; // final certificate base64 encoded
-
 			// temporarily create a new CA self signed certificate
-			(X509Certificate2 x509CA, AsymmetricKeyParameter myCAprivateKey) = BouncyCastleHelper.InitCA("publickeyserver");
+			X509Certificate2 x509CA = BouncyCastleHelper.InitCA("publickeyserver", "publickeyserver");
 
+			/*
 			// create a new certificate
 			X509Certificate2 certificate = BouncyCastleHelper.CreateSelfSignedCertificateBasedOnCertificateAuthorityPrivateKey("CN=" + alias, "CN=" + "publickeyserver" + "CA", myCAprivateKey);
+
+			
+			Org.BouncyCastle.X509.X509CertificateParser cp = new X509CertificateParser();
+			Org.BouncyCastle.X509.X509Certificate cert = cp.ReadCertificate(certificate.Export(X509ContentType.Pkcs12));
+
+			byte[] b_certificate = DotNetUtilities.ToX509Certificate(cert).Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12, "password");
+
+
+			System.IO.File.WriteAllBytes("fred-server.pfx", b_certificate);
+
+			string x509Base64 = Convert.ToBase64String(b_certificate);
+			*/
+
+			
+			byte[] b_certificate = BouncyCastleHelper.create_509_certificate(alias, key, x509CA, "publickeyserver");
+			string x509Base64 = Convert.ToBase64String(b_certificate);
+			
 
 			//
 			// save the certificate and the api details
@@ -134,11 +157,10 @@ namespace publickeyserv.Controllers
 				bool exists = AwsHelper.Put(client, alias, x509Base64).Result;
 			};
 
+			MemoryStream stream = new MemoryStream(b_certificate);
+
 
 			return stream;
-
-
-			//return cert;
 
 		}
 		// ---------------------------------------------------------------------

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Org.BouncyCastle.Asn1;
@@ -17,6 +18,9 @@ using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
+using Org.BouncyCastle.X509.Extension;
+using Org.BouncyCastle.OpenSsl;
+using System.IO;
 
 namespace publickeyserv
 {
@@ -46,7 +50,7 @@ namespace publickeyserv
 
 			AsymmetricKeyParameter myCAprivateKey = null;
 			Console.WriteLine("Creating CA");
-			X509Certificate2 certificateAuthorityCertificate = CreateCertificateAuthorityCertificate("CN=" + certSubjectName + "CA", ref myCAprivateKey);
+			X509Certificate2 certificateAuthorityCertificate = CreateCertificateAuthorityCertificate("CN=" + certSubjectName + "CA", ref myCAprivateKey, "password");
 
 			Console.WriteLine("Adding CA to Store");
 			AddCertificateToSpecifiedStore(certificateAuthorityCertificate, StoreName.Root, StoreLocation.LocalMachine);
@@ -67,13 +71,13 @@ namespace publickeyserv
 		}
 		
 
-		public static (X509Certificate2, AsymmetricKeyParameter) InitCA(string certSubjectName)
+		public static X509Certificate2 InitCA(string certSubjectName, string password)
 		{
 			AsymmetricKeyParameter myCAprivateKey = null;
 			Console.WriteLine("Creating CA");
-			X509Certificate2 certificateAuthorityCertificate = CreateCertificateAuthorityCertificate("CN=" + certSubjectName + "CA", ref myCAprivateKey);
+			X509Certificate2 certificateAuthorityCertificate = CreateCertificateAuthorityCertificate("CN=" + certSubjectName + "CA", ref myCAprivateKey, password);
 
-			return (certificateAuthorityCertificate, myCAprivateKey);
+			return certificateAuthorityCertificate;
 		}
 
 		public static X509Certificate2 CreateSelfSignedCertificateBasedOnCertificateAuthorityPrivateKey(string subjectName, string issuerName, AsymmetricKeyParameter issuerPrivKey)
@@ -141,11 +145,19 @@ namespace publickeyserv
 			RsaPrivateCrtKeyParameters rsaparams = new RsaPrivateCrtKeyParameters(
 				rsa.Modulus, rsa.PublicExponent, rsa.PrivateExponent, rsa.Prime1, rsa.Prime2, rsa.Exponent1, rsa.Exponent2, rsa.Coefficient);
 
+			// ----------
+			//var parms = DotNetUtilities.ToRSAParameters(rsaparams as RsaPrivateCrtKeyParameters);
+			//var rsa2 = RSA.Create();
+			//rsa2.ImportParameters(parms);
+			//x509.PrivateKey = rsa2;
+			// ----------
 			//x509.PrivateKey = DotNetUtilities.ToRSA(rsaparams);
+			// ----------
+
 			return x509;
 
 		}
-		public static X509Certificate2 CreateCertificateAuthorityCertificate(string subjectName, ref AsymmetricKeyParameter CaPrivateKey)
+		public static X509Certificate2 CreateCertificateAuthorityCertificate(string subjectName, ref AsymmetricKeyParameter CaPrivateKey, string password)
 		{
 			const int keyStrength = 2048;
 
@@ -191,9 +203,35 @@ namespace publickeyserv
 			ISignatureFactory signatureFactory = new Asn1SignatureFactory("SHA512WITHRSA", issuerKeyPair.Private, random);
 			// selfsign certificate
 			Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(signatureFactory);
+
+			// --------------------------
+			var store = new Pkcs12Store();
+			var certificateEntry = new X509CertificateEntry(certificate);
+			store.SetCertificateEntry("publickeyserverCA", certificateEntry);
+			store.SetKeyEntry("publickeyserverCA", new AsymmetricKeyEntry(subjectKeyPair.Private), new[] { certificateEntry });
+			var stream = new MemoryStream();
+			store.Save(stream, password.ToCharArray(), random);
+			X509Certificate2 x509 = new X509Certificate2(stream.ToArray(), password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+			
+			// --------------------------
+
+
+			/*
 			X509Certificate2 x509 = new X509Certificate2(certificate.GetEncoded());
 
 			CaPrivateKey = issuerKeyPair.Private;
+			*/
+
+
+			// ----------------------------------
+			//RSACryptoServiceProvider tempRcsp = (RSACryptoServiceProvider)DotNetUtilities.ToRSA(issuerKeyPair.Private);
+			//RSACryptoServiceProvider rcsp = new RSACryptoServiceProvider(new CspParameters(1, "Microsoft Strong Cryptographic Provider", new Guid().ToString(), new CryptoKeySecurity(), null));
+			//rcsp.ImportCspBlob(tempRcsp.ExportCspBlob(true));
+			//dotnetCertificate2.PrivateKey = rcsp;
+
+			//int bytesRead;
+			//x509.PrivateKey.ImportPkcs8PrivateKey(tempRcsp.ExportPkcs8PrivateKey(), out bytesRead);
+			// ----------------------------------
 
 			return x509;
 			//return issuerKeyPair.Private;
@@ -245,7 +283,79 @@ namespace publickeyserv
 
 			return stringBuilder.ToString();
 		}
+		// ---------------------------------------------------------------------
+		public static byte[] create_509_certificate(string alias, string public_key, X509Certificate2 x509CA, string organisation)
+		{
+			RSACryptoServiceProvider RSA_public_key = new RSACryptoServiceProvider();
+			RSA_public_key.ImportFromPem(public_key);
+			RsaKeyParameters rsa_public_key = Org.BouncyCastle.Security.DotNetUtilities.GetRsaPublicKey(RSA_public_key);
 
+			string private_key_for_signing = x509CA.PrivateKey.ToXmlString(true);
+			RSACryptoServiceProvider RSA_private_key_for_signing = new RSACryptoServiceProvider();
+
+			
+
+			RSA_private_key_for_signing.FromXmlString(private_key_for_signing);
+			AsymmetricCipherKeyPair rsa_private_key_for_signing = DotNetUtilities.GetRsaKeyPair(RSA_private_key_for_signing);
+
+
+			var gen = new X509V3CertificateGenerator();
+
+			X509Name certName = new X509Name("CN=" + alias + ",O=" + organisation);
+			//BigInteger serialNo = BigInteger.ProbablePrime(120, new Random());
+			// rob linton 16/11/2015
+			// change to ensure serial numbers are unique
+			Byte[] myguid = Guid.NewGuid().ToByteArray();
+			BigInteger serialNo = new BigInteger(myguid);
+			while (serialNo.SignValue == -1)
+			{
+				myguid = Guid.NewGuid().ToByteArray();
+				serialNo = new BigInteger(myguid);
+			}
+
+
+			X509Name issuer = new X509Name("CN=" + x509CA.IssuerName.Name);
+
+			gen.SetSerialNumber(serialNo);
+			gen.SetSubjectDN(certName);
+			gen.SetIssuerDN(issuer);
+			gen.SetNotAfter(DateTime.Now.AddYears(100));
+			gen.SetNotBefore(DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0)));
+			gen.SetSignatureAlgorithm("SHA256WithRSA");
+			gen.SetPublicKey(rsa_public_key);
+
+			gen.AddExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(rsa_private_key_for_signing.Public));
+			gen.AddExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(rsa_public_key));
+
+			// key usage flags
+			gen.AddExtension(X509Extensions.KeyUsage, false, new KeyUsage(KeyUsage.DigitalSignature | KeyUsage.KeyEncipherment));
+			gen.AddExtension(X509Extensions.ExtendedKeyUsage, false, new ExtendedKeyUsage(KeyPurposeID.IdKPServerAuth));
+
+			//gen.AddExtension(X509Extensions.ExtendedKeyUsage.Id, false, new ExtendedKeyUsage(new ArrayList() { new DerObjectIdentifier("1.3.6.1.5.5.7.3.2") }));
+
+			//gen.AddExtension(X509Extensions.ExtendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeID.AnyExtendedKeyUsage));
+
+
+			// add an alternative name (email)
+			//GeneralNames alternative_names = new GeneralNames(new GeneralName(GeneralName.Rfc822Name, email));
+			//gen.AddExtension(X509Extensions.SubjectAlternativeName, false, alternative_names);
+
+			
+
+
+
+			// add the unique id
+			//DerObjectIdentifier unique_ID = new DerObjectIdentifier(Core.PODZY_OID_UNIQUE_ID);
+			//GeneralNames unique_id_name = new GeneralNames(new GeneralName(GeneralName.UniformResourceIdentifier, unique_id));
+			//gen.AddExtension(unique_ID, false, unique_id_name);
+
+			Org.BouncyCastle.X509.X509Certificate newCert = gen.Generate(rsa_private_key_for_signing.Private);
+
+			return DotNetUtilities.ToX509Certificate(newCert).Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12, "password");
+		}
+
+
+		// ---------------------------------------------------------------------
 
 	}
 }
