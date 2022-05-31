@@ -1,0 +1,7 @@
+﻿<Properties StartupConfiguration="{EF34F599-8BB8-4FB2-B065-94B7420B58CF}|Default">
+  <Debugger.DebugSourceFolders>
+    <String>/Users/rob/Library/Caches/VisualStudio/17.0/Symbols/novotnyllc/bc-csharp/0f827cc3e74a8f45669fba5c525adacd6b897503</String>
+  </Debugger.DebugSourceFolders>
+  <MonoDevelop.Ide.ItemProperties.publickeyserver PreferredExecutionTarget="/Applications/Google Chrome.app" />
+  <MultiItemStartupConfigurations />
+</Properties>

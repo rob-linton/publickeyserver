@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "Hash": "iynMwTGloQHZTcHdDv2cK7iZNj8fF9VwYvFGLQPnMhA=",
+  "Source": "publickeyserver",
+  "BasePath": "_content/publickeyserver",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "publickeyserver/wwwroot",
+      "Source": "publickeyserver",
+      "ContentRoot": "/Users/rob/Documents/src/publickeyserver/publickeyserver/wwwroot/",
+      "BasePath": "_content/publickeyserver",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/Users/rob/Documents/src/publickeyserver/publickeyserver/wwwroot/index.html",
+      "SourceId": "publickeyserver",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/rob/Documents/src/publickeyserver/publickeyserver/wwwroot/",
+      "BasePath": "_content/publickeyserver",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/index.html"
+    }
+  ]
+}
