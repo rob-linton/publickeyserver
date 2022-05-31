@@ -196,6 +196,9 @@ namespace publickeyserv
 			keyPairGenerator.Init(keyGenerationParameters);
 			subjectKeyPair = keyPairGenerator.GenerateKeyPair();
 
+			// assign the private key that was used
+			CaPrivateKey = subjectKeyPair.Private;
+
 			certificateGenerator.SetPublicKey(subjectKeyPair.Public);
 
 			// Generating the Certificate
@@ -212,6 +215,8 @@ namespace publickeyserv
 			var stream = new MemoryStream();
 			store.Save(stream, password.ToCharArray(), random);
 			X509Certificate2 x509 = new X509Certificate2(stream.ToArray(), password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+
+			
 			
 			// --------------------------
 

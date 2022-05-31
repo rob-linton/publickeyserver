@@ -35,6 +35,20 @@ using Org.BouncyCastle.Utilities.Net;
 
 namespace publickeyserv.Controllers
 {
+	//
+	// based loosley on RFC 7030
+	//
+
+	// differences:
+	// returns an x.509
+	// accepts a PEM public key
+	// no reenroll
+	// no CSR
+	// pre-set params
+
+	// simpleenroll accepts a POST (supply your own public key in PEM and returns an X.509 without the private key)
+	// or GET (returns an x.509 with the private key embedded but created for you)
+
 	[ApiController]
 	//[Route("[controller]")]
 	public class KeyController : ControllerBase
@@ -145,7 +159,7 @@ OJam3J3J9kybVfh6OAbT4JssXG6dOjeJS8A9pThDBCJbktpiFL8RqtlnGw/xkl/E
 			*/
 
 			
-			byte[] b_certificate = BouncyCastleHelper.create_509_certificate(alias, key, x509CA, "publickeyserver");
+			byte[] b_certificate = BouncyCastleHelper.create_509_certificate(alias, key, x509CA, "publickeyserver.org");
 			string x509Base64 = Convert.ToBase64String(b_certificate);
 			
 
