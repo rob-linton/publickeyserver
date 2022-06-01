@@ -76,7 +76,7 @@ namespace publickeyserver.Controllers
 		// will create one if one does not already exist
 		// ---------------------------------------------------------------------
 		[Route("cacert")]
-		[Produces("application/x-pkcs12")]
+		[Produces("application/x-x509-ca-cert")]
 		[HttpGet]
 		public Stream cacerts()
 		{
@@ -141,6 +141,20 @@ namespace publickeyserver.Controllers
 
 			return stream;
 
+		}
+		// ---------------------------------------------------------------------
+		// creates a private/public key pair in PEM format on behalf of the user
+		// not secure, essentially used for testing
+		// ---------------------------------------------------------------------
+		[Route("keys")]
+		[Produces("application/pem-certificate-chain")]
+		[HttpGet]
+		public Stream keys()
+		{
+			byte[] byteArray = Encoding.ASCII.GetBytes('');
+			MemoryStream stream = new MemoryStream(byteArray);
+
+			return stream;
 		}
 		// ---------------------------------------------------------------------
 	}
