@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using dotenv.net;
 
 namespace publickeyserver
 {
@@ -24,8 +25,13 @@ namespace publickeyserver
         {
             if (args.Length != 4)
             {
-                Console.WriteLine("usage: [s3key] [s3secret] [s3endpoint] [s3bucket]");
-                return;
+                DotEnv.Load(options: new DotEnvOptions(trimValues: true));
+                var envVars = DotEnv.Read();
+
+                GLOBALS.s3key = envVars["s3key"];
+                GLOBALS.s3secret = envVars["s3secret"];
+                GLOBALS.s3endpoint = envVars["s3endpoint"];
+                GLOBALS.s3bucket = envVars["s3bucket"];
             }
             else
             {

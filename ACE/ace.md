@@ -84,22 +84,59 @@ Post format:
 
 
 {  
-  "key"     : "public key in PEM format (RSA2048)"  *mandatory*
-  "1"       : "optional information 1" *optional*
-  ..
-  "65534"   : "optional information 65534" *optional*
+  "key",     : "public key in PEM format (RSA2048)"  *mandatory*
+  "servers" :
+    [
+        "0.0.0.0",   
+        ..,
+        "0.0.0.0"
+    ],
+   "data" : 
+    [
+        "1" : "optional information 1",
+        ..,
+        "65534" : "optional information 65534"
+    ]
 }
 ```
 
+Where:
+
+servers:
+
+An optional list of server IP addresses hosting instances of the publicdataserver.
+(default of omitted is to user publicdataserver.org)
+
+data:
+
+An optional list of arbitary data.
+
+Allowed chracters.
+```
+[a..z|A..Z|[0..9]:|/|;|.|?|&|#|!|$|%|^|*|(|)|[|]|{|}|<|>|,|_|-|+|=|@|~|
+```
+
+Each optional data piece is limited to 255 characters.
+
+ 
 ```
 Return format:  
   application/x-pkcs12  
   
   with embedded OID's:
-  OID 1.3.6.1.4.57055.1 = "optional information 1"
-  OID 1.3.6.1.4.57055.65534 = "optional information 65534"
+  OID 1.3.6.1.4.1.57055.1 = "optional servers"
+    eg. OID 1.3.6.1.4.1.57055.1.1 = "0.0.0.0"
+    eg. OID 1.3.6.1.4.1.57055.1.2 = "0.0.0.0"
+
+  OID 1.3.6.1.4.1.57055.2 = "optional data"
+    eg. OID 1.3.6.1.4.1.57055.2.1 = "data 1"
+    eg. OID 1.3.6.1.4.1.57055.2.2 = "data 2"
   
 ```
+
+
+Official listing:
+http://oid-info.com/cgi-bin/display?oid=1.3.6.1.4.1.57055&a=display
 
 
 POST GET /cert/{alias}

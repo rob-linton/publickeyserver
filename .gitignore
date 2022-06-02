@@ -1,2 +1,5 @@
 publickeyserver/obj
 publickeyserver/bin
+publickeyserver/*.pfx
+publickeyserver/*.pem
+.env

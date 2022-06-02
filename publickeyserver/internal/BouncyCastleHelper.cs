@@ -21,6 +21,7 @@ using Org.BouncyCastle.X509;
 using Org.BouncyCastle.X509.Extension;
 using Org.BouncyCastle.OpenSsl;
 using System.IO;
+using System.Collections.Generic;
 
 namespace publickeyserver
 {
@@ -56,7 +57,7 @@ namespace publickeyserver
 			AddCertificateToSpecifiedStore(certificateAuthorityCertificate, StoreName.Root, StoreLocation.LocalMachine);
 
 			Console.WriteLine("Creating certificate based on CA");
-			X509Certificate2 certificate = CreateSelfSignedCertificateBasedOnCertificateAuthorityPrivateKey("CN=" + certSubjectName, "CN=" + certSubjectName, subjectKeyPair.Private);
+			X509Certificate2 certificate = CreateSelfSignedCertificateBasedOnCertificateAuthorityPrivateKey("CN=" + certSubjectName, new List<string>[0], new List<string>[0], "CN=" + certSubjectName, subjectKeyPair.Private);
 			Console.WriteLine("Adding certificate to Store");
 			AddCertificateToSpecifiedStore(certificate, StoreName.My, StoreLocation.LocalMachine);
 
@@ -71,7 +72,7 @@ namespace publickeyserver
 		}
 		
 
-		public static X509Certificate2 CreateSelfSignedCertificateBasedOnCertificateAuthorityPrivateKey(string subjectName, string issuerName, AsymmetricKeyParameter issuerPrivKey)
+		public static X509Certificate2 CreateSelfSignedCertificateBasedOnCertificateAuthorityPrivateKey(string subjectName, List<string>[] servers, List<string>[] data, string issuerName, AsymmetricKeyParameter issuerPrivKey)
 		{
 			const int keyStrength = 2048;
 
@@ -200,6 +201,9 @@ namespace publickeyserver
 			// simple way to convert that does not carry the private key over
 			X509Certificate2 x509 = new X509Certificate2(certificate.GetEncoded());
 
+			// or this is another way
+			//byte[] x5092 = DotNetUtilities.ToX509Certificate(certificate).Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12, "password");
+
 			// old way to carry the private key
 			// --------------------------
 			/*
@@ -310,6 +314,7 @@ namespace publickeyserver
 			// key usage flags
 			gen.AddExtension(X509Extensions.KeyUsage, false, new KeyUsage(KeyUsage.DigitalSignature | KeyUsage.KeyEncipherment));
 			gen.AddExtension(X509Extensions.ExtendedKeyUsage, false, new ExtendedKeyUsage(KeyPurposeID.IdKPServerAuth));
+
 
 			//gen.AddExtension(X509Extensions.ExtendedKeyUsage.Id, false, new ExtendedKeyUsage(new ArrayList() { new DerObjectIdentifier("1.3.6.1.5.5.7.3.2") }));
 

@@ -75,10 +75,10 @@ namespace publickeyserver.Controllers
 		// returns the CA cert in x.509
 		// will create one if one does not already exist
 		// ---------------------------------------------------------------------
-		[Route("cacert")]
+		[Route("cacerts")]
 		[Produces("application/x-x509-ca-cert")]
 		[HttpGet]
-		public Stream cacerts()
+		public async Task<IActionResult> cacerts()
 		{
 			// lets check to see if we have a cacert
 			X509Certificate2 ca;
@@ -93,10 +93,12 @@ namespace publickeyserver.Controllers
 			}
 			catch (Exception e)
 			{
+
+#if DEBUG
 				// one doesn't exist, so create it the first time
 				AsymmetricCipherKeyPair subjectKeyPairCA = null;
 
-				Console.WriteLine("Creating CA");
+				Console.WriteLine("Creating CA for development");
 				ca = BouncyCastleHelper.CreateCertificateAuthorityCertificate("CN=" + "publickeyserver.org", ref subjectKeyPairCA, "");
 				raw = ca.Export(X509ContentType.Pkcs12);
 				System.IO.File.WriteAllBytes("cacert.pfx", raw);
@@ -106,26 +108,41 @@ namespace publickeyserver.Controllers
 				pemWriter.WriteObject(subjectKeyPairCA);
 				pemWriter.Writer.Flush();
 				System.IO.File.WriteAllText("cakeys.pem", textWriter.ToString());
+#else
+				Log.Error("Unable to get cacert", e);
+				return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get ca certs");
+#endif
 			}
 
 			MemoryStream stream = new MemoryStream(raw);
 
-			return stream;
+			return Ok(stream);
 		}
 		// ---------------------------------------------------------------------
-		/*
-		 * Cert lookup is not done here
-		 * 
 		[Route("cert")]
+		[Produces("application/x-pkcs12")]
 		[HttpGet]
-		public Stream cert(string alias)
+		public async Task<IActionResult> cert(string alias)
 		{
-			byte[] byteArray = Encoding.ASCII.GetBytes(alias);
-			MemoryStream stream = new MemoryStream(byteArray);
+			byte[] raw = null;
+			try
+			{
+				
+				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				{
+					raw = await AwsHelper.Get(client, alias);
+				};
+			}
+			catch (Exception e)
+			{
+				Log.Error("Unable to get cert", e);
+				return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get cert");
+			}
 
-			return stream;
+			MemoryStream stream = new MemoryStream(raw);
+
+			return Ok(stream);
 		}
-		*/
 		// ---------------------------------------------------------------------
 		// returns a new x.509 certificate with the common name set to a random
 		// set of three words and signed by the root CA
@@ -133,13 +150,76 @@ namespace publickeyserver.Controllers
 		[Route("simpleenroll")]
 		[Produces("application/x-pkcs12")]
 		[HttpPost]
-		public Stream simpleenroll()
+		public async Task<IActionResult> simpleenroll([FromBody] CreateKey createkey)
 		{
+			try
+			{
+				string key = createkey.key;
+				List<string>[] servers = createkey.servers;
+				List<string>[] data = createkey.data;
 
-			byte[] byteArray = Encoding.ASCII.GetBytes("");
-			MemoryStream stream = new MemoryStream(byteArray);
+				//
+				// create a three letter word that hasn't been used before
+				//
+				string alias = "";
+				while (true)
+				{
+					// Generate a random first name
+					var randomizerFirstName = RandomizerFactory.GetRandomizer(new FieldOptionsTextWords { Min = 3, Max = 3 });
+					alias = randomizerFirstName.Generate();
 
-			return stream;
+					// check if exists in s3
+					using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+					{
+						bool exists = await AwsHelper.Exists(client, alias);
+						if (exists)
+							break;
+					};
+				}
+
+				//
+				// get the certificate private key
+				//
+				TextReader textReader = new StringReader(System.IO.File.ReadAllText("cakeys.pem"));
+				PemReader pemReader = new PemReader(textReader);
+				AsymmetricCipherKeyPair subjectKeyPairCA = (AsymmetricCipherKeyPair)pemReader.ReadObject();
+
+
+				//
+				// now create the certificate
+				//
+				Console.WriteLine("Creating Certificate - " + alias);
+				X509Certificate2 cert = BouncyCastleHelper.CreateSelfSignedCertificateBasedOnCertificateAuthorityPrivateKey(alias, servers, data, "publickeyserver.org", subjectKeyPairCA.Private);
+				byte[] raw = cert.Export(X509ContentType.Pkcs12);
+
+				//
+				// save the certificate
+				//
+				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				{
+					using (var ms = new MemoryStream(raw))
+					{
+						var uploadRequest = new TransferUtilityUploadRequest
+						{
+							InputStream = ms,
+							Key = alias,
+							BucketName = GLOBALS.s3bucket,
+							CannedACL = S3CannedACL.PublicRead
+						};
+
+						var fileTransferUtility = new TransferUtility(client);
+						await fileTransferUtility.UploadAsync(uploadRequest);
+
+						return Ok(ms);
+					}
+
+				};
+			}
+			catch (Exception e)
+			{
+				Log.Error("Unable to get cert", e);
+				return StatusCode(StatusCodes.Status500InternalServerError, "Unable to create cert");
+			}
 
 		}
 		// ---------------------------------------------------------------------
@@ -151,7 +231,7 @@ namespace publickeyserver.Controllers
 		[HttpGet]
 		public Stream keys()
 		{
-			byte[] byteArray = Encoding.ASCII.GetBytes('');
+			byte[] byteArray = Encoding.ASCII.GetBytes("");
 			MemoryStream stream = new MemoryStream(byteArray);
 
 			return stream;
