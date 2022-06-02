@@ -28,10 +28,10 @@ namespace publickeyserver
                 DotEnv.Load(options: new DotEnvOptions(trimValues: true));
                 var envVars = DotEnv.Read();
 
-                GLOBALS.s3key = envVars["s3key"];
-                GLOBALS.s3secret = envVars["s3secret"];
-                GLOBALS.s3endpoint = envVars["s3endpoint"];
-                GLOBALS.s3bucket = envVars["s3bucket"];
+                GLOBALS.s3key = envVars["S3KEY"];
+                GLOBALS.s3secret = envVars["S3SECRET"];
+                GLOBALS.s3endpoint = envVars["S3ENDPOINT"];
+                GLOBALS.s3bucket = envVars["S3BUCKET"];
             }
             else
             {
