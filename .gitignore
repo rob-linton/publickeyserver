@@ -3,3 +3,4 @@ publickeyserver/bin
 publickeyserver/*.pfx
 publickeyserver/*.pem
 .env
+.vs

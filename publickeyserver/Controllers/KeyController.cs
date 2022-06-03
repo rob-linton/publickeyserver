@@ -76,16 +76,26 @@ namespace publickeyserver.Controllers
 		// will create one if one does not already exist
 		// ---------------------------------------------------------------------
 		[Route("cacerts")]
-		[Produces("application/x-x509-ca-cert")]
+		[Produces("application/x-pkcs12")]
 		[HttpGet]
 		public async Task<IActionResult> cacerts()
 		{
 			// lets check to see if we have a cacert
 			X509Certificate2 ca;
+			byte[] rawEncrypted;
 			byte[] raw;
+
 			try
 			{
-				raw = System.IO.File.ReadAllBytes("cacert.pfx");
+				rawEncrypted = System.IO.File.ReadAllBytes("cacert.pfx");
+
+				//
+				// now decrypt it
+				//
+
+				//TODO///////////////
+				raw = rawEncrypted;//
+				/////////////////////
 
 				// test to make sure we can read it
 				ca = new X509Certificate2(raw);
@@ -93,25 +103,27 @@ namespace publickeyserver.Controllers
 			}
 			catch (Exception e)
 			{
+				//
+				// when debuggin automatically create a cacert and key if we don't already have one
+				//
+				#if DEBUG
+					// one doesn't exist, so create it the first time
+					AsymmetricCipherKeyPair subjectKeyPairCA = null;
 
-#if DEBUG
-				// one doesn't exist, so create it the first time
-				AsymmetricCipherKeyPair subjectKeyPairCA = null;
+					Console.WriteLine("Creating CA for development");
+					ca = BouncyCastleHelper.CreateCertificateAuthorityCertificate("CN=" + "publickeyserver.org", ref subjectKeyPairCA, "");
+					raw = ca.Export(X509ContentType.Pkcs12);
+					System.IO.File.WriteAllBytes("cacert.pfx", raw);
 
-				Console.WriteLine("Creating CA for development");
-				ca = BouncyCastleHelper.CreateCertificateAuthorityCertificate("CN=" + "publickeyserver.org", ref subjectKeyPairCA, "");
-				raw = ca.Export(X509ContentType.Pkcs12);
-				System.IO.File.WriteAllBytes("cacert.pfx", raw);
-
-				TextWriter textWriter = new StringWriter();
-				PemWriter pemWriter = new PemWriter(textWriter);
-				pemWriter.WriteObject(subjectKeyPairCA);
-				pemWriter.Writer.Flush();
-				System.IO.File.WriteAllText("cakeys.pem", textWriter.ToString());
-#else
-				Log.Error("Unable to get cacert", e);
-				return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get ca certs");
-#endif
+					TextWriter textWriter = new StringWriter();
+					PemWriter pemWriter = new PemWriter(textWriter);
+					pemWriter.WriteObject(subjectKeyPairCA);
+					pemWriter.Writer.Flush();
+					System.IO.File.WriteAllText("cakeys.pem", textWriter.ToString());
+				#else
+					Log.Error("Unable to get cacerts", e);
+					return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get ca certs");
+				#endif
 			}
 
 			MemoryStream stream = new MemoryStream(raw);
@@ -204,7 +216,7 @@ namespace publickeyserver.Controllers
 							InputStream = ms,
 							Key = alias,
 							BucketName = GLOBALS.s3bucket,
-							CannedACL = S3CannedACL.PublicRead
+							CannedACL = S3CannedACL.AuthenticatedRead
 						};
 
 						var fileTransferUtility = new TransferUtility(client);
@@ -217,7 +229,7 @@ namespace publickeyserver.Controllers
 			}
 			catch (Exception e)
 			{
-				Log.Error("Unable to get cert", e);
+				Log.Error("Unable to create cert", e);
 				return StatusCode(StatusCodes.Status500InternalServerError, "Unable to create cert");
 			}
 
