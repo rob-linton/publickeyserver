@@ -39,6 +39,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Org.BouncyCastle.OpenSsl;
+using System.Net.Mime;
 
 namespace publickeyserver.Controllers
 {
@@ -144,10 +145,8 @@ namespace publickeyserver.Controllers
 
 				#endif
 			}
+			return File(raw, MediaTypeNames.Text.Plain, $"publickeyserver-cacert.pem");
 
-			MemoryStream stream = new MemoryStream(raw);
-
-			return Ok(stream);
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,10 +172,8 @@ namespace publickeyserver.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get cert");
 			}
 
-			using (MemoryStream stream = new MemoryStream(raw))
-			{
-				return Ok(stream);
-			}
+			string safeAlias = alias.Replace(" ", "-");
+			return File(raw, MediaTypeNames.Text.Plain, $"publickeyserver-cert-{safeAlias}.pem");
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,6 +225,7 @@ namespace publickeyserver.Controllers
 				// create a three letter word that hasn't been used before
 				//
 				string alias = "";
+				string safeAlias = "";
 				int max = 0;
 				while (true)
 				{
@@ -239,6 +237,7 @@ namespace publickeyserver.Controllers
 					// Generate a random first name
 					var randomizerFirstName = RandomizerFactory.GetRandomizer(new FieldOptionsTextWords { Min = 3, Max = 3 });
 					alias = randomizerFirstName.Generate();
+					safeAlias = alias.Replace(" ", "-");
 
 					// check if exists in s3
 					using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
@@ -266,7 +265,7 @@ namespace publickeyserver.Controllers
 				//
 				Log.Information("Creating Certificate - " + alias);
 				X509Certificate2 cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, servers, data, "publickeyserver.org", subjectKeyPairCA.Private, requestorPublicKey.Public);
-				byte[] raw = cert.Export(X509ContentType.Pkcs12);
+				//byte[] raw = cert.Export(X509ContentType.Pkcs12);
 
 				// get the PEM format version
 				string certPEM;
@@ -286,11 +285,7 @@ namespace publickeyserver.Controllers
 					await AwsHelper.Put(client, alias, certPEM.ToBytes());
 				}
 
-				// now return it
-				using (MemoryStream stream = new MemoryStream(certPEM.ToBytes()))
-				{
-					return Ok(stream);
-				}
+				return File(Encoding.UTF8.GetBytes(certPEM), MediaTypeNames.Text.Plain, $"publickeyserver-cert-{safeAlias}.pem");
 
 			}
 			catch (Exception e)
@@ -333,10 +328,9 @@ namespace publickeyserver.Controllers
 			}
 
 			// now return it
-			using (MemoryStream stream = new MemoryStream(keysPEM.ToBytes()))
-			{
-				return Ok(stream);
-			}
+			return File(Encoding.UTF8.GetBytes(keysPEM), MediaTypeNames.Text.Plain, $"publickeyserver-privatekey.pem");
+			//return Ok(stream);
+			
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 	}

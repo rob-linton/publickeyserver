@@ -7,8 +7,8 @@ namespace publickeyserver
     {
         public string key { get; set; }
 
-        public List<String>[] servers { get; set; }
+        public List<String> servers { get; set; }
 
-        public List<String>[] data { get; set; }
+        public List<String> data { get; set; }
     }
 }

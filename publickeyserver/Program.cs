@@ -47,7 +47,7 @@ namespace publickeyserver
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.File(
-                    "C:\\shared\\log\\log_restapi.txt",
+                    "C:\\shared\\log\\log_publickeyserver.txt",
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [Thread: {ThreadId}] [{Level:u3}] {Message:lj}{NewLine}{Exception}",
                     rollingInterval: RollingInterval.Day,
                     rollOnFileSizeLimit: true,
