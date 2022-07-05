@@ -34,7 +34,7 @@ eg:
 
 Optional extra information may be baked into an X.509 certificate. The base OID is as follows:
 
-`iso.org.dod.internet.private.enterprise.publickeyserver (1.3.6.1.4.1.57055)`
+`iso.org.dod.internet.private.enterprise.publickeyserver (1.3.6.1.4.1.57055.2)`
 
 Optional information may be ascii with the following characters allowed:
 
@@ -92,11 +92,11 @@ Post format:
         "0.0.0.0"
     ],
    "data" : 
-    [
+    {
         "1" : "optional information 1",
         ..,
         "65534" : "optional information 65534"
-    ]
+    }
 }
 ```
 
@@ -116,7 +116,7 @@ Allowed chracters.
 [a..z|A..Z|[0..9]:|/|;|.|?|&|#|!|$|%|^|*|(|)|[|]|{|}|<|>|,|_|-|+|=|@|~|
 ```
 
-Each optional data piece is limited to 255 characters.
+Each optional data piece is has no limit to it's data length
 
  
 ```
@@ -124,13 +124,13 @@ Return format:
   application/x-pkcs12  
   
   with embedded OID's:
-  OID 1.3.6.1.4.1.57055.1 = "optional servers"
-    eg. OID 1.3.6.1.4.1.57055.1.1 = "0.0.0.0"
-    eg. OID 1.3.6.1.4.1.57055.1.2 = "0.0.0.0"
+  OID 1.3.6.1.4.1.57055.0 = "optional servers"
+    eg. OID 1.3.6.1.4.1.57055.0.1 = "0.0.0.0"
+    eg. OID 1.3.6.1.4.1.57055.0.2 = "0.0.0.0"
 
-  OID 1.3.6.1.4.1.57055.2 = "optional data"
-    eg. OID 1.3.6.1.4.1.57055.2.1 = "data 1"
-    eg. OID 1.3.6.1.4.1.57055.2.2 = "data 2"
+  OID 1.3.6.1.4.1.57055.1 = "optional data"
+    eg. OID 1.3.6.1.4.1.57055.1.1 = "data 1"
+    eg. OID 1.3.6.1.4.1.57055.1.2 = "data 2"
   
 ```
 
