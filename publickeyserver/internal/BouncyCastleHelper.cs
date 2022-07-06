@@ -105,8 +105,8 @@ namespace publickeyserver
 			//certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
 
 			// Issuer and Subject Name
-			X509Name subjectDN = new X509Name(subjectName);
-			X509Name issuerDN = new X509Name(issuerName);
+			X509Name subjectDN = new X509Name("CN=" + subjectName);
+			X509Name issuerDN = new X509Name("CN=" + issuerName);
 			certificateGenerator.SetIssuerDN(issuerDN);
 			certificateGenerator.SetSubjectDN(subjectDN);
 
@@ -198,7 +198,7 @@ namespace publickeyserver
 		//
 		// create a self signed CA certificate
 		//
-		public static Org.BouncyCastle.X509.X509Certificate CreateCertificateAuthorityCertificate(string subjectName, ref AsymmetricCipherKeyPair subjectKeyPairCA, string password)
+		public static Org.BouncyCastle.X509.X509Certificate CreateCertificateAuthorityCertificate(string subjectName, ref AsymmetricCipherKeyPair subjectKeyPairCA)
 		{
 			const int keyStrength = 2048;
 
@@ -215,8 +215,8 @@ namespace publickeyserver
 
 
 			// Issuer and Subject Name
-			X509Name subjectDN = new X509Name(subjectName);
-			X509Name issuerDN = subjectDN;
+			X509Name subjectDN = new X509Name("CN=" + subjectName);
+			X509Name issuerDN = new X509Name("CN=" + GLOBALS.origin);
 			certificateGenerator.SetIssuerDN(issuerDN);
 			certificateGenerator.SetSubjectDN(subjectDN);
 

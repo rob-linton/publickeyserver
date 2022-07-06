@@ -4,3 +4,4 @@ publickeyserver/*.pfx
 publickeyserver/*.pem
 .env
 .vs
+*.log

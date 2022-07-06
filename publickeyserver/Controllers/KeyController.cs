@@ -58,9 +58,7 @@ namespace publickeyserver.Controllers
 	// pre-set params
 
 	// simpleenroll accepts a POST (supply your own public key in PEM and
-	// returns an X.509 without the private key)
-	// or GET (returns an x.509 with the private key embedded but created for
-	// you)
+	// returns an X.509
 	// ---------------------------------------------------------------------
 	[ApiController]
 	//[Route("[controller]")]
@@ -79,7 +77,7 @@ namespace publickeyserver.Controllers
 		// will create one if one does not already exist
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		[Route("cacerts")]
-		[Produces("application/x-pem-file")]
+		[Produces("application/json")]
 		[HttpGet]
 		public async Task<IActionResult> CaCerts()
 		{
@@ -111,7 +109,7 @@ namespace publickeyserver.Controllers
 				AsymmetricCipherKeyPair subjectKeyPairCA = null;
 
 				Console.WriteLine("Creating CA for development");
-				ca = BouncyCastleHelper.CreateCertificateAuthorityCertificate("CN=" + "publickeyserver.org", ref subjectKeyPairCA, "");
+				ca = BouncyCastleHelper.CreateCertificateAuthorityCertificate(GLOBALS.origin, ref subjectKeyPairCA);
 
 				certPEM = BouncyCastleHelper.toPEM(ca);
 				System.IO.File.WriteAllText("cacert.pem", certPEM);
@@ -126,15 +124,24 @@ namespace publickeyserver.Controllers
 #endif
 			}
 
-			return File(Encoding.UTF8.GetBytes(certPEM), MediaTypeNames.Text.Plain, $"publickeyserver-cacert.pem");
 
+			Response.StatusCode = StatusCodes.Status200OK;
+			Dictionary<string, dynamic> ret = new Dictionary<string, dynamic>();
+
+			List<string> cacerts = new List<string>();
+
+			cacerts.Add(certPEM);
+			ret["origin"] = GLOBALS.origin;
+			ret["cacerts"] = cacerts;
+
+			return new JsonResult(ret);
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		// get a cert from the cert store using the alias
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		[Route("cert")]
-		[Produces("application/x-pem-file")]
+		[Produces("application/json")]
 		[HttpGet]
 		public async Task<IActionResult> Cert(string alias)
 		{
@@ -148,8 +155,18 @@ namespace publickeyserver.Controllers
 					raw = await AwsHelper.Get(client, alias);
 				};
 
-				string safeAlias = alias.Replace(" ", "-");
-				return File(raw, MediaTypeNames.Text.Plain, $"publickeyserver-cert-{safeAlias}.pem");
+				string cert = Encoding.UTF8.GetString(raw);
+
+
+				Response.StatusCode = StatusCodes.Status200OK;
+				Dictionary<string, string> ret = new Dictionary<string, string>();
+
+				ret["alias"] = alias;
+				ret["origin"] = GLOBALS.origin;
+				ret["certificate"] = cert;
+
+				return new JsonResult(ret);
+
 			}
 			catch (Exception e)
 			{
@@ -163,7 +180,7 @@ namespace publickeyserver.Controllers
 		// set of three words and signed by the root CA
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		[Route("simpleenroll")]
-		[Produces("application/x-pem-file")]
+		[Produces("application/json")]
 		[HttpPost]
 		public async Task<IActionResult> SimpleEnroll()
 		{
@@ -194,6 +211,8 @@ namespace publickeyserver.Controllers
 				try
 				{
 					servers = createkey.servers;
+					if (servers == null)
+						servers = new List<string>();
 				}
 				catch { }
 
@@ -204,6 +223,8 @@ namespace publickeyserver.Controllers
 				try
 				{
 					data = createkey.data;
+					if (data == null)
+						data = new List<string>();
 				}
 				catch { }
 				
@@ -212,7 +233,7 @@ namespace publickeyserver.Controllers
 				// create a three letter word that hasn't been used before
 				//
 				string alias = "";
-				string safeAlias = "";
+				
 				int max = 0;
 				while (true)
 				{
@@ -223,15 +244,15 @@ namespace publickeyserver.Controllers
 
 					// Generate a random first name
 					var randomizerFirstName = RandomizerFactory.GetRandomizer(new FieldOptionsTextWords { Min = 3, Max = 3 });
-					alias = randomizerFirstName.Generate();
-					safeAlias = alias.Replace(" ", "-");
+					alias = randomizerFirstName.Generate().Replace(" ", ".");
+					
 
 					// check if exists in s3
 					using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 					{
 						try
 						{
-							bool exists = await AwsHelper.Exists(client, safeAlias);
+							bool exists = await AwsHelper.Exists(client, alias);
 						}
 						catch
 						{
@@ -257,21 +278,31 @@ namespace publickeyserver.Controllers
 				// now create the certificate
 				//
 				Log.Information("Creating Certificate - " + alias);
-				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(safeAlias, servers, data, "publickeyserver.org", subjectKeyPairCA.Private, requestorPublicKey.Public);
-				//byte[] raw = cert.Export(X509ContentType.Pkcs12);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, servers, data, GLOBALS.origin, subjectKeyPairCA.Private, requestorPublicKey.Public);
 
 				// convert to PEM
 				string certPEM = BouncyCastleHelper.toPEM(cert);
+
+				Log.Information(certPEM);
 
 				//
 				// save the certificate in S3
 				//
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					await AwsHelper.Put(client, alias, certPEM.ToBytes());
+					//await AwsHelper.Put(client, alias, certPEM.ToBytes());
 				}
 
-				return File(Encoding.UTF8.GetBytes(certPEM), MediaTypeNames.Text.Plain, $"publickeyserver-cert-{safeAlias}.pem");
+
+				Response.StatusCode = StatusCodes.Status200OK;
+				Dictionary<string, string> ret = new Dictionary<string, string>();
+
+				ret["alias"] = alias;
+				ret["origin"] = GLOBALS.origin;
+				ret["publickey"] = BouncyCastleHelper.toPEM(requestorPublicKey.Public);
+				ret["certificate"] = certPEM;
+
+				return new JsonResult(ret);
 
 			}
 			catch (Exception e)
@@ -287,12 +318,12 @@ namespace publickeyserver.Controllers
 		// not secure, essentially used for testing
 		// -------------------------------------------------------------------------------------------------------------------------------------------------------
 		[Route("serverkeygen")]
-		[Produces("application/x-pem-file")]
+		[Produces("application/json")]
 		[HttpGet]
 		public async Task<IActionResult> ServerKeyGen()
 		{
 			const int keyStrength = 2048;
-			AsymmetricCipherKeyPair keyPair = null;
+			AsymmetricCipherKeyPair privatekeyACP = null;
 
 			// Generating Random Numbers
 			CryptoApiRandomGenerator randomGenerator = new CryptoApiRandomGenerator();
@@ -302,15 +333,27 @@ namespace publickeyserver.Controllers
 			KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, keyStrength);
 			RsaKeyPairGenerator keyPairGenerator = new RsaKeyPairGenerator();
 			keyPairGenerator.Init(keyGenerationParameters);
-			keyPair = keyPairGenerator.GenerateKeyPair();
+			privatekeyACP = keyPairGenerator.GenerateKeyPair();
+
+			AsymmetricKeyParameter publickeyACP = privatekeyACP.Public;
 
 			// convert to PEM
-			string keysPEM = BouncyCastleHelper.toPEM(keyPair);
+			string privatekey = BouncyCastleHelper.toPEM(privatekeyACP);
+			string publickey = BouncyCastleHelper.toPEM(publickeyACP);
 
 			// now return it
-			return File(Encoding.UTF8.GetBytes(keysPEM), MediaTypeNames.Text.Plain, $"publickeyserver-privatekey.pem");
-			//return Ok(stream);
+
+
+			Response.StatusCode = StatusCodes.Status200OK;
+			Dictionary<string, string> ret = new Dictionary<string, string>();
+
 			
+			ret["origin"] = GLOBALS.origin;
+			ret["publickey"] = publickey;
+			ret["privatekey"] = privatekey;
+
+			return new JsonResult(ret);
+
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 	}
