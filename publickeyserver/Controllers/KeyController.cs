@@ -193,11 +193,11 @@ namespace publickeyserver.Controllers
 				//
 				// get the user public key
 				//
-				AsymmetricKeyParameter requestorPublicKey = null;
+				AsymmetricKeyParameter publickeyRequestor = null;
 				try
 				{
 					string key = createkey.key;
-					requestorPublicKey = (AsymmetricKeyParameter)BouncyCastleHelper.fromPEM(key);
+					publickeyRequestor = (AsymmetricKeyParameter)BouncyCastleHelper.fromPEM(key);
 
 				}
 				catch
@@ -240,7 +240,7 @@ namespace publickeyserver.Controllers
 				{
 					if (max > 1000)
 					{
-						throw new Exception("Exceeded 1000 attempts to get a unique alias");
+						return Misc.err(Response, "Exceeded 1000 attempts to get a unique alias", help);
 					}
 
 					// Generate a random first name
@@ -268,18 +268,18 @@ namespace publickeyserver.Controllers
 				//
 				// get the CA private key
 				//
-				AsymmetricCipherKeyPair subjectKeyPairCA;
+				AsymmetricCipherKeyPair privatekeyCA;
 				using (TextReader textReader = new StringReader(System.IO.File.ReadAllText("cakeys.pem")))
 				{
 					PemReader pemReader = new PemReader(textReader);
-					subjectKeyPairCA = (AsymmetricCipherKeyPair)pemReader.ReadObject();
+					privatekeyCA = (AsymmetricCipherKeyPair)pemReader.ReadObject();
 				}
 					
 				//
 				// now create the certificate
 				//
 				Log.Information("Creating Certificate - " + alias);
-				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, servers, data, GLOBALS.origin, subjectKeyPairCA.Private, requestorPublicKey);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, servers, data, GLOBALS.origin, privatekeyCA.Private, publickeyRequestor);
 
 				// convert to PEM
 				string certPEM = BouncyCastleHelper.toPEM(cert);
@@ -300,7 +300,7 @@ namespace publickeyserver.Controllers
 
 				ret["alias"] = alias;
 				ret["origin"] = GLOBALS.origin;
-				ret["publickey"] = BouncyCastleHelper.toPEM(requestorPublicKey);
+				ret["publickey"] = BouncyCastleHelper.toPEM(publickeyRequestor);
 				ret["certificate"] = certPEM;
 
 				return new JsonResult(ret);
