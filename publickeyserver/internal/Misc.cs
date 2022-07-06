@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace publickeyserver
@@ -57,7 +60,24 @@ namespace publickeyserver
 			}
 		}
 		// ---------------------------------------------------------------------
-		// ------------------------------------------------------------------------------------------------------
+		public static IActionResult err(HttpResponse Response, string msg)
+		{
+			return err(Response, msg, "");
+		}
+		// ---------------------------------------------------------------------
+		public static IActionResult err(HttpResponse Response, string msg, string helpURL)
+		{
+			Response.StatusCode = StatusCodes.Status400BadRequest;
+			Dictionary<string, string> error = new Dictionary<string, string>();
+
+			error["error"] = msg;
+
+			if (!String.IsNullOrEmpty(helpURL))
+				error["help"] = helpURL;
+
+			return new JsonResult(error);
+		}
+		// ---------------------------------------------------------------------
 		public static dynamic getEmptyDynamic()
 		{
 			return JsonConvert.DeserializeObject("{}");

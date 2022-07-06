@@ -16,29 +16,22 @@ namespace publickeyserver
 		public static async Task<bool> Exists(Amazon.S3.AmazonS3Client client, string key)
 		{
 			GetObjectMetadataResponse response = null;
-			try
+			
+			var request = new GetObjectMetadataRequest
 			{
-				var request = new GetObjectMetadataRequest
-				{
-					BucketName = GLOBALS.s3bucket,
-					Key = key
-				};
+				BucketName = GLOBALS.s3bucket,
+				Key = key
+			};
 
 
-				// If the object doesn't exist then a "NotFound" will be thrown
-				response = await client.GetObjectMetadataAsync(request);
-				if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
-				{
-					throw new Exception("Unable to find cert");
-				}
-
-				return true;
-			}
-			catch (AmazonS3Exception e)
+			// If the object doesn't exist then a "NotFound" will be thrown
+			response = await client.GetObjectMetadataAsync(request);
+			if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
 			{
-				Log.Error("HTTP reponse not 200 in AwsHelper.Exists: {a}, {b}", response.HttpStatusCode, e.Message);
-				throw;
+				throw new Exception("Unable to find cert");
 			}
+
+			return true;
 		}
 		// ---------------------------------------------------------------------
 		public static async Task Put(Amazon.S3.AmazonS3Client client, string key, byte[] body)

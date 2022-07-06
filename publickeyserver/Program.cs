@@ -17,6 +17,7 @@ namespace publickeyserver
         public static string s3secret = "";
         public static string s3endpoint = "";
         public static string s3bucket = "";
+        public static string origin = "";
     }
 
     public class Program
@@ -32,6 +33,16 @@ namespace publickeyserver
                 GLOBALS.s3secret = envVars["S3SECRET"];
                 GLOBALS.s3endpoint = envVars["S3ENDPOINT"];
                 GLOBALS.s3bucket = envVars["S3BUCKET"];
+                GLOBALS.origin = envVars["ORIGIN"];
+
+                Console.WriteLine("------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("Reading configuration from env...");
+                Console.WriteLine("AWS region  : " + GLOBALS.s3endpoint);
+                Console.WriteLine("AWS bucket  : " + GLOBALS.s3bucket);
+                Console.WriteLine("AWS key     : " + GLOBALS.s3key);
+                Console.WriteLine("AWS secret  : " + GLOBALS.s3secret);
+                Console.WriteLine("Origin      : " + GLOBALS.origin);
+                Console.WriteLine("------------------------------------------------------------------------------------------------------------");
             }
             else
             {
@@ -39,6 +50,16 @@ namespace publickeyserver
                 GLOBALS.s3secret = args[1];
                 GLOBALS.s3endpoint = args[2];
                 GLOBALS.s3bucket = args[3];
+                GLOBALS.origin = args[4];
+
+                Console.WriteLine("------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("Reading configuration from command line...");
+                Console.WriteLine("AWS region  : " + GLOBALS.s3endpoint);
+                Console.WriteLine("AWS bucket  : " + GLOBALS.s3bucket);
+                Console.WriteLine("AWS key     : " + GLOBALS.s3key);
+                Console.WriteLine("AWS secret  : " + GLOBALS.s3secret);
+                Console.WriteLine("Origin      : " + GLOBALS.origin);
+                Console.WriteLine("------------------------------------------------------------------------------------------------------------");
             }
 
 
@@ -47,7 +68,7 @@ namespace publickeyserver
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.File(
-                    "C:\\shared\\log\\log_publickeyserver.txt",
+                    "log_" + GLOBALS.origin + ".log",
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [Thread: {ThreadId}] [{Level:u3}] {Message:lj}{NewLine}{Exception}",
                     rollingInterval: RollingInterval.Day,
                     rollOnFileSizeLimit: true,

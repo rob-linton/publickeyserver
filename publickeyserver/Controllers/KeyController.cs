@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable CS1998
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -81,25 +83,20 @@ namespace publickeyserver.Controllers
 		[HttpGet]
 		public async Task<IActionResult> CaCerts()
 		{
+
+			string help = "https://github.com/rob-linton/publickeyserver/wiki/Ca-Certs";
+
 			// lets check to see if we have a cacert
-			X509Certificate2 ca;
-			byte[] rawEncrypted;
-			byte[] raw;
+			Org.BouncyCastle.X509.X509Certificate ca;
+			string certPEM = "";
 
 			try
 			{
-				rawEncrypted = System.IO.File.ReadAllBytes("cacert.pfx");
+				certPEM = System.IO.File.ReadAllText("cacert.pem");
 
-				//
-				// now decrypt it
-				//
-
-				//TODO///////////////
-				raw = rawEncrypted;//
-				/////////////////////
 
 				// test to make sure we can read it
-				ca = new X509Certificate2(raw);
+				ca = (Org.BouncyCastle.X509.X509Certificate)BouncyCastleHelper.fromPEM(certPEM);
 
 			}
 			catch (Exception e)
@@ -108,7 +105,7 @@ namespace publickeyserver.Controllers
 				// when debuggin automatically create a cacert and key if we don't already have one
 				//
 
-				#if DEBUG
+#if DEBUG
 
 				// one doesn't exist, so create it the first time
 				AsymmetricCipherKeyPair subjectKeyPairCA = null;
@@ -116,36 +113,20 @@ namespace publickeyserver.Controllers
 				Console.WriteLine("Creating CA for development");
 				ca = BouncyCastleHelper.CreateCertificateAuthorityCertificate("CN=" + "publickeyserver.org", ref subjectKeyPairCA, "");
 
-				// used to save a binary version of the x.509
-				raw = ca.Export(X509ContentType.Pkcs12);
-				System.IO.File.WriteAllBytes("cacert.pfx", raw);
+				certPEM = BouncyCastleHelper.toPEM(ca);
+				System.IO.File.WriteAllText("cacert.pem", certPEM);
+				System.IO.File.WriteAllText("cakeys.pem", BouncyCastleHelper.toPEM(subjectKeyPairCA));
 
-				// save the PEM format version of the ca
-				using (TextWriter textWriter = new StringWriter())
-				{
-					PemWriter pemWriter = new PemWriter(textWriter);
-					pemWriter.WriteObject(ca);
-					pemWriter.Writer.Flush();
-					System.IO.File.WriteAllText("cacert.pem", textWriter.ToString());
-				}
 
-				using (TextWriter textWriter = new StringWriter())
-				{
-					PemWriter pemWriter = new PemWriter(textWriter);
-					pemWriter.WriteObject(subjectKeyPairCA);
-					pemWriter.Writer.Flush();
-					System.IO.File.WriteAllText("cakeys.pem", textWriter.ToString());
-				}
-					
-					
-				#else
+#else
 
 				Log.Error("Unable to get cacerts", e);
-				return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get ca certs");
+				return Misc.err(Response, "Unable to get cacerts", help);
 
-				#endif
+#endif
 			}
-			return File(raw, MediaTypeNames.Text.Plain, $"publickeyserver-cacert.pem");
+
+			return File(Encoding.UTF8.GetBytes(certPEM), MediaTypeNames.Text.Plain, $"publickeyserver-cacert.pem");
 
 		}
 
@@ -157,23 +138,24 @@ namespace publickeyserver.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Cert(string alias)
 		{
-			byte[] raw;
+			const string help = "https://github.com/rob-linton/publickeyserver/wiki/Cert";
+
 			try
 			{
-				
+				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
 					raw = await AwsHelper.Get(client, alias);
 				};
+
+				string safeAlias = alias.Replace(" ", "-");
+				return File(raw, MediaTypeNames.Text.Plain, $"publickeyserver-cert-{safeAlias}.pem");
 			}
 			catch (Exception e)
 			{
 				Log.Error(e, "Unable to get cert");
-				return StatusCode(StatusCodes.Status500InternalServerError, "Unable to get cert");
+				return Misc.err(Response, "Unable to get cert", help);
 			}
-
-			string safeAlias = alias.Replace(" ", "-");
-			return File(raw, MediaTypeNames.Text.Plain, $"publickeyserver-cert-{safeAlias}.pem");
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -183,21 +165,26 @@ namespace publickeyserver.Controllers
 		[Route("simpleenroll")]
 		[Produces("application/x-pem-file")]
 		[HttpPost]
-		public async Task<IActionResult> SimpleEnroll([FromBody] CreateKey createkey)
+		public async Task<IActionResult> SimpleEnroll()
 		{
+			string help = "https://github.com/rob-linton/publickeyserver/wiki/Simple-Enroll";
+
 			try
 			{
-
+				dynamic createkey = Misc.GetRequestBodyDynamic(Request);
 
 				//
 				// get the user public key
 				//
-				string key = createkey.key;
-				AsymmetricCipherKeyPair requestorPublicKey;
-				using (TextReader textReader = new StringReader(key))
+				AsymmetricCipherKeyPair requestorPublicKey = null;
+				try
 				{
-					PemReader pemReader = new PemReader(textReader);
-					requestorPublicKey = (AsymmetricCipherKeyPair)pemReader.ReadObject();
+					string key = createkey.key;
+					requestorPublicKey = (AsymmetricCipherKeyPair)BouncyCastleHelper.fromPEM(key);
+				}
+				catch
+				{
+					return Misc.err(Response, "Invalid JSON key parameter. A public key in PEM format is mandatory.", help);
 				}
 
 				//
@@ -242,9 +229,15 @@ namespace publickeyserver.Controllers
 					// check if exists in s3
 					using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 					{
-						bool exists = await AwsHelper.Exists(client, alias);
-						if (exists)
+						try
+						{
+							bool exists = await AwsHelper.Exists(client, safeAlias);
+						}
+						catch
+						{
+							// doesn't exist
 							break;
+						}
 					};
 
 					max++;
@@ -264,18 +257,11 @@ namespace publickeyserver.Controllers
 				// now create the certificate
 				//
 				Log.Information("Creating Certificate - " + alias);
-				X509Certificate2 cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, servers, data, "publickeyserver.org", subjectKeyPairCA.Private, requestorPublicKey.Public);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(safeAlias, servers, data, "publickeyserver.org", subjectKeyPairCA.Private, requestorPublicKey.Public);
 				//byte[] raw = cert.Export(X509ContentType.Pkcs12);
 
-				// get the PEM format version
-				string certPEM;
-				using (TextWriter textWriter = new StringWriter())
-				{
-					PemWriter pemWriter = new PemWriter(textWriter);
-					pemWriter.WriteObject(cert);
-					pemWriter.Writer.Flush();
-					certPEM = textWriter.ToString();
-				}
+				// convert to PEM
+				string certPEM = BouncyCastleHelper.toPEM(cert);
 
 				//
 				// save the certificate in S3
@@ -291,7 +277,7 @@ namespace publickeyserver.Controllers
 			catch (Exception e)
 			{
 				Log.Error(e, "Unable to create cert");
-				return StatusCode(StatusCodes.Status500InternalServerError, "Unable to create cert");
+				return Misc.err(Response, "Unable to create cert", help);
 			}
 
 		}
@@ -318,14 +304,8 @@ namespace publickeyserver.Controllers
 			keyPairGenerator.Init(keyGenerationParameters);
 			keyPair = keyPairGenerator.GenerateKeyPair();
 
-			string keysPEM;
-			using (TextWriter textWriter = new StringWriter())
-			{
-				PemWriter pemWriter = new PemWriter(textWriter);
-				pemWriter.WriteObject(keyPair);
-				pemWriter.Writer.Flush();
-				keysPEM = textWriter.ToString();
-			}
+			// convert to PEM
+			string keysPEM = BouncyCastleHelper.toPEM(keyPair);
 
 			// now return it
 			return File(Encoding.UTF8.GetBytes(keysPEM), MediaTypeNames.Text.Plain, $"publickeyserver-privatekey.pem");

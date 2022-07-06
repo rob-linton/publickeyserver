@@ -73,7 +73,7 @@ namespace publickeyserver
 		*/
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
-		public static X509Certificate2 CreateCertificateBasedOnCertificateAuthorityPrivateKey(string subjectName, List<string> servers, List<string> data, string issuerName, AsymmetricKeyParameter issuerPrivKey, AsymmetricKeyParameter requestorPublicKey)
+		public static Org.BouncyCastle.X509.X509Certificate CreateCertificateBasedOnCertificateAuthorityPrivateKey(string subjectName, List<string> servers, List<string> data, string issuerName, AsymmetricKeyParameter issuerPrivKey, AsymmetricKeyParameter requestorPublicKey)
 		{
 			// *************************
 			// *** THIS NEEDS REWORK ***
@@ -159,9 +159,11 @@ namespace publickeyserver
 			// selfsign certificate
 			Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(signatureFactory);
 
+			return certificate;
+
 			// convert into an x509
-			X509Certificate2 x509 = new X509Certificate2(certificate.GetEncoded());
-			return x509;
+			//X509Certificate2 x509 = new X509Certificate2(certificate.GetEncoded());
+			//return x509;
 
 			// correcponding private key
 			//PrivateKeyInfo info = PrivateKeyInfoFactory.CreatePrivateKeyInfo(subjectKeyPair.Private);
@@ -196,7 +198,7 @@ namespace publickeyserver
 		//
 		// create a self signed CA certificate
 		//
-		public static X509Certificate2 CreateCertificateAuthorityCertificate(string subjectName, ref AsymmetricCipherKeyPair subjectKeyPairCA, string password)
+		public static Org.BouncyCastle.X509.X509Certificate CreateCertificateAuthorityCertificate(string subjectName, ref AsymmetricCipherKeyPair subjectKeyPairCA, string password)
 		{
 			const int keyStrength = 2048;
 
@@ -241,8 +243,12 @@ namespace publickeyserver
 			Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(signatureFactory);
 
 
+			return certificate;
+
+
+
 			// simple way to convert that does not carry the private key over
-			X509Certificate2 x509 = new X509Certificate2(certificate.GetEncoded());
+			//X509Certificate2 x509 = new X509Certificate2(certificate.GetEncoded());
 
 			// or this is another way
 			//byte[] x5092 = DotNetUtilities.ToX509Certificate(certificate).Export(System.Security.Cryptography.X509Certificates.X509ContentType.Pkcs12, "password");
@@ -261,8 +267,28 @@ namespace publickeyserver
 			// --------------------------
 
 
-			return x509;
+			//return x509;
 
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static string toPEM (object o)
+		{
+			StringBuilder CertPem = new StringBuilder();
+			PemWriter CSRPemWriter = new PemWriter(new StringWriter(CertPem));
+			CSRPemWriter.WriteObject(o);
+			CSRPemWriter.Writer.Flush();
+
+			
+			return CertPem.ToString();
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static object fromPEM(string p)
+		{
+			using (TextReader textReader = new StringReader(p))
+			{
+				PemReader pemReader = new PemReader(textReader);
+				return pemReader.ReadObject();
+			}		
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		public static bool AddCertificateToSpecifiedStore(X509Certificate2 cert, StoreName st, StoreLocation sl)
