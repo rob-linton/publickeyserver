@@ -193,11 +193,12 @@ namespace publickeyserver.Controllers
 				//
 				// get the user public key
 				//
-				AsymmetricCipherKeyPair requestorPublicKey = null;
+				AsymmetricKeyParameter requestorPublicKey = null;
 				try
 				{
 					string key = createkey.key;
-					requestorPublicKey = (AsymmetricCipherKeyPair)BouncyCastleHelper.fromPEM(key);
+					requestorPublicKey = (AsymmetricKeyParameter)BouncyCastleHelper.fromPEM(key);
+
 				}
 				catch
 				{
@@ -278,7 +279,7 @@ namespace publickeyserver.Controllers
 				// now create the certificate
 				//
 				Log.Information("Creating Certificate - " + alias);
-				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, servers, data, GLOBALS.origin, subjectKeyPairCA.Private, requestorPublicKey.Public);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, servers, data, GLOBALS.origin, subjectKeyPairCA.Private, requestorPublicKey);
 
 				// convert to PEM
 				string certPEM = BouncyCastleHelper.toPEM(cert);
@@ -299,7 +300,7 @@ namespace publickeyserver.Controllers
 
 				ret["alias"] = alias;
 				ret["origin"] = GLOBALS.origin;
-				ret["publickey"] = BouncyCastleHelper.toPEM(requestorPublicKey.Public);
+				ret["publickey"] = BouncyCastleHelper.toPEM(requestorPublicKey);
 				ret["certificate"] = certPEM;
 
 				return new JsonResult(ret);
