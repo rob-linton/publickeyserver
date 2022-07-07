@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -83,6 +84,37 @@ namespace publickeyserver
 			return JsonConvert.DeserializeObject("{}");
 		}
 		// ---------------------------------------------------------------------
+		public static string getPasswordFromConsole(String displayMessage)
+		{
+			SecureString pass = new SecureString();
+			Console.WriteLine(displayMessage);
+			ConsoleKeyInfo key;
+
+			do
+			{
+				key = Console.ReadKey(true);
+
+				// Backspace Should Not Work
+				if (!char.IsControl(key.KeyChar))
+				{
+					pass.AppendChar(key.KeyChar);
+					Console.Write("*");
+				}
+				else
+				{
+					if (key.Key == ConsoleKey.Backspace && pass.Length > 0)
+					{
+						pass.RemoveAt(pass.Length - 1);
+						Console.Write("\b \b");
+					}
+				}
+			}
+			// Stops Receving Keys Once Enter is Pressed
+			while (key.Key != ConsoleKey.Enter);
+
+			Console.WriteLine("");
+			return pass.ToPlainString();
+		}
 		// ---------------------------------------------------------------------
 
 	}

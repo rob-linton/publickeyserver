@@ -90,7 +90,11 @@ namespace publickeyserver.Controllers
 
 			try
 			{
-				certPEM = System.IO.File.ReadAllText("cacert.pem");
+				byte[] cacertBytes = System.IO.File.ReadAllBytes($"cacert.{GLOBALS.origin}.pem");
+
+				byte[] cacertDecrypted = BouncyCastleHelper.DecryptWithKey(cacertBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
+
+				certPEM = cacertDecrypted.FromBytes();
 
 
 				// test to make sure we can read it
@@ -99,29 +103,8 @@ namespace publickeyserver.Controllers
 			}
 			catch (Exception e)
 			{
-				//
-				// when debuggin automatically create a cacert and key if we don't already have one
-				//
-
-#if DEBUG
-
-				// one doesn't exist, so create it the first time
-				AsymmetricCipherKeyPair subjectKeyPairCA = null;
-
-				Console.WriteLine("Creating CA for development");
-				ca = BouncyCastleHelper.CreateCertificateAuthorityCertificate(GLOBALS.origin, ref subjectKeyPairCA);
-
-				certPEM = BouncyCastleHelper.toPEM(ca);
-				System.IO.File.WriteAllText("cacert.pem", certPEM);
-				System.IO.File.WriteAllText("cakeys.pem", BouncyCastleHelper.toPEM(subjectKeyPairCA));
-
-
-#else
-
-				Log.Error("Unable to get cacerts", e);
-				return Misc.err(Response, "Unable to get cacerts", help);
-
-#endif
+				Log.Error(e, "No CA Certificate");
+				return Misc.err(Response, "No CA Certificat", help);
 			}
 
 
@@ -269,7 +252,7 @@ namespace publickeyserver.Controllers
 				// get the CA private key
 				//
 				AsymmetricCipherKeyPair privatekeyCA;
-				using (TextReader textReader = new StringReader(System.IO.File.ReadAllText("cakeys.pem")))
+				using (TextReader textReader = new StringReader(System.IO.File.ReadAllText($"cakeys.{GLOBALS.origin}.pem")))
 				{
 					PemReader pemReader = new PemReader(textReader);
 					privatekeyCA = (AsymmetricCipherKeyPair)pemReader.ReadObject();

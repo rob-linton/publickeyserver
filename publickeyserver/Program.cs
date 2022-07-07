@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using dotenv.net;
+using System.IO;
 
 namespace publickeyserver
 {
@@ -18,13 +19,15 @@ namespace publickeyserver
         public static string s3endpoint = "";
         public static string s3bucket = "";
         public static string origin = "";
+        public static string password = "";
     }
 
     public class Program
     {
         public static void Main(string[] args)
         {
-            if (args.Length != 4)
+            Console.WriteLine("Public Key Server v1.0");
+            if (args.Length < 5)
             {
                 DotEnv.Load(options: new DotEnvOptions(trimValues: true));
                 var envVars = DotEnv.Read();
@@ -34,6 +37,12 @@ namespace publickeyserver
                 GLOBALS.s3endpoint = envVars["S3ENDPOINT"];
                 GLOBALS.s3bucket = envVars["S3BUCKET"];
                 GLOBALS.origin = envVars["ORIGIN"];
+
+                try
+                {
+                    GLOBALS.password = envVars["PASSWORD"];
+                }
+                catch { }
 
                 Console.WriteLine("------------------------------------------------------------------------------------------------------------");
                 Console.WriteLine("Reading configuration from env...");
@@ -52,6 +61,12 @@ namespace publickeyserver
                 GLOBALS.s3bucket = args[3];
                 GLOBALS.origin = args[4];
 
+                try
+                {
+                    GLOBALS.password = args[5];
+                }
+                catch { }
+
                 Console.WriteLine("------------------------------------------------------------------------------------------------------------");
                 Console.WriteLine("Reading configuration from command line...");
                 Console.WriteLine("AWS region  : " + GLOBALS.s3endpoint);
@@ -62,6 +77,58 @@ namespace publickeyserver
                 Console.WriteLine("------------------------------------------------------------------------------------------------------------");
             }
 
+            // if we don't have a password by this point then ask for it
+            if (String.IsNullOrEmpty(GLOBALS.password))
+			{
+                
+                //Console.WriteLine("Please enter the password:");
+                string password1 = Misc.getPasswordFromConsole("Please enter the password: ");
+                //string password1 = Console.ReadLine();
+
+                // test the validity of the password
+                try
+				{
+                    if (!File.Exists($"cacert.{GLOBALS.origin}.pem"))
+					{
+                        Console.WriteLine("The Certificate Authority Cert does not exist.");
+                        //Console.WriteLine("Please enter the password again to confirm creation:");
+                        //string password2 = Console.ReadLine();
+                        string password2 = Misc.getPasswordFromConsole("Please enter the password again to confirm creation: ");
+
+                        if (password1 == password2)
+						{
+                            BouncyCastleHelper.CreateEncryptedCA(GLOBALS.origin, password1);
+                            GLOBALS.password = password1;
+                            Console.WriteLine("CA created successfully.");
+                        }
+                        else
+						{
+                            Console.WriteLine("Passwords do not match, exiting...");
+                            Environment.Exit(0);
+                        }
+                    }
+                    else
+					{
+                        try
+						{
+                            byte[] cacertBytes = BouncyCastleHelper.DecryptWithKey(File.ReadAllBytes($"cacert.{GLOBALS.origin}.pem"), password1.ToBytes(), GLOBALS.origin.ToBytes());
+
+                            // if we get here we successfully decrypted it, so accept the password
+                            GLOBALS.password = password1;
+						}
+                        catch
+						{
+                            Console.WriteLine("Passwords do not match, exiting...");
+                            Environment.Exit(0);
+                        }
+					}
+				}
+				catch
+                {
+                    Console.WriteLine("Exiting...");
+                    Environment.Exit(0);
+                }
+			}
 
             // Initialise SeriLog
             Log.Logger = new LoggerConfiguration()
@@ -76,8 +143,9 @@ namespace publickeyserver
                     flushToDiskInterval: TimeSpan.FromSeconds(2)) // a full disk flush will be performed every 2 seconds
                 .CreateLogger();
 
+           
 
-
+            // start the web server
             CreateHostBuilder(args).Build().Run();
         }
 

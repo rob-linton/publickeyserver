@@ -22,15 +22,142 @@ using Org.BouncyCastle.X509.Extension;
 using Org.BouncyCastle.OpenSsl;
 using System.IO;
 using System.Collections.Generic;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Engines;
 
 namespace publickeyserver
 {
 	public class BouncyCastleHelper
 	{
+		// --------------------------------------------------------------------------------------------------------
+		private const int KEY_BIT_SIZE = 256;
+
+		private const int MAC_BIT_SIZE = 128;
+
+		private const int NONCE_BIT_SIZE = 128;
+
+		
+
+		// --------------------------------------------------------------------------------------------------------
 		public BouncyCastleHelper()
 		{
+			
 		}
+		// --------------------------------------------------------------------------------------------------------
+		public static void CreateEncryptedCA(string origin, string password)
+		{
+			// one doesn't exist, so create it the first time
+			AsymmetricCipherKeyPair privatekeyCA = null;
 
+			Console.WriteLine("Creating CA");
+			Org.BouncyCastle.X509.X509Certificate ca = BouncyCastleHelper.CreateCertificateAuthorityCertificate(GLOBALS.origin, ref privatekeyCA);
+			string cacertPEM = BouncyCastleHelper.toPEM(ca);
+			string cakeysPEM = BouncyCastleHelper.toPEM(privatekeyCA);
+
+			byte[] cacertBytes = cacertPEM.ToBytes();
+			byte[] cakeysBytes = cakeysPEM.ToBytes();
+
+			byte[] cacertEncrypted = EncryptWithKey(cacertBytes, password.ToBytes(), origin.ToBytes());
+			byte[] cakeysEncrypted = EncryptWithKey(cakeysBytes, password.ToBytes(), origin.ToBytes());
+
+			System.IO.File.WriteAllBytes($"cacert.{origin}.pem", cacertEncrypted);
+			System.IO.File.WriteAllBytes($"cakeys.{origin}.pem", cakeysEncrypted);
+		}
+		// --------------------------------------------------------------------------------------------------------
+		public static byte[] EncryptWithKey(byte[] messageToEncrypt, byte[] key, byte[] nonSecretPayload = null)
+		{
+			SecureRandom _random = new SecureRandom();
+
+			if (key == null || key.Length != KEY_BIT_SIZE / 8)
+			{
+				using (SHA256 sha256Hash = SHA256.Create())
+				{
+					key = sha256Hash.ComputeHash(key);
+				}
+			}
+
+			//Non-secret Payload Optional
+			nonSecretPayload = nonSecretPayload ?? new byte[] { };
+
+			//Using random nonce large enough not to repeat
+			var nonce = new byte[NONCE_BIT_SIZE / 8];
+			_random.NextBytes(nonce, 0, nonce.Length);
+
+			var cipher = new GcmBlockCipher(new AesEngine());
+			var parameters = new AeadParameters(new KeyParameter(key), MAC_BIT_SIZE, nonce, nonSecretPayload);
+			cipher.Init(true, parameters);
+
+			//Generate Cipher Text With Auth Tag
+			var cipherText = new byte[cipher.GetOutputSize(messageToEncrypt.Length)];
+			var len = cipher.ProcessBytes(messageToEncrypt, 0, messageToEncrypt.Length, cipherText, 0);
+			cipher.DoFinal(cipherText, len);
+
+			//Assemble Message
+			using (var combinedStream = new MemoryStream())
+			{
+				using (var binaryWriter = new BinaryWriter(combinedStream))
+				{
+					//Prepend Authenticated Payload
+					binaryWriter.Write(nonSecretPayload);
+					//Prepend Nonce
+					binaryWriter.Write(nonce);
+					//Write Cipher Text
+					binaryWriter.Write(cipherText);
+				}
+				return combinedStream.ToArray();
+			}
+		}
+		// --------------------------------------------------------------------------------------------------------
+		public static byte[] DecryptWithKey(byte[] encryptedMessage, byte[] key, byte[] nonSecretPayload = null)
+		{
+
+			int nonSecretPayloadLength = nonSecretPayload.Length;
+
+			//User Error Checks
+			if (key == null || key.Length != KEY_BIT_SIZE / 8)
+			{
+				using (SHA256 sha256Hash = SHA256.Create())
+				{
+					key = sha256Hash.ComputeHash(key);
+				}
+			}
+
+			if (encryptedMessage == null || encryptedMessage.Length == 0)
+			{
+				throw new ArgumentException("Encrypted Message Required!", "encryptedMessage");
+			}
+
+			using (var cipherStream = new MemoryStream(encryptedMessage))
+			using (var cipherReader = new BinaryReader(cipherStream))
+			{
+				//Grab Payload
+				var nonSecretPayloadMsg = cipherReader.ReadBytes(nonSecretPayloadLength);
+
+				if (nonSecretPayload.FromBytes() != nonSecretPayloadMsg.FromBytes())
+				{
+					throw new Exception("Non Secret Payload Does not Match!");
+				}
+
+				//Grab Nonce
+				var nonce = cipherReader.ReadBytes(NONCE_BIT_SIZE / 8);
+
+				var cipher = new GcmBlockCipher(new AesEngine());
+				var parameters = new AeadParameters(new KeyParameter(key), MAC_BIT_SIZE, nonce, nonSecretPayload);
+				cipher.Init(false, parameters);
+
+				//Decrypt Cipher Text
+				var cipherText = cipherReader.ReadBytes(encryptedMessage.Length - nonSecretPayloadLength - nonce.Length);
+				var plainText = new byte[cipher.GetOutputSize(cipherText.Length)];
+
+				
+				var len = cipher.ProcessBytes(cipherText, 0, cipherText.Length, plainText, 0);
+				cipher.DoFinal(plainText, len);
+		
+
+				return plainText;
+			}
+		}
+		// --------------------------------------------------------------------------------------------------------
 		// https://stackoverflow.com/questions/36712679/bouncy-castles-x509v3certificategenerator-setsignaturealgorithm-marked-obsolete/50833528
 
 		/*
