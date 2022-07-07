@@ -27,14 +27,14 @@ X.509 certificates are signed using the following algorithm:
 
 `SHA512WITHRSA`  
 
-Alias's are automatically assigned and are a random group of three words.
+Alias's are automatically assigned and are a random group of three words seperated by a period.
 
 eg:
-  marlin spike coil
+  martin.spike.coil
 
 Optional extra information may be baked into an X.509 certificate. The base OID is as follows:
 
-`iso.org.dod.internet.private.enterprise.publickeyserver (1.3.6.1.4.1.57055.2)`
+`iso.org.dod.internet.private.enterprise.publickeyserver (1.3.6.1.4.1.57055)`
 
 Optional information may be ascii with the following characters allowed:
 
@@ -57,19 +57,21 @@ Implementation
 Thw ACE protocol uses the same REST API mechanism as EST and provides the following endpoints:  
   
 `GET /cacerts`  
-`POST /simpleenroll`  
+`POST /simpleenroll`
+`GET /serverkeygen`
   
 Because the EST protocol does not provide a mechanism for the retrieval of public keys, the extra endpoint has been implemented:  
 
-`GET /cert/` `alias`  
+`GET /cert?alias={alias}`  
 
 
 GET /cacerts  
 ------------
-Returns a PKCS#12 certificate of the CA root signing authority for this server. 
+Returns a PEM x.509 certificate of the CA root signing authority for this server. 
+
 ```
 Return format:  
-  application/x-pkcs12  
+  application/json  
 ```
 
 POST /simpleenroll    
@@ -87,7 +89,7 @@ Post format:
   "key",     : "public key in PEM format (RSA2048)"  *mandatory*
   "servers" :
     [
-        "0.0.0.0",   
+        "publicdataserver.org",   *optional*
         ..,
         "0.0.0.0"
     ],
@@ -104,8 +106,7 @@ Where:
 
 servers:
 
-An optional list of server IP addresses hosting instances of the publicdataserver.
-(default of omitted is to user publicdataserver.org)
+An optional list of servers that any user of the certificate *MAY* use to form a hint as to where the services associated with this certificate reside
 
 data:
 
@@ -121,11 +122,11 @@ Each optional data piece is has no limit to it's data length
  
 ```
 Return format:  
-  application/x-pkcs12  
+  application/json  
   
   with embedded OID's:
   OID 1.3.6.1.4.1.57055.0 = "optional servers"
-    eg. OID 1.3.6.1.4.1.57055.0.1 = "0.0.0.0"
+    eg. OID 1.3.6.1.4.1.57055.0.1 = "publicdataserver.org"
     eg. OID 1.3.6.1.4.1.57055.0.2 = "0.0.0.0"
 
   OID 1.3.6.1.4.1.57055.1 = "optional data"
@@ -139,18 +140,11 @@ Official listing:
 http://oid-info.com/cgi-bin/display?oid=1.3.6.1.4.1.57055&a=display
 
 
-POST GET /cert/{alias}
+GET /cert?alias={alias}
 ----------------------
-Returns the associated certificate with the alias in PKCS#12 format.  
+Returns the associated certificate with the alias in x.509 PEM format.  
 
-```
-alias = generated alias
-```  
 
-```
-Return format:  
-  application/x-pkcs12  
-```  
 
 
 
