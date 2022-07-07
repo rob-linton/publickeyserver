@@ -116,6 +116,7 @@ namespace publickeyserver.Controllers
 			cacerts.Add(certPEM);
 			ret["origin"] = GLOBALS.origin;
 			ret["cacerts"] = cacerts;
+			ret["help"] = help;
 
 			return new JsonResult(ret);
 		}
@@ -147,6 +148,7 @@ namespace publickeyserver.Controllers
 				ret["alias"] = alias;
 				ret["origin"] = GLOBALS.origin;
 				ret["certificate"] = cert;
+				ret["help"] = help;
 
 				return new JsonResult(ret);
 
@@ -285,6 +287,7 @@ namespace publickeyserver.Controllers
 				ret["origin"] = GLOBALS.origin;
 				ret["publickey"] = BouncyCastleHelper.toPEM(publickeyRequestor);
 				ret["certificate"] = certPEM;
+				ret["help"] = help;
 
 				return new JsonResult(ret);
 
@@ -306,6 +309,8 @@ namespace publickeyserver.Controllers
 		[HttpGet]
 		public async Task<IActionResult> ServerKeyGen()
 		{
+			const string help = "https://github.com/rob-linton/publickeyserver/wiki/Server-Key-Gen";
+
 			const int keyStrength = 2048;
 			AsymmetricCipherKeyPair privatekeyACP = null;
 
@@ -335,6 +340,7 @@ namespace publickeyserver.Controllers
 			ret["origin"] = GLOBALS.origin;
 			ret["publickey"] = publickey;
 			ret["privatekey"] = privatekey;
+			ret["help"] = help;
 
 			return new JsonResult(ret);
 
