@@ -11,17 +11,7 @@ using dotenv.net;
 using System.IO;
 
 namespace publickeyserver
-{
-    static class GLOBALS
-    {
-        public static string s3key = "";
-        public static string s3secret = "";
-        public static string s3endpoint = "";
-        public static string s3bucket = "";
-        public static string origin = "";
-        public static string password = "";
-    }
-
+{ 
     public class Program
     {
         public static void Main(string[] args)

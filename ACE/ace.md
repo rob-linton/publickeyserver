@@ -86,31 +86,19 @@ Post format:
 
 
 {  
-  "key",     : "public key in PEM format (RSA2048)"  *mandatory*
-  "servers" :
-    [
-        "publicdataserver.org",   *optional*
-        ..,
-        "0.0.0.0"
-    ],
+  "key",     : "[public key in PEM format (RSA2048)]"  *mandatory*
    "data" : 
     {
-        "1" : "optional information 1",
-        ..,
-        "65534" : "optional information 65534"
+        [some data *optional*]
     }
 }
 ```
 
 Where:
 
-servers:
-
-An optional list of servers that any user of the certificate *MAY* use to form a hint as to where the services associated with this certificate reside
-
 data:
 
-An optional list of arbitary data.
+An optional list of arbitary data in JSON format
 
 Allowed chracters.
 ```
@@ -125,13 +113,7 @@ Return format:
   application/json  
   
   with embedded OID's:
-  OID 1.3.6.1.4.1.57055.0 = "optional servers"
-    eg. OID 1.3.6.1.4.1.57055.0.1 = "publicdataserver.org"
-    eg. OID 1.3.6.1.4.1.57055.0.2 = "0.0.0.0"
-
-  OID 1.3.6.1.4.1.57055.1 = "optional data"
-    eg. OID 1.3.6.1.4.1.57055.1.1 = "data 1"
-    eg. OID 1.3.6.1.4.1.57055.1.2 = "data 2"
+  OID 1.3.6.1.4.1.57055
   
 ```
 

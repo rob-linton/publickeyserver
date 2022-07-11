@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.S3;
@@ -18,32 +17,14 @@ using System.Text;
 using Serilog;
 using Amazon.S3.Model;
 using Newtonsoft.Json.Linq;
-
-using System.Security.Cryptography.X509Certificates;
-using Org.BouncyCastle.Asn1;
-using Org.BouncyCastle.Asn1.Pkcs;
-using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Operators;
-using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Prng;
-using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Utilities;
-using Org.BouncyCastle.X509;
-using Org.BouncyCastle.Utilities.Net;
-using Org.BouncyCastle.X509.Extension;
-
-using System.Collections;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using Org.BouncyCastle.OpenSsl;
-using System.Net.Mime;
+using Newtonsoft.Json;
 
-namespace publickeyserver.Controllers
+namespace publickeyserver
 {
 	// ---------------------------------------------------------------------
 	//
@@ -57,7 +38,7 @@ namespace publickeyserver.Controllers
 	// no CSR
 	// pre-set params
 
-	// simpleenroll accepts a POST (supply your own public key in PEM and
+	// simpleenroll accepts a POST (supply your own public key in PEM RSA2048 and
 	// returns an X.509
 	// ---------------------------------------------------------------------
 	[ApiController]
@@ -82,8 +63,6 @@ namespace publickeyserver.Controllers
 		public async Task<IActionResult> CaCerts()
 		{
 
-			string help = "https://github.com/rob-linton/publickeyserver/wiki/Ca-Certs";
-
 			// lets check to see if we have a cacert
 			Org.BouncyCastle.X509.X509Certificate ca;
 			string certPEM = "";
@@ -104,7 +83,7 @@ namespace publickeyserver.Controllers
 			catch (Exception e)
 			{
 				Log.Error(e, "No CA Certificate");
-				return Misc.err(Response, "No CA Certificat", help);
+				return Misc.err(Response, "No CA Certificat", Help.cacerts);
 			}
 
 
@@ -116,7 +95,7 @@ namespace publickeyserver.Controllers
 			cacerts.Add(certPEM);
 			ret["origin"] = GLOBALS.origin;
 			ret["cacerts"] = cacerts;
-			ret["help"] = help;
+			ret["help"] = Help.cacerts;
 
 			return new JsonResult(ret);
 		}
@@ -129,8 +108,6 @@ namespace publickeyserver.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Cert(string alias)
 		{
-			const string help = "https://github.com/rob-linton/publickeyserver/wiki/Cert";
-
 			try
 			{
 				byte[] raw;
@@ -148,7 +125,7 @@ namespace publickeyserver.Controllers
 				ret["alias"] = alias;
 				ret["origin"] = GLOBALS.origin;
 				ret["certificate"] = cert;
-				ret["help"] = help;
+				ret["help"] = Help.cert;
 
 				return new JsonResult(ret);
 
@@ -156,7 +133,7 @@ namespace publickeyserver.Controllers
 			catch (Exception e)
 			{
 				Log.Error(e, "Unable to get cert");
-				return Misc.err(Response, "Unable to get cert", help);
+				return Misc.err(Response, "Unable to get cert", Help.cert);
 			}
 		}
 
@@ -169,8 +146,6 @@ namespace publickeyserver.Controllers
 		[HttpPost]
 		public async Task<IActionResult> SimpleEnroll()
 		{
-			string help = "https://github.com/rob-linton/publickeyserver/wiki/Simple-Enroll";
-
 			try
 			{
 				dynamic createkey = Misc.GetRequestBodyDynamic(Request);
@@ -187,33 +162,22 @@ namespace publickeyserver.Controllers
 				}
 				catch
 				{
-					return Misc.err(Response, "Invalid JSON key parameter. A public key in PEM format is mandatory.", help);
+					return Misc.err(Response, "Invalid JSON key parameter. A public key in PEM format is mandatory.", Help.simpleenroll);
 				}
 
-				//
-				// get the list of servers
-				//
-				List<string> servers = new List<string>(); 
-				try
-				{
-					servers = createkey.servers;
-					if (servers == null)
-						servers = new List<string>();
-				}
-				catch { }
 
 				//
 				// get the list of optional data
 				//
-				List<string> data = new List<string>();
-				try
+				string data = createkey.data;
+				if (!String.IsNullOrEmpty(data))
 				{
-					data = createkey.data;
-					if (data == null)
-						data = new List<string>();
+					dynamic json = JsonConvert.DeserializeObject(data);
 				}
-				catch { }
-				
+
+				Byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+				string dataBase64 = Convert.ToBase64String(dataBytes);
+
 
 				//
 				// create a three letter word that hasn't been used before
@@ -225,7 +189,7 @@ namespace publickeyserver.Controllers
 				{
 					if (max > 1000)
 					{
-						return Misc.err(Response, "Exceeded 1000 attempts to get a unique alias", help);
+						return Misc.err(Response, "Exceeded 1000 attempts to get a unique alias", Help.simpleenroll);
 					}
 
 					// Generate a random first name
@@ -264,7 +228,7 @@ namespace publickeyserver.Controllers
 				// now create the certificate
 				//
 				Log.Information("Creating Certificate - " + alias);
-				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, servers, data, GLOBALS.origin, privatekeyCA.Private, publickeyRequestor);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, data, GLOBALS.origin, privatekeyCA.Private, publickeyRequestor);
 
 				// convert to PEM
 				string certPEM = BouncyCastleHelper.toPEM(cert);
@@ -287,7 +251,7 @@ namespace publickeyserver.Controllers
 				ret["origin"] = GLOBALS.origin;
 				ret["publickey"] = BouncyCastleHelper.toPEM(publickeyRequestor);
 				ret["certificate"] = certPEM;
-				ret["help"] = help;
+				ret["help"] = Help.simpleenroll;
 
 				return new JsonResult(ret);
 
@@ -295,7 +259,7 @@ namespace publickeyserver.Controllers
 			catch (Exception e)
 			{
 				Log.Error(e, "Unable to create cert");
-				return Misc.err(Response, "Unable to create cert", help);
+				return Misc.err(Response, "Unable to create cert", Help.simpleenroll);
 			}
 
 		}
@@ -309,9 +273,6 @@ namespace publickeyserver.Controllers
 		[HttpGet]
 		public async Task<IActionResult> ServerKeyGen()
 		{
-			const string help = "https://github.com/rob-linton/publickeyserver/wiki/Server-Key-Gen";
-
-			const int keyStrength = 2048;
 			AsymmetricCipherKeyPair privatekeyACP = null;
 
 			// Generating Random Numbers
@@ -319,7 +280,7 @@ namespace publickeyserver.Controllers
 			SecureRandom random = new SecureRandom(randomGenerator);
 
 			// generate key pair
-			KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, keyStrength);
+			KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, Defines.keyStrength);
 			RsaKeyPairGenerator keyPairGenerator = new RsaKeyPairGenerator();
 			keyPairGenerator.Init(keyGenerationParameters);
 			privatekeyACP = keyPairGenerator.GenerateKeyPair();
@@ -340,7 +301,7 @@ namespace publickeyserver.Controllers
 			ret["origin"] = GLOBALS.origin;
 			ret["publickey"] = publickey;
 			ret["privatekey"] = privatekey;
-			ret["help"] = help;
+			ret["help"] = Help.serverkeygen;
 
 			return new JsonResult(ret);
 
