@@ -271,18 +271,16 @@ namespace publickeyserver
 				//
 				// get the CA private key
 				//
-				AsymmetricCipherKeyPair privatekeyCA;
-				using (TextReader textReader = new StringReader(System.IO.File.ReadAllText($"cakeys.{GLOBALS.origin}.pem")))
-				{
-					PemReader pemReader = new PemReader(textReader);
-					privatekeyCA = (AsymmetricCipherKeyPair)pemReader.ReadObject();
-				}
-					
+				byte[] cakeysBytes = System.IO.File.ReadAllBytes($"cakeys.{GLOBALS.origin}.pem");
+				byte[] cakeysDecrypted = BouncyCastleHelper.DecryptWithKey(cakeysBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
+				string cakeysPEM = cakeysDecrypted.FromBytes();
+				AsymmetricCipherKeyPair cakeys = (AsymmetricCipherKeyPair)BouncyCastleHelper.fromPEM(cakeysPEM);
+
 				//
 				// now create the certificate
 				//
 				Log.Information("Creating Certificate - " + alias);
-				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, dataBase64, GLOBALS.origin, privatekeyCA.Private, publickeyRequestor);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, dataBase64, GLOBALS.origin, cakeys.Private, publickeyRequestor);
 
 				// convert to PEM
 				string certPEM = BouncyCastleHelper.toPEM(cert);
