@@ -323,6 +323,109 @@ namespace publickeyserver
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		// returns a new x.509 certificate with the common name set to a random
+		// set of three words and signed by the root CA
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		[Route("simpleenroll")]
+		[Produces("application/json")]
+		[HttpGet]
+		public async Task<IActionResult> SimpleEnrollGet([FromServices] IWords words)
+		{
+
+			try
+			{
+				AsymmetricCipherKeyPair privatekeyACP = ControllerHelper.GenerateKey();
+				AsymmetricKeyParameter publickeyRequestor = privatekeyACP.Public;
+
+				//
+				// create a three letter word that hasn't been used before
+				//
+				string alias = "";
+
+				int max = 0;
+				while (true)
+				{
+					if (max > 10)
+					{
+						return Misc.err(Response, "Exceeded 10 attempts to get a unique alias", Help.simpleenroll);
+					}
+
+					// Generate a random first name
+					//var randomizerFirstName = RandomizerFactory.GetRandomizer(new FieldOptionsTextWords { Min = 3, Max = 3 });
+					//alias = randomizerFirstName.Generate().Replace(" ", ".");
+					alias = words.GetAlias(GLOBALS.origin);
+
+
+					// check if exists in s3
+					using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+					{
+						try
+						{
+							bool exists = await AwsHelper.Exists(client, $"{alias}.{GLOBALS.origin}.pem");
+
+							if (!exists)
+								break;
+						}
+						catch (Exception e)
+						{
+							// doesn't exist
+							break;
+						}
+					};
+
+					max++;
+				}
+
+				//
+				// get the CA private key
+				//
+				byte[] cakeysBytes = System.IO.File.ReadAllBytes($"cakeys.{GLOBALS.origin}.pem");
+				byte[] cakeysDecrypted = BouncyCastleHelper.DecryptWithKey(cakeysBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
+				string cakeysPEM = cakeysDecrypted.FromBytes();
+				AsymmetricCipherKeyPair cakeys = (AsymmetricCipherKeyPair)BouncyCastleHelper.fromPEM(cakeysPEM);
+
+				//
+				// now create the certificate
+				//
+				Log.Information("Creating Certificate - " + alias);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, "", GLOBALS.origin, cakeys.Private, publickeyRequestor);
+
+				// convert to PEM
+				string certPEM = BouncyCastleHelper.toPEM(cert);
+
+				Log.Information(certPEM);
+
+				//
+				// save the certificate in S3
+				//
+				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				{
+					await AwsHelper.Put(client, $"{alias}.pem", certPEM.ToBytes());
+				}
+
+
+				Response.StatusCode = StatusCodes.Status200OK;
+				Dictionary<string, string> ret = new Dictionary<string, string>();
+
+				ret["alias"] = alias;
+				ret["origin"] = GLOBALS.origin;
+				ret["publickey"] = BouncyCastleHelper.toPEM(publickeyRequestor);
+				ret["privatekey"] = BouncyCastleHelper.toPEM(privatekeyACP);
+				ret["certificate"] = certPEM;
+				ret["help"] = Help.simpleenroll;
+
+
+				GLOBALS.status_certs_enrolled++;
+				return new JsonResult(ret);
+			}
+			catch (Exception e)
+			{
+				Log.Error(e, "Unable to create cert");
+				return Misc.err(Response, "Unable to create cert", Help.simpleenroll);
+			}
+
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		// creates a private/public key pair in PEM format on behalf of the user
 		// not secure, essentially used for testing
 		// -------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -331,17 +434,7 @@ namespace publickeyserver
 		[HttpGet]
 		public async Task<IActionResult> ServerKeyGen()
 		{
-			AsymmetricCipherKeyPair privatekeyACP = null;
-
-			// Generating Random Numbers
-			CryptoApiRandomGenerator randomGenerator = new CryptoApiRandomGenerator();
-			SecureRandom random = new SecureRandom(randomGenerator);
-
-			// generate key pair
-			KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, Defines.keyStrength);
-			RsaKeyPairGenerator keyPairGenerator = new RsaKeyPairGenerator();
-			keyPairGenerator.Init(keyGenerationParameters);
-			privatekeyACP = keyPairGenerator.GenerateKeyPair();
+			AsymmetricCipherKeyPair privatekeyACP = ControllerHelper.GenerateKey();
 
 			AsymmetricKeyParameter publickeyACP = privatekeyACP.Public;
 
