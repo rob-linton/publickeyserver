@@ -23,6 +23,7 @@ using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.OpenSsl;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace publickeyserver
 {
@@ -51,6 +52,55 @@ namespace publickeyserver
 		public KeyController(ILogger<Controller> logger)
 		{
 			_logger = logger;
+		}
+
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		// returns the simple key server status
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		[Route("status")]
+		[Produces("application/json")]
+		[HttpGet]
+		public async Task<IActionResult> Status()
+		{
+
+			TimeSpan runtime = DateTime.Now - Process.GetCurrentProcess().StartTime;
+
+			Dictionary<string, dynamic> ret = new Dictionary<string, dynamic>();
+
+			ret["origin"] = GLOBALS.origin;
+			ret["uptime"] = runtime.Seconds;
+			ret["certs_served"] = GLOBALS.status_certs_served;
+			ret["certs_enrolled"] = GLOBALS.status_certs_enrolled;
+
+			// lets check to see if we have a cacert
+			Org.BouncyCastle.X509.X509Certificate ca;
+			string certPEM = "";
+
+			try
+			{
+				byte[] cacertBytes = System.IO.File.ReadAllBytes($"cacert.{GLOBALS.origin}.pem");
+
+				byte[] cacertDecrypted = BouncyCastleHelper.DecryptWithKey(cacertBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
+
+				certPEM = cacertDecrypted.FromBytes();
+
+
+				// test to make sure we can read it
+				ca = (Org.BouncyCastle.X509.X509Certificate)BouncyCastleHelper.fromPEM(certPEM);
+
+				ret["status"] = "OK";
+
+			}
+			catch (Exception e)
+			{
+				ret["status"] = "NOT OK";
+			}
+
+
+			Response.StatusCode = StatusCodes.Status200OK;
+			
+
+			return new JsonResult(ret);
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -127,6 +177,7 @@ namespace publickeyserver
 				ret["certificate"] = cert;
 				ret["help"] = Help.cert;
 
+				GLOBALS.status_certs_served++;
 				return new JsonResult(ret);
 
 			}
@@ -170,13 +221,16 @@ namespace publickeyserver
 				// get the list of optional data
 				//
 				string data = createkey.data;
+				string dataBase64 = "";
 				if (!String.IsNullOrEmpty(data))
 				{
 					dynamic json = JsonConvert.DeserializeObject(data);
+
+					Byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+					dataBase64 = Convert.ToBase64String(dataBytes);
 				}
 
-				Byte[] dataBytes = Encoding.UTF8.GetBytes(data);
-				string dataBase64 = Convert.ToBase64String(dataBytes);
+				
 
 
 				//
@@ -228,7 +282,7 @@ namespace publickeyserver
 				// now create the certificate
 				//
 				Log.Information("Creating Certificate - " + alias);
-				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, data, GLOBALS.origin, privatekeyCA.Private, publickeyRequestor);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, dataBase64, GLOBALS.origin, privatekeyCA.Private, publickeyRequestor);
 
 				// convert to PEM
 				string certPEM = BouncyCastleHelper.toPEM(cert);
@@ -253,6 +307,8 @@ namespace publickeyserver
 				ret["certificate"] = certPEM;
 				ret["help"] = Help.simpleenroll;
 
+
+				GLOBALS.status_certs_enrolled++;
 				return new JsonResult(ret);
 
 			}

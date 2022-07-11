@@ -2,6 +2,8 @@
 
 namespace publickeyserver
 {
+    
+
     static class GLOBALS
     {
         public static string s3key = "";
@@ -10,6 +12,9 @@ namespace publickeyserver
         public static string s3bucket = "";
         public static string origin = "";
         public static string password = "";
+
+        public static int status_certs_enrolled = 0;
+        public static int status_certs_served = 0;
     }
 
     public class Help
