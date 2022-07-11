@@ -1,17 +1,30 @@
 ﻿using System;
-namespace publickeyserver.@internal
+
+namespace publickeyserver
 {
-	public static class Defines
-	{
-        static class GLOBALS
-        {
-            public static string s3key = "";
-            public static string s3secret = "";
-            public static string s3endpoint = "";
-            public static string s3bucket = "";
-            public static string origin = "";
-            public static string password = "";
-        }
+    static class GLOBALS
+    {
+        public static string s3key = "";
+        public static string s3secret = "";
+        public static string s3endpoint = "";
+        public static string s3bucket = "";
+        public static string origin = "";
+        public static string password = "";
     }
+
+    public class Help
+	{
+        public static string cacerts = "https://github.com/rob-linton/publickeyserver/wiki/Ca-Certs";
+        public static string cert = "https://github.com/rob-linton/publickeyserver/wiki/Cert";
+        public static string simpleenroll = "https://github.com/rob-linton/publickeyserver/wiki/Simple-Enroll";
+        public static string serverkeygen = "https://github.com/rob-linton/publickeyserver/wiki/Server-Key-Gen";
+    }
+
+    public class Defines
+	{
+        public static int keyStrength = 2048;
+    }
+
+
 }
 
