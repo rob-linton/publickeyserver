@@ -163,7 +163,7 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					raw = await AwsHelper.Get(client, $"{alias}.{GLOBALS.origin}.pem");
+					raw = await AwsHelper.Get(client, $"{alias}.pem");
 				};
 
 				string cert = raw.FromBytes();
@@ -195,7 +195,7 @@ namespace publickeyserver
 		[Route("simpleenroll")]
 		[Produces("application/json")]
 		[HttpPost]
-		public async Task<IActionResult> SimpleEnroll()
+		public async Task<IActionResult> SimpleEnroll([FromServices] IWords words)
 		{
 			try
 			{
@@ -247,9 +247,10 @@ namespace publickeyserver
 					}
 
 					// Generate a random first name
-					var randomizerFirstName = RandomizerFactory.GetRandomizer(new FieldOptionsTextWords { Min = 3, Max = 3 });
-					alias = randomizerFirstName.Generate().Replace(" ", ".");
-					
+					//var randomizerFirstName = RandomizerFactory.GetRandomizer(new FieldOptionsTextWords { Min = 3, Max = 3 });
+					//alias = randomizerFirstName.Generate().Replace(" ", ".");
+					alias = words.GetAlias(GLOBALS.origin);
+
 
 					// check if exists in s3
 					using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
@@ -295,7 +296,7 @@ namespace publickeyserver
 				//
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					await AwsHelper.Put(client, $"{alias}.{GLOBALS.origin}.pem", certPEM.ToBytes());
+					await AwsHelper.Put(client, $"{alias}.pem", certPEM.ToBytes());
 				}
 
 
