@@ -163,10 +163,10 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					raw = await AwsHelper.Get(client, alias);
+					raw = await AwsHelper.Get(client, $"{alias}.{GLOBALS.origin}.pem");
 				};
 
-				string cert = Encoding.UTF8.GetString(raw);
+				string cert = raw.FromBytes();
 
 
 				Response.StatusCode = StatusCodes.Status200OK;
@@ -241,9 +241,9 @@ namespace publickeyserver
 				int max = 0;
 				while (true)
 				{
-					if (max > 1000)
+					if (max > 10)
 					{
-						return Misc.err(Response, "Exceeded 1000 attempts to get a unique alias", Help.simpleenroll);
+						return Misc.err(Response, "Exceeded 10 attempts to get a unique alias", Help.simpleenroll);
 					}
 
 					// Generate a random first name
@@ -256,9 +256,12 @@ namespace publickeyserver
 					{
 						try
 						{
-							bool exists = await AwsHelper.Exists(client, alias);
+							bool exists = await AwsHelper.Exists(client, $"{alias}.{GLOBALS.origin}.pem");
+							
+							if (!exists)
+								break;
 						}
-						catch
+						catch (Exception e)
 						{
 							// doesn't exist
 							break;
@@ -292,7 +295,7 @@ namespace publickeyserver
 				//
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					//await AwsHelper.Put(client, alias, certPEM.ToBytes());
+					await AwsHelper.Put(client, $"{alias}.{GLOBALS.origin}.pem", certPEM.ToBytes());
 				}
 
 
