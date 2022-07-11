@@ -257,7 +257,7 @@ namespace publickeyserver
 					{
 						try
 						{
-							bool exists = await AwsHelper.Exists(client, $"{alias}.{GLOBALS.origin}.pem");
+							bool exists = await AwsHelper.Exists(client, $"{alias}.pem");
 							
 							if (!exists)
 								break;
@@ -361,7 +361,7 @@ namespace publickeyserver
 					{
 						try
 						{
-							bool exists = await AwsHelper.Exists(client, $"{alias}.{GLOBALS.origin}.pem");
+							bool exists = await AwsHelper.Exists(client, $"{alias}.pem");
 
 							if (!exists)
 								break;

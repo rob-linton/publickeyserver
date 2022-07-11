@@ -3,12 +3,24 @@
 <head>
     <title>Public Key Server</title>
 </head>
-<body>
-    <p>This is a public key server</p>
+<body style="background-color: black; color: #41FF00; font-family: monospace; text-align: center; ">
+    <h1>This is a public key server</h1>
 
+    <p>
+        This key server generates anonymous x509 certificates.
+    </p>
 
-    Rare probabilities
+    <p>
+        Certificates are randonly given a common name of three parts with varying levels of rarity.
+    </p>
+
+    <p>&nbsp;</p>
+
+    
     <pre>
+    Rare probabilities      
+    ------------------      
+
     Legendary        1/10000
     Epic            10/10000
     Rare           100/10000
@@ -16,5 +28,49 @@
     Common        8889/10000
     </pre>
 
+    <p>&nbsp;</p>
+
+    <pre>
+    Examples are:                     
+
+    common.accessible.latter.employees
+    uncommon.missions.locks.sox       
+
+
+    </pre>
+
+    <pre>
+    The quick way to get one:                                                                     
+        <a style="background-color: black; color: #41FF00; font-family: monospace; text-align: center; " href="https://publickeyserver.org/simpleenroll">https://publickeyserver.org/simpleenroll</a>                                                          
+    </pre>
+
+
+    <pre>
+    However you should not use the quick way as it will generate a private/public RSA2048 key pair
+    on your behalf...which means it knows your private key, if only for a moment.                 
+
+    Create an RSA2048 public/private key pair locally on your device and then send ONLY the public
+    key to the POST version of simpleenroll.                                                      
+
+    POST: https://publickeyserver.org/simpleenroll                                                
+    {                                                                                             
+      key : "-----BEGIN PUBLIC KEY-----                                                           
+             MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibaEsrl3Wgm1woCUDDeM                    
+             qBPHqt2fHfKsEar8BxgyUKKUVVySdYI7W1qdBHIUJvEKpDwAXoiyCsobeHNeYZbh                    
+             VcRy9gR5DHyDwJzUNmRQFu2JjVNnd6Yg9l0x6iJzY8DOb6kFukEWLY4xtuHsDc1v                    
+             ejBtpnXDWjvuR0SNfe1m5XvDbY2ya4lbREJjjdzfrXQhRkTcT1uRSPpn06AxFPZt                    
+             ooZba8WGkZfY9WCVLULwy2CcQ7oM+RIm4e+40k3dWgPqG+H6v0dnQPiUNiu1CUiw                    
+             kVQLAnySlc9r5htc+9kJXkczZVDQlbAz/7iOAT1EIaGMj4e3SFzT0u56PxjOaa1w                    
+             2QIDAQAB                                                                            
+             -----END PUBLIC KEY-----"                                                           
+    }                                                                                            
+
+
+    Documentation is located at:                                                                  
+    https://github.com/rob-linton/publickeyserver/blob/main/ACE/ace.md                            
+    </pre>
+
+
+    
 </body>
 </html>
