@@ -56,7 +56,7 @@ namespace publickeyserver
             app.UseHttpsRedirection();
 
             app.UseDefaultFiles();
-            app.UseStaticFiles();
+            //app.UseStaticFiles();
 
             app.UseRouting();
             app.UseCors(x => x

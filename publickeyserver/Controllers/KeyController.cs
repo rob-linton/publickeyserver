@@ -24,6 +24,8 @@ using Org.BouncyCastle.Security;
 using Org.BouncyCastle.OpenSsl;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Reflection.Metadata;
 
 namespace publickeyserver
 {
@@ -165,6 +167,8 @@ namespace publickeyserver
 		{
 			try
 			{
+				alias = alias + "." + GLOBALS.origin;
+
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
@@ -196,13 +200,46 @@ namespace publickeyserver
 		// get a cert from the cert store using the alias
 		// in this case an S3 bucket
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
-		[Route("{*alias}")]
+		[Route("{*aliasIn}")]
 		[Produces("application/json")]
 		[HttpGet]
-		public async Task<IActionResult> CertWildcard(string alias)
+		public async Task<IActionResult> CertWildcard(string aliasIn)
 		{
 			try
 			{
+				string alias = "";
+
+				// get the host string
+				HostString host = Request.Host;
+
+				// remove the origin
+				string[] bits = host.ToString().Replace(GLOBALS.origin, "").Split('.');
+
+				// take the host name if it was passed in at the front
+				if (bits.Length == 2)
+				{
+					alias = bits[0] + "." + GLOBALS.origin;
+				}
+				else if (aliasIn != "index.html")
+				{
+					// else take the end of the url
+					alias = aliasIn + "." + GLOBALS.origin;
+				}
+
+				// return the index.html page if the host was empty and the url was empty
+				if (aliasIn == "index.html" && alias == "")
+				{
+					string index = System.IO.File.ReadAllText("wwwroot/index.html");
+					return new ContentResult()
+					{
+						Content = index,
+						ContentType = "text/html",
+					};
+
+				}
+
+				
+
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
