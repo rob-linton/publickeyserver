@@ -28,6 +28,7 @@ namespace publickeyserver
     public class Defines
 	{
         public static int keyStrength = 2048;
+        public static int caKeyStrength = 4096;
     }
 
 

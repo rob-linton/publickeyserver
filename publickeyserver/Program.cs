@@ -78,16 +78,17 @@ namespace publickeyserver
                 // test the validity of the password
                 try
 				{
-                    if (!File.Exists($"cacert.{GLOBALS.origin}.pem"))
+                    if (!File.Exists($"subcacert.{GLOBALS.origin}.pem"))
 					{
-                        Console.WriteLine("The Certificate Authority Cert does not exist.");
+                        Console.WriteLine("The Certificate Authority Sub Cert does not exist.");
                         //Console.WriteLine("Please enter the password again to confirm creation:");
                         //string password2 = Console.ReadLine();
                         string password2 = Misc.getPasswordFromConsole("Please enter the password again to confirm creation: ");
 
                         if (password1 == password2)
 						{
-                            BouncyCastleHelper.CreateEncryptedCA(GLOBALS.origin, password1);
+                            //BouncyCastleHelper.CreateEncryptedCA(GLOBALS.origin, password1);
+                            BouncyCastleHelper.CheckCAandCreate(GLOBALS.origin, password1);
                             GLOBALS.password = password1;
                             Console.WriteLine("CA created successfully.");
                         }
@@ -119,6 +120,13 @@ namespace publickeyserver
                     Environment.Exit(0);
                 }
 			}
+            else
+			{
+                if (!File.Exists($"subcacert.{GLOBALS.origin}.pem"))
+                {
+                    BouncyCastleHelper.CheckCAandCreate(GLOBALS.origin, GLOBALS.password);
+                }
+            }
 
             // Initialise SeriLog
             Log.Logger = new LoggerConfiguration()

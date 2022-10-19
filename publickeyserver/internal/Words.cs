@@ -10089,7 +10089,8 @@ namespace publickeyserver
 				rarity = GetRarity();
 			}
 
-			return $"{rarity}.{word1}.{word2}.{word3}.{origin}";
+			return $"{word1}.{word2}.{word3}.{origin}";
+			//return $"{word1}.{word2}.{word3}.{rarity}.{origin}";
 		}
 	}
 }

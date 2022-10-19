@@ -74,6 +74,14 @@ Return format:
   application/json  
 ```
 
+GET /simpleenroll    
+------------------
+The quick way to get one                                                       
+    
+However you should not use the quick way as it will generate a private/public RSA2048 key pair
+on your behalf...which means it knows your private key, if only for a moment. 
+
+
 POST /simpleenroll    
 ------------------
 Creates a certificate and returns it in PKCS#12 format  

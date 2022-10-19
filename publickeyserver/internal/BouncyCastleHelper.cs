@@ -34,6 +34,36 @@ namespace publickeyserver
 			
 		}
 		// --------------------------------------------------------------------------------------------------------
+		public static void CheckCAandCreate(
+			string origin,
+			string password
+			)
+		{
+			// first check if we have a sub ca
+			if (!File.Exists($"subcacert.{origin}.pem"))
+			{
+				// if we don't then check if we have a root ca
+				if (!File.Exists($"cacert.{origin}.pem"))
+				{
+					// if we dont create the root ca
+					CreateEncryptedCA(origin, password);
+				}
+
+				//
+				// get the CA private key
+				//
+				byte[] cakeysBytes = System.IO.File.ReadAllBytes($"SAVE-ME-OFFLINE-cakeys.{GLOBALS.origin}.pem");
+				byte[] cakeysDecrypted = BouncyCastleHelper.DecryptWithKey(cakeysBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
+				string cakeysPEM = cakeysDecrypted.FromBytes();
+				AsymmetricCipherKeyPair cakeys = (AsymmetricCipherKeyPair)BouncyCastleHelper.fromPEM(cakeysPEM);
+
+				// create the sub ca
+				CreateEncryptedSubCA(origin, password, cakeys);
+			}
+
+
+		}
+		// --------------------------------------------------------------------------------------------------------
 		public static void CreateEncryptedCA(
 			string origin,
 			string password
@@ -43,7 +73,7 @@ namespace publickeyserver
 			AsymmetricCipherKeyPair privatekeyCA = null;
 
 			Console.WriteLine("Creating CA");
-			Org.BouncyCastle.X509.X509Certificate ca = BouncyCastleHelper.CreateCertificateAuthorityCertificate(GLOBALS.origin, ref privatekeyCA);
+			Org.BouncyCastle.X509.X509Certificate ca = CreateCertificateAuthorityCertificate(GLOBALS.origin, ref privatekeyCA);
 			string cacertPEM = BouncyCastleHelper.toPEM(ca);
 			string cakeysPEM = BouncyCastleHelper.toPEM(privatekeyCA);
 
@@ -54,7 +84,31 @@ namespace publickeyserver
 			byte[] cakeysEncrypted = EncryptWithKey(cakeysBytes, password.ToBytes(), origin.ToBytes());
 
 			System.IO.File.WriteAllBytes($"cacert.{origin}.pem", cacertEncrypted);
-			System.IO.File.WriteAllBytes($"cakeys.{origin}.pem", cakeysEncrypted);
+			System.IO.File.WriteAllBytes($"SAVE-ME-OFFLINE-cakeys.{origin}.pem", cakeysEncrypted);
+		}
+		// --------------------------------------------------------------------------------------------------------
+		public static void CreateEncryptedSubCA(
+			string origin,
+			string password,
+			AsymmetricCipherKeyPair privatekeyCA
+			)
+		{
+			// one doesn't exist, so create it the first time
+			AsymmetricCipherKeyPair privatekeySubCA = null;
+
+			Console.WriteLine("Creating Sub CA");
+			Org.BouncyCastle.X509.X509Certificate ca = CreateSubCertificateAuthorityCertificate(GLOBALS.origin, ref privatekeySubCA, privatekeyCA);
+			string cacertPEM = BouncyCastleHelper.toPEM(ca);
+			string cakeysPEM = BouncyCastleHelper.toPEM(privatekeySubCA);
+
+			byte[] cacertBytes = cacertPEM.ToBytes();
+			byte[] cakeysBytes = cakeysPEM.ToBytes();
+
+			byte[] cacertEncrypted = EncryptWithKey(cacertBytes, password.ToBytes(), origin.ToBytes());
+			byte[] cakeysEncrypted = EncryptWithKey(cakeysBytes, password.ToBytes(), origin.ToBytes());
+
+			System.IO.File.WriteAllBytes($"subcacert.{origin}.pem", cacertEncrypted);
+			System.IO.File.WriteAllBytes($"subcakeys.{origin}.pem", cakeysEncrypted);
 		}
 		// --------------------------------------------------------------------------------------------------------
 		public static byte[] EncryptWithKey(
@@ -189,7 +243,7 @@ namespace publickeyserver
 
 			// Valid For
 			DateTime notBefore = DateTime.UtcNow.Date;
-			DateTime notAfter = notBefore.AddYears(20);
+			DateTime notAfter = notBefore.AddDays(397);
 
 			certificateGenerator.SetNotBefore(notBefore);
 			certificateGenerator.SetNotAfter(notAfter);
@@ -207,6 +261,14 @@ namespace publickeyserver
 
 			// set the public key
 			certificateGenerator.SetPublicKey(requestorPublicKey);
+
+			//
+			// adding policies
+			//
+			KeyUsage keyUsage = new KeyUsage(KeyUsage.KeyEncipherment);
+			certificateGenerator.AddExtension(X509Extensions.KeyUsage, true, keyUsage);
+
+			certificateGenerator.AddExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(false));
 
 			// generate the certificate
 			Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(signatureFactory);
@@ -244,13 +306,13 @@ namespace publickeyserver
 
 			// Valid For
 			DateTime notBefore = DateTime.UtcNow.Date;
-			DateTime notAfter = notBefore.AddYears(2);
+			DateTime notAfter = notBefore.AddYears(20);
 
 			certificateGenerator.SetNotBefore(notBefore);
 			certificateGenerator.SetNotAfter(notAfter);
 
 			// Subject Public Key
-			KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, Defines.keyStrength);
+			KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, Defines.caKeyStrength);
 			RsaKeyPairGenerator keyPairGenerator = new RsaKeyPairGenerator();
 			keyPairGenerator.Init(keyGenerationParameters);
 			subjectKeyPairCA = keyPairGenerator.GenerateKeyPair();
@@ -261,6 +323,76 @@ namespace publickeyserver
 			// Generating the Certificate
 			AsymmetricCipherKeyPair issuerKeyPair = subjectKeyPairCA;
 			ISignatureFactory signatureFactory = new Asn1SignatureFactory("SHA512WITHRSA", issuerKeyPair.Private);
+
+			//
+			// adding policies
+			//
+			KeyUsage keyUsage = new KeyUsage(KeyUsage.KeyCertSign | KeyUsage.CrlSign);
+			certificateGenerator.AddExtension(X509Extensions.KeyUsage, true, keyUsage);
+
+			certificateGenerator.AddExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(true));
+
+
+			// selfsign certificate
+			Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(signatureFactory);
+
+			return certificate;
+		}
+		// --------------------------------------------------------------------------------------------------------
+		public static Org.BouncyCastle.X509.X509Certificate CreateSubCertificateAuthorityCertificate(
+			string subjectName,
+			ref AsymmetricCipherKeyPair subjectKeyPairSubCA,
+			AsymmetricCipherKeyPair subjectKeyPairCA
+			)
+		{
+
+
+			// Generating Random Numbers
+			CryptoApiRandomGenerator randomGenerator = new CryptoApiRandomGenerator();
+			SecureRandom random = new SecureRandom(randomGenerator);
+
+			// The Certificate Generator
+			X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
+
+			// Serial Number
+			BigInteger serialNumber = BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random);
+			certificateGenerator.SetSerialNumber(serialNumber);
+
+			// Issuer and Subject Name
+			X509Name subjectDN = new X509Name("CN=" + subjectName);
+			X509Name issuerDN = new X509Name("CN=" + GLOBALS.origin);
+			certificateGenerator.SetIssuerDN(issuerDN);
+			certificateGenerator.SetSubjectDN(subjectDN);
+
+			// Valid For
+			DateTime notBefore = DateTime.UtcNow.Date;
+			DateTime notAfter = notBefore.AddYears(20);
+
+			certificateGenerator.SetNotBefore(notBefore);
+			certificateGenerator.SetNotAfter(notAfter);
+
+			// Subject Public Key
+			KeyGenerationParameters keyGenerationParameters = new KeyGenerationParameters(random, Defines.caKeyStrength);
+			RsaKeyPairGenerator keyPairGenerator = new RsaKeyPairGenerator();
+			keyPairGenerator.Init(keyGenerationParameters);
+			subjectKeyPairSubCA = keyPairGenerator.GenerateKeyPair();
+
+
+			certificateGenerator.SetPublicKey(subjectKeyPairSubCA.Public);
+
+			// Generating the Certificate
+			AsymmetricCipherKeyPair issuerKeyPair = subjectKeyPairSubCA;
+			ISignatureFactory signatureFactory = new Asn1SignatureFactory("SHA512WITHRSA", subjectKeyPairCA.Private);
+
+			//
+			// adding policies
+			//
+			KeyUsage keyUsage = new KeyUsage(KeyUsage.KeyCertSign | KeyUsage.CrlSign);
+			certificateGenerator.AddExtension(X509Extensions.KeyUsage, true, keyUsage);
+
+			certificateGenerator.AddExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(true));
+
+			
 
 			// selfsign certificate
 			Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(signatureFactory);
