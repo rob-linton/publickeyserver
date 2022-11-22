@@ -7,7 +7,7 @@
     <h1>This is a public key server</h1>
 
     <p>
-        This key server generates anonymous x509 certificates.
+        This key server generates anonymous public key certificates.
     </p>
 
     <p>
@@ -19,10 +19,9 @@
     
     
     <pre>
-    Examples are:                     
+    Example is:    
 
-    accessible-latter-employees
-    missions-locks-sox       
+    missions-locks-sox.publickeyserver.org       
 
 
     </pre>
@@ -34,8 +33,8 @@
 
 
     <pre>
-    However you should not use the quick way as it will generate a private/public RSA2048 key pair
-    on your behalf...which means it knows your private key, if only for a moment.                 
+    However you should not use the quick way as we will generate a private/public RSA2048 key pair
+    on your behalf...which means we see your private key, if only for a moment.                   
 
     Create an RSA2048 public/private key pair locally on your device and then send ONLY the public
     key to the POST version of simpleenroll.                                                      
@@ -59,14 +58,20 @@
     </pre>
 
     <pre>
-    The whole point of the server is that now anyone can get you public key certificate by
-    calling:
+    The whole point of this server is that anyone can get your public key certificate by          
+    just calling:                                                                                 
 
-    GET: https://missions-locks-sox.publickeyserver.org
+    GET: https://missions-locks-sox.publickeyserver.org                                           
 
-    OR:
+    And they can validate your certificate by using the certificate chain returned by calling:    
 
-    GET: https://exempt-lead-constraint.publickeyserver.org
+    GET: https://publickeyserver.org/cacerts                                                      
+
+    </pre>
+
+    <pre>
+    Help located at:
+    https://github.com/rob-linton/publickeyserver/wiki
 
     </pre>
 
