@@ -27,10 +27,10 @@ X.509 certificates are signed using the following algorithm:
 
 `SHA512WITHRSA`  
 
-Alias's are automatically assigned and are a random group of three words seperated by a period.
+Alias's are automatically assigned and are a random group of three words seperated by a hyphen.
 
 eg:
-  martin.spike.coil
+  missions-locks-sox.publickeyserver.org
 
 Optional extra information may be baked into an X.509 certificate. The base OID is as follows:
 
