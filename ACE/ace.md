@@ -32,17 +32,11 @@ Alias's are automatically assigned and are a random group of three words seperat
 eg:
   missions-locks-sox.publickeyserver.org
 
-Optional extra information may be baked into an X.509 certificate. The base OID is as follows:
+Optional extra information may be baked into an X.509 certificate. The base OID for your info is as follows:
 
 `iso.org.dod.internet.private.enterprise.publickeyserver (1.3.6.1.4.1.57055)`
 
-Optional information may be ascii with the following characters allowed:
-
-```
-[a..z|A..Z|[0..9]:|/|;|.|?|&|#|!|$|%|^|*|(|)|[|]|{|}|<|>|,|_|-|+|=|@|~|
-```  
-
-Optional information may also be provided base64 encoded, no assumption is made as to the data format provided.
+Optional information must be base64 encoded, no assumption is made as to the data format provided.
 
 
 Authentication
@@ -98,11 +92,8 @@ Post format:
 
 
 {  
-  "key",     : "[public key in PEM format (RSA2048)]"  *mandatory*
-   "data" : 
-    {
-        [some data *optional*]
-    }
+  "key"  : "[public key in PEM format (RSA2048)]"    *mandatory
+  "data" : "[BASE64ENCODED DATA]"                    *optional
 }
 ```
 
