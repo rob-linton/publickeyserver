@@ -51,6 +51,7 @@ Implementation
 Thw ACE protocol uses the same REST API mechanism as EST and provides the following endpoints:  
   
 `GET /cacerts`  
+`GET /simpleenroll` 
 `POST /simpleenroll`  
 `GET /serverkeygen`  
   
@@ -129,6 +130,11 @@ GET /cert?alias={alias}
 GET {alias}.publickeyserver.org
 ----------------------
 Returns the associated certificate with the alias in x.509 PEM format.  
+
+
+GET /serverkeygen
+----------------------
+Returns a public/private key pair (generally for testing)  
 
 
 
