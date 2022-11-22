@@ -50,10 +50,10 @@ Implementation
 
 Thw ACE protocol uses the same REST API mechanism as EST and provides the following endpoints:  
   
-`GET /cacerts`  
-`GET /simpleenroll` 
-`POST /simpleenroll`  
-`GET /serverkeygen`  
+`GET /cacerts`   
+`GET /simpleenroll`   
+`POST /simpleenroll`   
+`GET /serverkeygen`   
   
 Because the EST protocol does not provide a mechanism for the retrieval of public keys, the extra endpoint has been implemented:  
 
