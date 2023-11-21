@@ -2,12 +2,24 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "build",
+			"label": "build_publickeyserver",
 			"command": "dotnet",
 			"type": "process",
 			"args": [
 				"build",
 				"${workspaceFolder}/publickeyserver.sln",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary;ForceNoAlign"
+			],
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "build_jdoe",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"build",
+				"${workspaceFolder}/jdoe/jdoe.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary;ForceNoAlign"
 			],

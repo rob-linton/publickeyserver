@@ -1,8 +1,9 @@
-publickeyserver/obj
-publickeyserver/bin
-publickeyserver/*.pfx
-publickeyserver/*.pem
-.env
 .vs
-*.log
 jdoe/bin
+jdoe/obj
+.env
+cacert.publickeyserver.org.pem
+*.log
+*.pem
+publickeyserver/bin
+publickeyserver/obj

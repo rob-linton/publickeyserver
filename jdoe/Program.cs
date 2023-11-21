@@ -7,7 +7,10 @@ public class Options
     public IEnumerable<string>? InputFiles { get; set; }
 
 	[Option('v', "verbose", Default = false, HelpText = "Set output to verbose messages.")]
-	public bool Verbose { get; set; } = false;
+	public int Verbose { get; set; } = 0;
+
+	 [Option('a', "aliases", Required = true, HelpText = "Input destination aliases")]
+    public IEnumerable<string>? InputAliases { get; set; }
 }
 
 class Program
@@ -19,12 +22,13 @@ class Program
         Parser.Default.ParseArguments<Options>(args)
            .WithParsed<Options>(o =>
            {
-               if (o.Verbose!)
+               if (o.Verbose > 0)
                {
                    Console.WriteLine($"Verbose mode is enabled. Verbose level: {o.Verbose}");
                }
 
                Console.WriteLine($"Read files: {string.Join(",", o.InputFiles!)}");
+			   Console.WriteLine($"Aliases: {string.Join(",", o.InputAliases!)}");
            });
     }
 }
