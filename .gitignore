@@ -7,3 +7,5 @@ cacert.publickeyserver.org.pem
 *.pem
 publickeyserver/bin
 publickeyserver/obj
+jdoe.Tests/bin
+jdoe.Tests/obj

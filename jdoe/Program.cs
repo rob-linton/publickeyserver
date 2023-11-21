@@ -13,22 +13,34 @@ public class Options
     public IEnumerable<string>? InputAliases { get; set; }
 }
 
-class Program
+
+
+public class Program
 {
+	public static Options ParseOptions(string[] args)
+	{
+		Options? result = null;
+
+		Parser.Default.ParseArguments<Options>(args)
+		.WithParsed<Options>(o => result = o);
+
+		return result!;
+	}
+
     static void Main(string[] args)
     {
 		Console.WriteLine("Hello World!");
+		
+		var options = ParseOptions(args);
+        
+		if (options.Verbose > 0)
+		{
+			{
+				Console.WriteLine($"Verbose mode is enabled. Verbose level: {options.Verbose}");
+			}
 
-        Parser.Default.ParseArguments<Options>(args)
-           .WithParsed<Options>(o =>
-           {
-               if (o.Verbose > 0)
-               {
-                   Console.WriteLine($"Verbose mode is enabled. Verbose level: {o.Verbose}");
-               }
-
-               Console.WriteLine($"Read files: {string.Join(",", o.InputFiles!)}");
-			   Console.WriteLine($"Aliases: {string.Join(",", o.InputAliases!)}");
-           });
+			Console.WriteLine($"Read files: {string.Join(",", options.InputFiles!)}");
+			Console.WriteLine($"Aliases: {string.Join(",", options.InputAliases!)}");
+        };
     }
 }
