@@ -1,6 +1,7 @@
 {
 	"version": "0.2.0",
 	"configurations": [
+		
 		{
 			"name": ".NET Core Launch (console)",
 			"type": "coreclr",
@@ -41,9 +42,24 @@
 			}
 		},
 		{
+			"name": ".NET Core Launch (jdoe)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "${workspaceFolder}/jdoe/bin/Debug/net8.0/jdoe.dll",
+			"args": ["--read","one","-v"],
+			"cwd": "${workspaceFolder}/jdoe",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
 			"name": ".NET Core Attach",
 			"type": "coreclr",
 			"request": "attach"
-		}
+		},
+		
 	]
 }

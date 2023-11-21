@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "IcVzPx0vJMaL8Cln7MPODwOz2PO8w5CV/vrW1aUKvbfaX0IP475Xu043tkIsPbAX/Z2ofRzsG4xwDUkg/ww/mg==",
+  "success": true,
+  "projectFilePath": "/Users/rob/Documents/src/publickeyserver/jdoe/jdoe.csproj",
+  "expectedPackageFiles": [
+    "/Users/rob/.nuget/packages/commandlineparser/2.9.1/commandlineparser.2.9.1.nupkg.sha512"
+  ],
+  "logs": []
+}
