@@ -5,3 +5,4 @@ publickeyserver/*.pem
 .env
 .vs
 *.log
+jdoe/bin
