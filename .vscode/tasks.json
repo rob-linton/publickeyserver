@@ -7,7 +7,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/publickeyserver.sln",
+				"${workspaceFolder}/publickeyserver/publickeyserver.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary;ForceNoAlign"
 			],
@@ -31,7 +31,7 @@
 			"type": "process",
 			"args": [
 				"publish",
-				"${workspaceFolder}/publickeyserver.sln",
+				"${workspaceFolder}/publickeyserver/publickeyserver.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary;ForceNoAlign"
 			],
@@ -45,7 +45,7 @@
 				"watch",
 				"run",
 				"--project",
-				"${workspaceFolder}/publickeyserver.sln"
+				"${workspaceFolder}/publickeyserver/publickeyserver.csproj"
 			],
 			"problemMatcher": "$msCompile"
 		}

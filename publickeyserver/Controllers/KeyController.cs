@@ -93,7 +93,7 @@ namespace publickeyserver
 				ret["status"] = "OK";
 
 			}
-			catch (Exception e)
+			catch
 			{
 				ret["status"] = "NOT OK";
 			}

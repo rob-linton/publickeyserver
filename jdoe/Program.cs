@@ -1,46 +1,28 @@
-﻿using CommandLine;
+﻿#pragma warning disable 1998
+
+using CommandLine;
+using jdoe.Verbs;
+using System.Collections.Generic;
+using System;
+
 namespace jdoe;
-
-public class Options
-{
-    [Option('r', "read", Required = true, HelpText = "Input files to be processed.")]
-    public IEnumerable<string>? InputFiles { get; set; }
-
-	[Option('v', "verbose", Default = false, HelpText = "Set output to verbose messages.")]
-	public int Verbose { get; set; } = 0;
-
-	 [Option('a', "aliases", Required = true, HelpText = "Input destination aliases")]
-    public IEnumerable<string>? InputAliases { get; set; }
-}
-
-
 
 public class Program
 {
-	public static Options ParseOptions(string[] args)
+	public static async Task<int> ParseOptions(string[] args)
 	{
-		Options? result = null;
 
-		Parser.Default.ParseArguments<Options>(args)
-		.WithParsed<Options>(o => result = o);
+		var opts = Parser.Default.ParseArguments<Options, PackOptions, UnpackOptions, CreateOptions>(args);
 
-		return result!;
+		return opts.MapResult(
+		(CreateOptions opts) => Verbs.Create.Execute(opts).Result,
+		(PackOptions opts) => Verbs.Pack.Execute(opts).Result,
+		(UnpackOptions opts) => Verbs.Unpack.Execute(opts).Result,
+		errors => 1);
 	}
 
-    static void Main(string[] args)
-    {
-		Console.WriteLine("Hello World!");
-		
-		var options = ParseOptions(args);
-        
-		if (options.Verbose > 0)
-		{
-			{
-				Console.WriteLine($"Verbose mode is enabled. Verbose level: {options.Verbose}");
-			}
-
-			Console.WriteLine($"Read files: {string.Join(",", options.InputFiles!)}");
-			Console.WriteLine($"Aliases: {string.Join(",", options.InputAliases!)}");
-        };
+    static async Task<int> Main(string[] args)
+    {	
+		return await ParseOptions(args);
     }
 }

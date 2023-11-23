@@ -65,7 +65,7 @@ namespace publickeyserver
 						if (!exists)
 							break;
 					}
-					catch (Exception e)
+					catch 
 					{
 						// doesn't exist
 						break;

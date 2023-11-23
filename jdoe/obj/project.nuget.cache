@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "IcVzPx0vJMaL8Cln7MPODwOz2PO8w5CV/vrW1aUKvbfaX0IP475Xu043tkIsPbAX/Z2ofRzsG4xwDUkg/ww/mg==",
+  "dgSpecHash": "+q5m9/brxY2lfvjEbZZPimiX28RZotFrSOpJ7iGXqr+0CSpA6B9K0odFQVZOc+pQhfgqSwvyuQKje4ubgreQ+Q==",
   "success": true,
   "projectFilePath": "/Users/rob/Documents/src/publickeyserver/jdoe/jdoe.csproj",
   "expectedPackageFiles": [
+    "/Users/rob/.nuget/packages/bouncycastle.cryptography/2.2.1/bouncycastle.cryptography.2.2.1.nupkg.sha512",
     "/Users/rob/.nuget/packages/commandlineparser/2.9.1/commandlineparser.2.9.1.nupkg.sha512"
   ],
   "logs": []
