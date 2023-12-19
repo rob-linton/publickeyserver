@@ -100,19 +100,10 @@ public class BouncyCastleHelper
             }
 
             // Optionally, check the root certificate separately here
-			string fingerprint = getFingerprint(intermediateAndRootCertificatePems[intermediateAndRootCertificatePems.Count-2]);
+			byte[] fingerprint = GetFingerprint(intermediateAndRootCertificatePems[intermediateAndRootCertificatePems.Count-1]);
 
-			// ...
-
-			string sha256Fingerprint;
-			using (SHA256 sha256 = SHA256.Create())
-			{
-				byte[] hashBytes = sha256.ComputeHash((fingerprint.ToBytes()));
-				sha256Fingerprint = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
-			}
-
-			DisplayVisualFingerprint(sha256Fingerprint);
-			//CertificateFingerprint.DisplayCertificateFingerprintFromString(sha256Fingerprint);
+			//DisplayVisualFingerprint(fingerprint);
+			CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
 
             return true;
         }
@@ -122,10 +113,13 @@ public class BouncyCastleHelper
             return false;
         }
     }
-	public static string getFingerprint(string pemString)
+	public static byte[] GetFingerprint(string pemString)
 	{
+		// make sure the certificate is valid
 		Org.BouncyCastle.X509.X509Certificate cert = ReadCertificateFromPemString(pemString);
-		return cert.SerialNumber.ToString();
+		using SHA256 sha256 = SHA256.Create();
+		byte[] hashBytes = sha256.ComputeHash(pemString.ToBytes());
+		return hashBytes;
 	}
 	// --------------------------------------------------------------------------------------------------------
 	private static void DisplayVisualFingerprint(string fingerprint)

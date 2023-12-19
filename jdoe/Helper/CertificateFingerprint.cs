@@ -4,52 +4,26 @@ using System.Security.Cryptography.X509Certificates;
 
 public class CertificateFingerprint
 {
-    private const int GridWidth = 17;
-    private const int GridHeight = 9;
+    private const int GridWidth = 16;
+    private const int GridHeight = 8;
     private static readonly int[,] Field = new int[GridHeight, GridWidth];
 
-	public static void DisplayCertificateFingerprintFromString(string fingerprint)
+	public static void DisplayCertificateFingerprintFromString(byte[] fingerprint)
 	{
 		// Process the fingerprint using Drunken Bishop algorithm
-                ProcessFingerprint(fingerprint);
+		ProcessFingerprint(fingerprint);
 
-                // Display the ASCII art representation
-                DisplayAsciiArtWithBox();
+		// Display the ASCII art representation
+		DisplayAsciiArtWithBox();
 	}
-    public static void DisplayCertificateFingerprint(string certificatePath)
-    {
-        try
-        {
-            // Load the certificate
-            X509Certificate2 cert = new X509Certificate2(certificatePath);
 
-            // Compute the SHA-256 hash of the certificate's raw data
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] hashBytes = sha256.ComputeHash(cert.RawData);
-                string fingerprint = BitConverter.ToString(hashBytes).Replace("-", string.Empty).ToLower();
-
-                // Process the fingerprint using Drunken Bishop algorithm
-                ProcessFingerprint(fingerprint);
-
-                // Display the ASCII art representation with a box around it
-                DisplayAsciiArtWithBox();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error displaying certificate fingerprint: {ex.Message}");
-        }
-    }
-
-    private static void ProcessFingerprint(string fingerprint)
+	private static void ProcessFingerprint(byte[] fingerprint)
     {
         int x = GridWidth / 2;
-        int y = GridHeight / 2;
+        int y = (GridHeight / 2) + 4;
 
-        foreach (char c in fingerprint)
+        foreach (int byteValue in fingerprint)
         {
-            int byteValue = Convert.ToInt32(c.ToString(), 16);
             for (int bit = 0; bit < 4; bit++)
             {
                 int move = (byteValue >> bit) & 0x03;
