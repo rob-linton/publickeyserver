@@ -16,3 +16,4 @@
 /Users/rob/Documents/src/publickeyserver/jdoe/obj/Debug/net8.0/jdoe.csproj.AssemblyReference.cache
 /Users/rob/Documents/src/publickeyserver/jdoe/bin/Debug/net8.0/CommandLine.dll
 /Users/rob/Documents/src/publickeyserver/jdoe/obj/Debug/net8.0/jdoe.csproj.CopyComplete
+/Users/rob/Documents/src/publickeyserver/jdoe/bin/Debug/net8.0/BouncyCastle.Cryptography.dll

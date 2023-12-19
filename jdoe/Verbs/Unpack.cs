@@ -12,7 +12,7 @@ public class UnpackOptions : Options
 
 class Unpack 
 {
-	public static async Task<int> Execute(Options opts)
+	public static async Task<int> Execute(UnpackOptions opts)
 	{
 		return 0;
 	}

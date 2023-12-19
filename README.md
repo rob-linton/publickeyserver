@@ -1,6 +1,6 @@
 ## Public Key Server
 
-This project implements the Anonymous Certificate Enrolment protocol [ACE](https://github.com/rob-linton/publickeyserver/blob/main/ACE/ace.md) which is loosley based on the Enrolment over Secure Transport [EST](https://tools.ietf.org/html/rfc7030) (RFC7030) protocol.
+This project implements the Anonymous Certificate Enrollment protocol [ACE](https://github.com/rob-linton/publickeyserver/blob/main/ACE/ace.md) which is loosely based on the Enrollment over Secure Transport [EST](https://tools.ietf.org/html/rfc7030) (RFC7030) protocol.
 
 The Public Key Server Project provides a simple and opinionated method for an anonymous individual to obtain a certificate associated with an anonymous alias and have it validated by a third party.  This project provides a simple yet functional anonymous certificate management protocol which allows unidentified individuals to know with certainty that they have identified the public key associated with an alias. 
 
@@ -18,6 +18,6 @@ Security
 
 While this project is simple and opinionated, some effort has been made to ensure server security including CA certificate storage.
 
-CA certificate storage is protected with AES-GCM encryption, server security makes use of standard Amazon AWS standards, with the source code publically available here in Github.
+CA certificate storage is protected with AES-GCM encryption, server security makes use of standard Amazon AWS standards, with the source code publicly available here in Github.
 
 This source code runs in production at https://publickeyserver.org.

@@ -70,7 +70,8 @@ namespace publickeyserver
 			Dictionary<string, dynamic> ret = new Dictionary<string, dynamic>();
 
 			ret["origin"] = GLOBALS.origin;
-			ret["uptime"] = runtime.Seconds;
+
+			ret["uptime"] = Math.Round(runtime.TotalSeconds);
 			ret["certs_served"] = GLOBALS.status_certs_served;
 			ret["certs_enrolled"] = GLOBALS.status_certs_enrolled;
 
@@ -147,8 +148,8 @@ namespace publickeyserver
 
 			List<string> cacerts = new List<string>();
 
-			cacerts.Add(certPEM);
 			cacerts.Add(subcertPEM);
+			cacerts.Add(certPEM);
 			ret["origin"] = GLOBALS.origin;
 			ret["cacerts"] = cacerts;
 			ret["help"] = Help.cacerts;
@@ -160,7 +161,7 @@ namespace publickeyserver
 		// get a cert from the cert store using the alias
 		// in this case an S3 bucket
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
-		[Route("cert")]
+		[Route("cert/{alias}")]
 		[Produces("application/json")]
 		[HttpGet]
 		public async Task<IActionResult> Cert(string alias)
@@ -308,13 +309,16 @@ namespace publickeyserver
 				//
 				// get the list of optional data
 				//
-				string data = createkey.data;
-				string dataBase64 = "";
-				if (!String.IsNullOrEmpty(data))
-				{
-					Byte[] dataBytes = Encoding.UTF8.GetBytes(data);
-					dataBase64 = Convert.ToBase64String(dataBytes);
-				}
+				string dataBase64 = createkey.data;
+				
+				// assume that data is already base64 encoded
+				
+				//string dataBase64 = "";
+				//if (!String.IsNullOrEmpty(data))
+				//{
+				//	Byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+				//	dataBase64 = Convert.ToBase64String(dataBytes);
+				//}
 
 				// get a three word alias
 				string alias = await ControllerHelper.GenerateAlias(GLOBALS.origin, GLOBALS.s3endpoint, GLOBALS.s3key, GLOBALS.s3secret, words);

@@ -41,12 +41,26 @@
 			}
 		},
 		{
-			"name": "JDoe .NET Core Launch (jdoe)",
+			"name": "JDoe (create)",
 			"type": "coreclr",
 			"request": "launch",
 			"preLaunchTask": "build_jdoe",
 			"program": "${workspaceFolder}/jdoe/bin/Debug/net8.0/jdoe.dll",
-			"args": ["--read","one","-v", "1", "--aliases","one-two-three", "four-five-six"],
+			"args": ["create","-d", "localhost:5001", "-p","password"],
+			"cwd": "${workspaceFolder}/jdoe",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
+			"name": "JDoe (verify)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_jdoe",
+			"program": "${workspaceFolder}/jdoe/bin/Debug/net8.0/jdoe.dll",
+			"args": ["verify","-d", "localhost:5001", "-p","password", "-a","tit-tickets-arguments.publickeyserver.org"],
 			"cwd": "${workspaceFolder}/jdoe",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",

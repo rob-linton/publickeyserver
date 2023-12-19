@@ -12,12 +12,13 @@ public class Program
 	public static async Task<int> ParseOptions(string[] args)
 	{
 
-		var opts = Parser.Default.ParseArguments<Options, PackOptions, UnpackOptions, CreateOptions>(args);
+		var opts = Parser.Default.ParseArguments<Options, PackOptions, UnpackOptions, CreateOptions, VerifyOptions>(args);
 
 		return opts.MapResult(
-		(CreateOptions opts) => Verbs.Create.Execute(opts).Result,
-		(PackOptions opts) => Verbs.Pack.Execute(opts).Result,
-		(UnpackOptions opts) => Verbs.Unpack.Execute(opts).Result,
+		(CreateOptions opts) 	=> Verbs.Create.Execute(opts).Result,
+		(PackOptions opts) 		=> Verbs.Pack.Execute(opts).Result,
+		(UnpackOptions opts) 	=> Verbs.Unpack.Execute(opts).Result,
+		(VerifyOptions opts) 	=> Verbs.Verify.Execute(opts).Result,
 		errors => 1);
 	}
 

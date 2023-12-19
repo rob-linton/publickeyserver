@@ -14,7 +14,7 @@ public class PackOptions : Options
 }
 class Pack 
 {
-	public static async Task<int> Execute(Options opts)
+	public static async Task<int> Execute(PackOptions opts)
 	{
 		return 0;
 	}

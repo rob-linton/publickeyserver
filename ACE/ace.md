@@ -1,6 +1,6 @@
 # Anonymous Certificate Enrollment protocol (ACE)
 
-This protocol is loosley based on the Enrolment over Secure Transport [EST](https://tools.ietf.org/html/rfc7030) (RFC7030) protocol.   
+This protocol is loosely based on the Enrollment over Secure Transport [EST](https://tools.ietf.org/html/rfc7030) (RFC7030) protocol.   
 https://tools.ietf.org/html/rfc7030  
 
 Abstract  
@@ -8,18 +8,18 @@ Abstract
 
 RFC7030 (EST) provides a secure method for creating, retrieving and verifying certificates.  
 
-The ACE protocol is a simple, opinionated distilled version of EST, developed for the very specific purpose of creating, providing and validating anonymous certificates that may be used for encryption without identity.
+The ACE protocol is a simple, opinionated version of EST, developed for the purpose of creating, providing and validating anonymous certificates that may be used for encryption without identity.
 
 The ACE protocol is designed (as is EST) to provide an automated method for creating, retrieving and verifying certificates. However this protocol removes all requirement for identification, other than the verification that a certificate is bound to an anonymous alias.  
 
 This protocol has been designed to facilitate an end-to-end encrypted communication such that the private key associated with an alias never leaves the client device and that the device is associated with an anonymous alias and nothing more.  
 
-The assumption being, that to communicate securely and anonymously using an end-to-end encryption protocol that can be securly verified by all parties, all one needs to know is the `alias` of the destination individual.  
+The assumption being, that to communicate securely and anonymously using an end-to-end encryption protocol that can be securely verified by all parties, all one needs to know is the `alias` of the destination individual.  
 
 Detail
 ------
 
-The ACE protocol is designed to be as simple as possible with very little (if any) customisation options.
+The ACE protocol is designed to be as simple as possible with very little (if any) customization options.
 
 RSA key pairs are RSA2048.  
 
@@ -27,7 +27,7 @@ X.509 certificates are signed using the following algorithm:
 
 `SHA512WITHRSA`  
 
-Alias's are automatically assigned and are a random group of three words seperated by a hyphen.
+Alias's are automatically assigned and are a random group of three words separated by a hyphen.
 
 eg:
   missions-locks-sox.publickeyserver.org
@@ -48,7 +48,7 @@ No authentication will be used to access a server providing the ACE protocol.
 Implementation
 --------------
 
-Thw ACE protocol uses the same REST API mechanism as EST and provides the following endpoints:  
+The ACE protocol uses the same REST API mechanism as EST and provides the following endpoints:  
   
 `GET /cacerts`   
 `GET /simpleenroll`   
@@ -102,9 +102,9 @@ Where:
 
 data:
 
-An optional list of arbitary data in JSON format
+An optional list of arbitrary data in JSON format
 
-Allowed chracters.
+Allowed characters.
 ```
 [a..z|A..Z|[0..9]:|/|;|.|?|&|#|!|$|%|^|*|(|)|[|]|{|}|<|>|,|_|-|+|=|@|~|
 ```
