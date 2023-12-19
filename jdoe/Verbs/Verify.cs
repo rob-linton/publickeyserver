@@ -20,40 +20,36 @@ class Verify
 {
 	public static async Task<int> Execute(VerifyOptions opts)
 	{
-		Console.WriteLine($"Verifying  {opts.Alias}\n");
+		Console.WriteLine($"\nVerifying  {opts.Alias}\n");
 
 		// first get the CA
-#if DEBUG
-		var result = await HttpHelper.Get($"http://{opts.Domain}/cacerts");
-#else
 		var result = await HttpHelper.Get($"https://{opts.Domain}/cacerts");	
-#endif
 		var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
 		var cacerts = ca?.cacerts;
 
-		// now get the alias
-#if DEBUG
-		result = await HttpHelper.Get($"http://{opts.Domain}/cert/{Misc.getAliasFromAliasAndDomain(opts.Alias)}");
-		#else	
+		// now get the alias	
 		result = await HttpHelper.Get($"https://{opts.Domain}/cert/{Misc.getAliasFromAliasAndDomain(opts.Alias)}");
-		#endif
+
 		var c = JsonSerializer.Deserialize<CertResult>(result);
 		var certificate = c?.certificate;
 
-
 		// now validate the certificate chain
-		bool valid = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts);
-		
+		bool valid = false;
+		if (certificate != null)
+		{
+			valid = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts);
+		}
+
 		Console.WriteLine("Please validate the CA certificate fingerprint at");
 		Console.WriteLine($"https://{opts.Domain}");
 
 		if (valid)
 		{
-			Console.WriteLine("\nAlias is valid");
+			Console.WriteLine("\nAlias is valid\n");
 		}
 		else
 		{
-			Console.WriteLine("\nAlias is *NOT* valid");
+			Console.WriteLine("\nAlias is *NOT* valid\n");
 		}
 
 		return 0;

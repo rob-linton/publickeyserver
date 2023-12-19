@@ -20,6 +20,7 @@ using Org.BouncyCastle.Security.Certificates;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Text;
+using System.Net.NetworkInformation;
 
 namespace jdoe;
 
@@ -89,14 +90,25 @@ public class BouncyCastleHelper
 
                 if (!child.IssuerDN.Equivalent(parent.SubjectDN))
                 {
-                    throw new CertificateException("Issuer/Subject DN mismatch");
+                    throw new CertificateException("*** ERROR: Issuer/Subject DN mismatch ***");
                 }
 
+				// trows an exception if not valid
                 child.Verify(parent.GetPublicKey());
+
+				// check if the commonname is a member
+				if (!CheckIfCommonNameIsAMember(child.SubjectDN.ToString(), child.IssuerDN.ToString()))
+				{
+					throw new CertificateException("*** Error: CommonName is not a member ***");
+				}
+
+				// check if the certificate is valid now
 				if (!child.IsValidNow)
 				{
-					throw new CertificateException("Certificate not valid now");
+					throw new CertificateException("*** Error: Certificate not valid now ***");
 				}
+
+				Console.WriteLine($"Certificate {i + 1} of {chain.Length} is valid");
             }
 
             // Optionally, check the root certificate separately here
@@ -109,10 +121,21 @@ public class BouncyCastleHelper
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Certificate chain validation failed: {ex.Message}");
+            Console.WriteLine($"*** Error: Certificate chain validation failed: {ex.Message} ***");
             return false;
         }
     }
+	public static bool CheckIfCommonNameIsAMember(string fullName, string shortName)
+	{
+		fullName = fullName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
+		shortName = shortName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
+
+		if (fullName.EndsWith(shortName))
+		{
+			return true;
+		}
+		return false;
+	}
 	public static byte[] GetFingerprint(string pemString)
 	{
 		// make sure the certificate is valid
