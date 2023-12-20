@@ -189,6 +189,11 @@ class Pack
 			zip.CreateEntryFromFile("manifest", "manifest");
 			zip.CreateEntryFromFile("envelope", "envelope");
 
+			// now delete them
+			File.Delete("manifest");
+			File.Delete("envelope");
+			
+			// add a comment to the zip file
 			zip.Comment = "This zip file was created by dedrp.com";
 		}
 
