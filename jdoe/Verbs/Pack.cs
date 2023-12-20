@@ -126,24 +126,30 @@ class Pack
 
 			// now loop through each of the aliases and add them to the envelope
 			Console.WriteLine("\nAddressing envelope:");
-			foreach (string alias in opts.InputAliases)
+			if (opts.InputAliases != null)
 			{
-				// get their public key
-				var result = await HttpHelper.Get($"https://{opts.Domain}/cert/{Misc.GetAliasFromAliasAndDomain(alias)}");
-				var c = JsonSerializer.Deserialize<CertResult>(result);
-				var certificate = c?.certificate;
+				foreach (string alias in opts.InputAliases)
+				{
+					// get their public key
+					var result = await HttpHelper.Get($"https://{opts.Domain}/cert/{Misc.GetAliasFromAliasAndDomain(alias)}");
+					var c = JsonSerializer.Deserialize<CertResult>(result);
+					var certificate = c?.certificate;
 
-				var x509 = BouncyCastleHelper.ReadCertificateFromPemString(certificate);
-				var publicKey = x509.GetPublicKey();
+					if (certificate != null)
+					{
+						var x509 = BouncyCastleHelper.ReadCertificateFromPemString(certificate);
+						var publicKey = x509.GetPublicKey();
 
-				// encrypt the key with the public key
-				byte[] encryptedKey = BouncyCastleHelper.EncryptWithPublicKey(key, publicKey);
-				string sEncryptedKey = Convert.ToBase64String(encryptedKey);
+						// encrypt the key with the public key
+						byte[] encryptedKey = BouncyCastleHelper.EncryptWithPublicKey(key, publicKey);
+						string sEncryptedKey = Convert.ToBase64String(encryptedKey);
 
-				// add the encrypted key to the envelope
-				envelope.Add(new { alias = alias, key = sEncryptedKey });
+						// add the encrypted key to the envelope
+						envelope.Add(new { alias = alias, key = sEncryptedKey });
 
-				Console.WriteLine($"adding {alias}");
+						Console.WriteLine($"adding {alias}");
+					}
+				}
 			}
 
 			string envelopeJson = JsonSerializer.Serialize(envelope);
@@ -172,7 +178,7 @@ class Pack
 			manifest["envelope_signature"] = Convert.ToBase64String(envelopeSignature);
 			manifest["envelope_signature_hash"] = "SHA256";
 			manifest["from"] = opts.From;
-			manifest["to"] = opts.InputAliases;
+			manifest["to"] = opts.InputAliases ?? new string[0];
 			manifest["created"] = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
 
@@ -192,7 +198,7 @@ class Pack
 			// now delete them
 			File.Delete("manifest");
 			File.Delete("envelope");
-			
+
 			// add a comment to the zip file
 			zip.Comment = "This zip file was created by dedrp.com";
 		}
