@@ -31,16 +31,16 @@ class Create
 		//
 		var data = new Dictionary<string, string>();
 		string alias = String.Empty;
-		string publicKey = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Public);
+		string publicKeyPem = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Public);
 
-		if (publicKey == null)
+		if (publicKeyPem == null)
 		{
 			Console.WriteLine("Error: could not read public key");
 			return 1;
 		}
 		
 		// save it as PEM format
-		data["key"] = publicKey;
+		data["key"] = publicKeyPem;
 		string json = JsonSerializer.Serialize(data);
 		var result = await HttpHelper.Post($"https://{opts.Domain}/simpleenroll", json);	
 
@@ -48,25 +48,16 @@ class Create
 		alias = j?.alias ?? string.Empty;
 		string certificate = j?.certificate ?? string.Empty;
 
-		File.WriteAllText($"{alias}.pem", certificate);
-		
+		Storage.StoreCert(alias, certificate);
 
-		string privateKeyText = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Private);
-		if (privateKeyText == null)
+		string privateKeyPem = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Private);
+		if (privateKeyPem == null)
 		{
 			Console.WriteLine("Error: could not read private key");
 			return 1;
 		}
 
-		// encrypt the private key
-		byte[] msg = privateKeyText.ToBytes();
-		byte[] key = opts.Password.ToBytes();
-		byte[] nonce = opts.Domain.ToBytes();
-
-		byte[] cipherText = BouncyCastleHelper.EncryptWithKey(msg, key, nonce);
-
-		// save it as PEM format
-		File.WriteAllBytes($"{alias}.privatekey.pem", cipherText);
+		Storage.StorePrivateKey(alias, privateKeyPem, opts.Password);
 
 		return 0;
 	}

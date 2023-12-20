@@ -28,14 +28,14 @@ class Verify
 		var cacerts = ca?.cacerts;
 
 		// now get the alias	
-		result = await HttpHelper.Get($"https://{opts.Domain}/cert/{Misc.getAliasFromAliasAndDomain(opts.Alias)}");
+		result = await HttpHelper.Get($"https://{opts.Domain}/cert/{Misc.GetAliasFromAliasAndDomain(opts.Alias)}");
 
 		var c = JsonSerializer.Deserialize<CertResult>(result);
 		var certificate = c?.certificate;
 
 		// now validate the certificate chain
 		bool valid = false;
-		if (certificate != null)
+		if (certificate != null && cacerts != null) // Add null check for cacerts
 		{
 			valid = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts);
 		}

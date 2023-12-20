@@ -2,6 +2,8 @@ using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
+using jdoe;
+
 public class CertificateFingerprint
 {
     private const int GridWidth = 16;

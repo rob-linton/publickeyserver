@@ -21,6 +21,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Text;
 using System.Net.NetworkInformation;
+using Org.BouncyCastle.Crypto.Encodings;
+using Org.BouncyCastle.Crypto.Digests;
 
 namespace jdoe;
 
@@ -125,6 +127,7 @@ public class BouncyCastleHelper
             return false;
         }
     }
+	// --------------------------------------------------------------------------------------------------------
 	public static bool CheckIfCommonNameIsAMember(string fullName, string shortName)
 	{
 		fullName = fullName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
@@ -136,6 +139,32 @@ public class BouncyCastleHelper
 		}
 		return false;
 	}
+	// --------------------------------------------------------------------------------------------------------
+	public static byte[] GetHashOfFile(string filename)
+	{
+		using SHA256 sha256 = SHA256.Create();
+		byte[] hashBytes = sha256.ComputeHash(File.ReadAllBytes(filename));
+		return hashBytes;
+	}
+	// --------------------------------------------------------------------------------------------------------
+	public static byte[] GetHashOfString(string s)
+	{
+		using SHA256 sha256 = SHA256.Create();
+		byte[] hashBytes = sha256.ComputeHash(s.ToBytes());
+		return hashBytes;
+	}
+	// --------------------------------------------------------------------------------------------------------
+	public static string ConvertHashToString(byte[] hash)
+    {
+        // Convert the byte array to a hexadecimal string
+        string hashString = BitConverter.ToString(hash);
+
+        // Remove the hyphens
+        hashString = hashString.Replace("-", "");
+
+        return hashString;
+    }
+	// --------------------------------------------------------------------------------------------------------
 	public static byte[] GetFingerprint(string pemString)
 	{
 		// make sure the certificate is valid
@@ -205,6 +234,13 @@ public class BouncyCastleHelper
 		return (Org.BouncyCastle.X509.X509Certificate)pemReader.ReadObject();
 	}
 	// --------------------------------------------------------------------------------------------------------
+	public static AsymmetricCipherKeyPair ReadKeyPairFromPemString(string pemString)
+	{
+		using StringReader reader = new StringReader(pemString);
+		PemReader pemReader = new PemReader(reader);
+		return (AsymmetricCipherKeyPair)pemReader.ReadObject();
+	}
+	// --------------------------------------------------------------------------------------------------------
 	public static bool ValidateCertificateChainDotNet(string primaryCertificatePath, List<string> intermediateCertificatesPaths)
     {
         try
@@ -241,6 +277,110 @@ public class BouncyCastleHelper
             return false;
         }
     }
+	// --------------------------------------------------------------------------------------------------------
+	public static byte[] Generate256BitRandom()
+    {
+        // Create a secure random number generator using Bouncy Castle
+        SecureRandom random = new SecureRandom();
+
+        // Create a buffer for 256 bits (32 bytes)
+        byte[] randomBytes = new byte[32];
+
+        // Fill the buffer with random bytes
+        random.NextBytes(randomBytes);
+
+        return randomBytes;
+    }
+	// --------------------------------------------------------------------------------------------------------
+	public static byte[] SignData(byte[] message, AsymmetricKeyParameter privateKey)
+	{
+		//
+		// sign the message using the private key
+		//
+
+		// Create an RSA engine for signing
+		IAsymmetricBlockCipher engine = new Pkcs1Encoding(new RsaEngine());
+		engine.Init(true, privateKey); // true for signing
+
+		// Sign the data
+		
+		byte[] signature = engine.ProcessBlock(message, 0, message.Length);
+
+		// return the signature and the message
+		return signature;
+	}
+	// --------------------------------------------------------------------------------------------------------
+	public static void verifySignature(byte[] message, byte[] signature, AsymmetricKeyParameter publicKey)
+	{
+		//
+		// verify the message using the public key
+		//
+
+		// Create an RSA engine for verification
+		IAsymmetricBlockCipher engine = new Pkcs1Encoding(new RsaEngine());
+		engine.Init(false, publicKey); // false for verification
+
+	}
+	// --------------------------------------------------------------------------------------------------------
+	public static List<string> EncryptFileInChunks(string filename, byte[] key, byte[] nonce)
+	{
+		List<string> chunkList = new List<string>();
+
+		// read the file in 1 MB chunks
+		byte[] buffer = new byte[1024 * 1024];
+		
+		// loop through each 1mb chunk of the file
+		using (FileStream fs = new FileStream(filename, FileMode.Open))
+		{
+			int bytesRead = 0;
+			int chunkNumber = 0;
+			while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0)
+			{
+				byte[] chunk = new byte[bytesRead];
+				Array.Copy(buffer, chunk, bytesRead);
+
+				// encrypt the chunk
+				byte[] encryptedChunk = EncryptWithKey(chunk, key, nonce);
+
+				// save the chunk to a file
+				File.WriteAllBytes($"{filename}.dedrp{chunkNumber}", encryptedChunk);
+				chunkList.Add($"{filename}.dedrp{chunkNumber}");
+
+				chunkNumber++;
+			}
+
+			return chunkList;
+		}
+	}
+	// --------------------------------------------------------------------------------------------------------
+	public static byte[] DecryptWithPrivateKey(byte[] cipherText, AsymmetricKeyParameter privateKey)
+	{
+		//
+		// decrypt the message using the private key
+		//
+
+		// Create an RSA engine for decryption
+		IAsymmetricBlockCipher engine = new Pkcs1Encoding(new RsaEngine());
+		engine.Init(false, privateKey); // false for decryption
+
+		// Decrypt the data
+		return engine.ProcessBlock(cipherText, 0, cipherText.Length);
+	}
+	// --------------------------------------------------------------------------------------------------------
+	public static byte[] EncryptWithPublicKey(byte[] message, AsymmetricKeyParameter publicKey)
+	{
+		//
+		// encrypt the message using the public key
+		//
+
+		// Create an RSA engine for encryption
+        IAsymmetricBlockCipher engine = new Pkcs1Encoding(new RsaEngine());
+        engine.Init(true, publicKey); // true for encryption
+
+        // Encrypt the data
+        return engine.ProcessBlock(message, 0, message.Length);
+
+	}
 	// --------------------------------------------------------------------------------------------------------
 	public static byte[] EncryptWithKey(
 			byte[] messageToEncrypt,
