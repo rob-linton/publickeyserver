@@ -10,7 +10,7 @@ namespace jdoe.Verbs;
 [Verb("pack", HelpText = "Create a package.")]
 public class PackOptions : Options
 {
-   [Option('i', "input", Required = true, HelpText = "Input file to be processed, (use wildcards for multiple)")]
+	[Option('i', "input", Required = true, HelpText = "Input file to be processed, (use wildcards for multiple)")]
     public string File { get; set; } = "*.*";
 
 	[Option('a', "aliases", Required = true, HelpText = "Destination aliases (comma delimited)")]
@@ -28,6 +28,8 @@ class Pack
 	{
 		try
 		{
+			string createDate = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC");
+
 			// get a 256 bit random key from bouncy castle
 			byte[] key = BouncyCastleHelper.Generate256BitRandom();
 
@@ -36,7 +38,8 @@ class Pack
 			Dictionary<string, dynamic> fileList = new Dictionary<string, dynamic>();
 
 			// create the envelope
-			List<dynamic> envelope = new List<dynamic>();
+			Dictionary<string, dynamic> envelope = new Dictionary<string, dynamic>();
+			List<dynamic> toList = new List<dynamic>();
 
 			// get the current directory
 			string currentDirectory = Directory.GetCurrentDirectory();
@@ -86,7 +89,8 @@ class Pack
 					if (File.Exists(filePath))
 					{
 						// encrypt the file in chunks
-						List<string> chunkFileList = BouncyCastleHelper.EncryptFileInChunks(filePath, key, opts.Domain.ToBytes());
+						byte[] nonce = Misc.GetDomainFromAlias(opts.From).ToBytes();
+						List<string> chunkFileList = BouncyCastleHelper.EncryptFileInChunks(filePath, key, nonce);
 
 						// Add each chunk to the zip file
 						foreach (string chunk in chunkFileList)
@@ -138,7 +142,7 @@ class Pack
 							// get their public key
 							if (opts.Verbose > 0)
 								Console.WriteLine($"GET: https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
-								
+
 							var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
 							var c = JsonSerializer.Deserialize<CertResult>(result);
 							var certificate = c?.certificate;
@@ -153,7 +157,7 @@ class Pack
 								string sEncryptedKey = Convert.ToBase64String(encryptedKey);
 
 								// add the encrypted key to the envelope
-								envelope.Add(new { alias = alias, key = sEncryptedKey });
+								toList.Add(new { alias = alias, key = sEncryptedKey });
 
 								Console.WriteLine($"adding {alias}");
 							}
@@ -164,6 +168,9 @@ class Pack
 						}
 					}
 				}
+				envelope["to"] = toList;
+				envelope["from"] = opts.From;
+				envelope["created"] = createDate;
 
 				string envelopeJson = JsonSerializer.Serialize(envelope);
 
@@ -191,8 +198,8 @@ class Pack
 				manifest["envelope_signature"] = Convert.ToBase64String(envelopeSignature);
 				manifest["envelope_signature_hash"] = "SHA256";
 				manifest["from"] = opts.From;
-				manifest["to"] = opts.InputAliases ?? new string[0];
-				manifest["created"] = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+				manifest["to"] = toList;
+				manifest["created"] = createDate;
 
 
 				string manifestJson = JsonSerializer.Serialize(manifest);

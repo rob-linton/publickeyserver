@@ -83,6 +83,20 @@
 			},
 		},
 		{
+			"name": "JDoe (unpack)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_jdoe",
+			"program": "${workspaceFolder}/jdoe/bin/Debug/net8.0/jdoe.dll",
+			"args": ["unpack","-v","1","-i","dedrp.zip","-d", "localhost:5001", "-p","password", "-a","everything-developing-foods.publickeyserver.org"],
+			"cwd": "${workspaceFolder}/jdoe",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
 			"name": ".NET Core Attach",
 			"type": "coreclr",
 			"request": "attach"
