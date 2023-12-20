@@ -20,38 +20,56 @@ class Verify
 {
 	public static async Task<int> Execute(VerifyOptions opts)
 	{
-		Console.WriteLine($"\nVerifying  {opts.Alias}\n");
-
-		// first get the CA
-		var result = await HttpHelper.Get($"https://{opts.Domain}/cacerts");	
-		var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
-		var cacerts = ca?.cacerts;
-
-		// now get the alias	
-		result = await HttpHelper.Get($"https://{opts.Domain}/cert/{Misc.GetAliasFromAliasAndDomain(opts.Alias)}");
-
-		var c = JsonSerializer.Deserialize<CertResult>(result);
-		var certificate = c?.certificate;
-
-		// now validate the certificate chain
-		bool valid = false;
-		if (certificate != null && cacerts != null) // Add null check for cacerts
+		try
 		{
-			valid = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts);
+			Console.WriteLine($"\nVerifying  {opts.Alias}\n");
+
+			string domain = Misc.GetDomain(opts, opts.Alias);
+
+			// first get the CA
+			if (opts.Verbose > 0)
+				Console.WriteLine($"GET: https://{domain}/cacerts");
+
+			var result = await HttpHelper.Get($"https://{domain}/cacerts");
+			var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
+			var cacerts = ca?.cacerts;
+
+			// now get the alias	
+			if (opts.Verbose > 0)
+				Console.WriteLine($"GET: https://{domain}/cert/{Misc.GetAliasFromAlias(opts.Alias)}");
+				
+			result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(opts.Alias)}");
+
+			var c = JsonSerializer.Deserialize<CertResult>(result);
+			var certificate = c?.certificate;
+
+			// now validate the certificate chain
+			bool valid = false;
+			if (certificate != null && cacerts != null) // Add null check for cacerts
+			{
+				valid = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts);
+			}
+
+			Console.WriteLine("Please validate the CA certificate fingerprint at");
+			Console.WriteLine($"https://{domain}");
+
+			if (valid)
+			{
+				Console.WriteLine("\nAlias is valid\n");
+			}
+			else
+			{
+				Console.WriteLine("\nAlias is *NOT* valid\n");
+			}
 		}
-
-		Console.WriteLine("Please validate the CA certificate fingerprint at");
-		Console.WriteLine($"https://{opts.Domain}");
-
-		if (valid)
+		catch (Exception ex)
 		{
-			Console.WriteLine("\nAlias is valid\n");
+			Console.WriteLine("\nUnable to validate alias\n");
+			if (opts.Verbose > 0)
+				Console.WriteLine(ex.Message);
+			return 1;
 		}
-		else
-		{
-			Console.WriteLine("\nAlias is *NOT* valid\n");
-		}
-
+		
 		return 0;
 	}
 }

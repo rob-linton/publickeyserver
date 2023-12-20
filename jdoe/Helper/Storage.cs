@@ -10,7 +10,7 @@ public class Storage
 		byte[] msg = privateKeyPem.ToBytes();
 		byte[] key = password.ToBytes();
 
-		string sNonce = Misc.GetDomainFromAliasAndDomain(alias);
+		string sNonce = Misc.GetDomainFromAlias(alias);
 		byte[] nonce = sNonce.ToBytes();
 
 		byte[] cipherText = BouncyCastleHelper.EncryptWithKey(msg, key, nonce);
@@ -21,7 +21,7 @@ public class Storage
 
 	public static string GetPrivateKey(string alias, string password)
 	{
-		string sNonce = Misc.GetDomainFromAliasAndDomain(alias);
+		string sNonce = Misc.GetDomainFromAlias(alias);
 		byte[] nonce = sNonce.ToBytes();
 
 		byte[] cipherText = File.ReadAllBytes($"{alias}.privatekey.pem");

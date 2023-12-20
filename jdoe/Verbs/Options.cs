@@ -10,7 +10,7 @@ public class Options
 	[Option('p', "password", Default = "", HelpText = "Enter password")]
 	public string Password { get; set; } = "";	
 
-	[Option('d', "domain", Default = "publickeyserver.org", HelpText = "Domain")]
-	public string Domain { get; set; } = "publickeyserver.org";	
-	
+	[Option('d', "domain", HelpText = "Domain name")]
+	public string Domain { get; set; } = "";
+
 }
