@@ -6,7 +6,7 @@ https://tools.ietf.org/html/rfc7030
 Abstract  
 --------
 
-RFC7030 (EST) provides a secure method for creating, retrieving and verifying certificates.  
+RFC7030 (EST) provides a secure method for creating and verifying certificates.  
 
 The ACE protocol is a simple, opinionated version of EST, developed for the purpose of creating, providing and validating anonymous certificates that may be used for encryption without identity.
 
@@ -61,12 +61,16 @@ Because the EST protocol does not provide a mechanism for the retrieval of publi
 
 OR
 
+`GET /cert/{alias}`  
+
+OR
+
 `GET {alias}.publickeyserver.org`
 
 
 GET /cacerts  
 ------------
-Returns a PEM x.509 certificate of the CA root signing authority for this server. 
+Returns a JSON snippet of the certificate chain in PEM format. 
 
 ```
 Return format:  
@@ -83,7 +87,7 @@ on your behalf...which means it knows your private key, if only for a moment.
 
 POST /simpleenroll    
 ------------------
-Creates a certificate and returns it in PKCS#12 format  
+Creates a certificate and returns it in PEM format  
 
 ```
 POST BODY  
@@ -126,8 +130,12 @@ Official listing:
 http://oid-info.com/cgi-bin/display?oid=1.3.6.1.4.1.57055&a=display
 
 
-GET /cert?alias={alias}
-GET {alias}.publickeyserver.org
+GET /cert?alias={alias}   
+
+GET {alias}.publickeyserver.org   
+
+GET /cert/{alias}   
+
 ----------------------
 Returns the associated certificate with the alias in x.509 PEM format.  
 
