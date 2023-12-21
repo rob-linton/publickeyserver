@@ -294,7 +294,7 @@ class Pack
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine("\nUnable to pack files\n");
+			Console.WriteLine("\nError: Unable to pack files\n");
 			if (opts.Verbose > 0)
 				Console.WriteLine(ex.Message);
 			return 1;

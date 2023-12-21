@@ -64,7 +64,7 @@ class Verify
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine("\nUnable to validate alias\n");
+			Console.WriteLine("\nError: Unable to validate alias\n");
 			if (opts.Verbose > 0)
 				Console.WriteLine(ex.Message);
 			return 1;

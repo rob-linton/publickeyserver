@@ -221,7 +221,7 @@ class Unpack
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine("\nUnable to unpack files\n");
+			Console.WriteLine("\nError: Unable to unpack files\n");
 			if (opts.Verbose > 0)
 				Console.WriteLine(ex.Message);
 			return 1;
