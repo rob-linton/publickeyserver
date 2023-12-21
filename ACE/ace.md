@@ -130,9 +130,9 @@ Official listing:
 http://oid-info.com/cgi-bin/display?oid=1.3.6.1.4.1.57055&a=display
 
 
-GET /cert?alias={alias}
-GET {alias}.publickeyserver.org
-GET /cert/{alias}
+GET /cert?alias={alias}   
+GET {alias}.publickeyserver.org  
+GET /cert/{alias}   
 ----------------------
 Returns the associated certificate with the alias in x.509 PEM format.  
 
