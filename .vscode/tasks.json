@@ -14,12 +14,12 @@
 			"problemMatcher": "$msCompile"
 		},
 		{
-			"label": "build_jdoe",
+			"label": "build_deadrop",
 			"command": "dotnet",
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/jdoe/jdoe.csproj",
+				"${workspaceFolder}/deadrop/deadrop.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary;ForceNoAlign"
 			],
