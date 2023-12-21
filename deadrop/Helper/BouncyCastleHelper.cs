@@ -68,10 +68,12 @@ public class BouncyCastleHelper
 		return keyPair;
     }
 	// --------------------------------------------------------------------------------------------------------
-	public static bool ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems)
+	public static bool ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName)
     {
         try
         {
+			Console.WriteLine("Validating certificate chain...");
+
             X509CertificateParser parser = new X509CertificateParser();
 
             // Parse the target certificate from PEM string
@@ -99,7 +101,7 @@ public class BouncyCastleHelper
                 child.Verify(parent.GetPublicKey());
 
 				// check if the commonname is a member
-				if (!CheckIfCommonNameIsAMember(child.SubjectDN.ToString(), child.IssuerDN.ToString()))
+				if (!CheckIfCommonNameIsAMember(child.SubjectDN.ToString(), commonName))
 				{
 					throw new CertificateException("*** Error: CommonName is not a member ***");
 				}
@@ -114,10 +116,10 @@ public class BouncyCastleHelper
             }
 
             // Optionally, check the root certificate separately here
-			byte[] fingerprint = GetFingerprint(intermediateAndRootCertificatePems[intermediateAndRootCertificatePems.Count-1]);
+			//byte[] fingerprint = GetFingerprint(intermediateAndRootCertificatePems[intermediateAndRootCertificatePems.Count-1]);
 
 			//DisplayVisualFingerprint(fingerprint);
-			CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
+			//CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
 
             return true;
         }
@@ -136,8 +138,16 @@ public class BouncyCastleHelper
 		if (fullName.EndsWith(shortName))
 		{
 			return true;
-		}
+		}		
+
+#if DEBUG
+		// allow domain mismatches in debug mode
+		return true;
+#else
 		return false;
+#endif
+
+		
 	}
 	// --------------------------------------------------------------------------------------------------------
 	public static byte[] GetHashOfFile(string filename)

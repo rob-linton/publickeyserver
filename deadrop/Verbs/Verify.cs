@@ -47,11 +47,11 @@ class Verify
 			bool valid = false;
 			if (certificate != null && cacerts != null) // Add null check for cacerts
 			{
-				valid = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts);
+				valid = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain);
 			}
 
-			Console.WriteLine("Please validate the CA certificate fingerprint at");
-			Console.WriteLine($"https://{domain}");
+			//Console.WriteLine("Please validate the CA certificate fingerprint at");
+			//Console.WriteLine($"https://{domain}");
 
 			if (valid)
 			{

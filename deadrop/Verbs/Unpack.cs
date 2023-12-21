@@ -149,7 +149,7 @@ class Unpack
 					bool valid = false;
 					if (fromCertificate != null && cacerts != null) // Add null check for cacerts
 					{
-						valid = BouncyCastleHelper.ValidateCertificateChain(fromCertificate, cacerts);
+						valid = BouncyCastleHelper.ValidateCertificateChain(fromCertificate, cacerts, domain);
 					}
 
 					// now check the signature
@@ -177,12 +177,12 @@ class Unpack
 					}
 
 
-					//Console.WriteLine("Decrypting files...");
+					Console.WriteLine("\nUnpacking files...\n");
 
 					// now decrypt each file
 					foreach (FileItem file in manifest.Files)
 					{
-						Console.WriteLine($"Decrypting {file.Name}...");
+						Console.WriteLine($"{file.Name}");
 
 						// create a file stream to write the file to
 						using (FileStream fs = File.Create(Path.Combine(outputDirectory, file.Name)))

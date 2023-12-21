@@ -75,7 +75,7 @@ class Pack
 
 			if (answer == null || answer.ToLower() != "n")
 			{
-				Console.WriteLine("\nPacking...");
+				Console.WriteLine("\nCreating package...");
 			}
 			else
 			{
@@ -83,6 +83,42 @@ class Pack
 				return 1;
 			}
 
+			// 
+			// validate the sender
+			//
+
+			Console.WriteLine("\nValidating the sender...");
+			string fromDomain = Misc.GetDomain(opts, opts.From);
+
+			// first get the CA
+			if (opts.Verbose > 0)
+				Console.WriteLine($"GET: https://{fromDomain}/cacerts");
+
+			var result = await HttpHelper.Get($"https://{fromDomain}/cacerts");
+			var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
+			var cacerts = ca?.CaCerts;
+
+			// now get the alias	
+			if (opts.Verbose > 0)
+				Console.WriteLine($"GET: https://{fromDomain}/cert/{Misc.GetAliasFromAlias(opts.From)}");
+
+			result = await HttpHelper.Get($"https://{fromDomain}/cert/{Misc.GetAliasFromAlias(opts.From)}");
+
+			var fromC = JsonSerializer.Deserialize<CertResult>(result);
+			var fromCertificate = fromC?.Certificate;
+
+			// now validate the certificate chain
+			bool valid = false;
+			if (fromCertificate != null && cacerts != null) // Add null check for cacerts
+			{
+				valid = BouncyCastleHelper.ValidateCertificateChain(fromCertificate, cacerts, fromDomain);
+			}
+
+			//
+			// create the zip file
+			//
+
+			Console.WriteLine("\nPacking files...\n");
 
 			// create an empty zip stream 
 			using (FileStream zipFileStream = new FileStream(opts.Output, FileMode.Create))
@@ -90,7 +126,7 @@ class Pack
 			{
 				foreach (string filePath in relativePaths)
 				{
-					Console.WriteLine($"\nPacking {filePath} ");
+					Console.WriteLine($"{filePath}");
 
 					List<string> blockList = new List<string>();
 
@@ -141,9 +177,12 @@ class Pack
 
 				Console.WriteLine("");
 				
+				//
+				// create the envelope
+				//
 
 				// now loop through each of the aliases and add them to the envelope
-				Console.WriteLine("\nAddressing envelope:");
+				Console.WriteLine("\nAddressing envelope...\n");
 				if (opts.InputAliases != null)
 				{
 					foreach (string alias in opts.InputAliases)
@@ -156,7 +195,7 @@ class Pack
 							if (opts.Verbose > 0)
 								Console.WriteLine($"GET: https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
 
-							var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+							result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
 							var c = JsonSerializer.Deserialize<CertResult>(result);
 							var certificate = c?.Certificate;
 
@@ -172,7 +211,7 @@ class Pack
 								// add the encrypted key to the envelope
 								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedKey });
 
-								Console.WriteLine($"adding {alias}");
+								Console.WriteLine($"{alias}");
 							}
 						}
 						catch
@@ -216,6 +255,10 @@ class Pack
 				// sign the envelope
 				byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);
 				byte[] envelopeSignature = BouncyCastleHelper.SignData(envelopeHash, privateKey.Private);
+
+				//
+				// create the manifest
+				//
 
 				// add the signature to the manifest
 				Manifest manifest = new Manifest 
