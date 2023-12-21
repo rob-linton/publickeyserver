@@ -90,7 +90,7 @@ class Pack
 			{
 				foreach (string filePath in relativePaths)
 				{
-					Console.Write($"\nPacking {filePath} ");
+					Console.WriteLine($"\nPacking {filePath} ");
 
 					List<string> blockList = new List<string>();
 
@@ -135,7 +135,7 @@ class Pack
 					}
 					else
 					{
-						Console.WriteLine($"File not found: {filePath}");
+						Console.WriteLine($"\nFile not found: {filePath}");
 					}
 				}
 
