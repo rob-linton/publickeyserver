@@ -32,7 +32,7 @@ class Pack
 		try
 		{
 			long createDate = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
-			byte[] nonce = Misc.GetDomainFromAlias(opts.From).ToBytes();
+			byte[] nonce = opts.From.ToLower().ToBytes();
 
 			// get a 256 bit random key from bouncy castle
 			byte[] key = BouncyCastleHelper.Generate256BitRandom();
@@ -140,7 +140,7 @@ class Pack
 				}
 
 				Console.WriteLine("");
-				Console.WriteLine("\nCreating manifest...");
+				
 
 				// now loop through each of the aliases and add them to the envelope
 				Console.WriteLine("\nAddressing envelope:");
@@ -211,6 +211,8 @@ class Pack
 					return 1;
 				}
 
+				Console.WriteLine("\nSigning the envelope...");
+				
 				// sign the envelope
 				byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);
 				byte[] envelopeSignature = BouncyCastleHelper.SignData(envelopeHash, privateKey.Private);
@@ -223,6 +225,8 @@ class Pack
 				};
 
 				string manifestJson = JsonSerializer.Serialize(manifest);
+
+				Console.WriteLine("Encrypting the manifest...");
 
 				// encrypt the manifest
 				byte[] encryptedManifest = BouncyCastleHelper.EncryptWithKey(manifestJson.ToBytes(), key, nonce);

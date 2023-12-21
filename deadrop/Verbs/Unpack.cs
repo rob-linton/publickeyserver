@@ -24,7 +24,7 @@ class Unpack
 	public static async Task<int> Execute(UnpackOptions opts)
 	{
 		Console.WriteLine("\nUnpacking the following file for dead drop:");
-		Console.WriteLine("============================================");
+		Console.WriteLine("===========================================");
 		Console.WriteLine($"\nFile: {opts.File}\n");
 
 		string domain = Misc.GetDomain(opts, opts.Alias);
@@ -66,9 +66,12 @@ class Unpack
 						string directoryPath = Path.GetDirectoryName(destinationPath) ?? string.Empty;
 						Directory.CreateDirectory(directoryPath);
 						entry.ExtractToFile(destinationPath, true);
+						Console.Write("#");
 					}
 				}
 			}
+			Console.WriteLine("");
+
 
 			// now read the envelope
 			string envelopeFile = Path.Combine(tmpOutputDirectory, "envelope");
@@ -76,7 +79,7 @@ class Unpack
 			var envelope = JsonSerializer.Deserialize<Envelope>(envelopeJson);
 			if (envelope == null)
 			{
-				Console.WriteLine("Error: could not read envelope");
+				Console.WriteLine("\nError: could not read envelope");
 				return 1;
 			}
 
@@ -110,7 +113,7 @@ class Unpack
 					string manifestFile = Path.Combine(tmpOutputDirectory, "manifest");
 					byte[] encryptedManifest = File.ReadAllBytes(manifestFile);
 
-					byte[] nonce = Misc.GetDomainFromAlias(envelope.From).ToBytes();
+					byte[] nonce = envelope.From.ToLower().ToBytes();
 					byte[] manifestJsonBytes = BouncyCastleHelper.DecryptWithKey(encryptedManifest, key, nonce);
 
 					string manifestJson = manifestJsonBytes.FromBytes();
