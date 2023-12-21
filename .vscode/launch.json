@@ -97,6 +97,20 @@
 			},
 		},
 		{
+			"name": "deadrop (list)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_deadrop",
+			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"args": ["list","-v","0","-d", "localhost:5001", "-p","password"],
+			"cwd": "${workspaceFolder}/deadrop",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
 			"name": ".NET Core Attach",
 			"type": "coreclr",
 			"request": "attach"

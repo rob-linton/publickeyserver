@@ -23,9 +23,9 @@ class Unpack
 {
 	public static async Task<int> Execute(UnpackOptions opts)
 	{
-		Console.WriteLine("\nUnpacking the following file for dead drop:");
-		Console.WriteLine("===========================================");
-		Console.WriteLine($"\nFile: {opts.File}\n");
+		Console.WriteLine("\nUnpacking the following file for dead drop");
+		Console.WriteLine("================================================\n");
+		Console.WriteLine($"File: {opts.File}\n");
 
 		string domain = Misc.GetDomain(opts, opts.Alias);
 
@@ -90,7 +90,7 @@ class Unpack
 				if (recipient.Alias == opts.Alias)
 				{
 					found_alias = true;
-					Console.WriteLine($"\nFound alias: {recipient.Alias}\n");
+					Console.WriteLine($"\nUsing alias: {recipient.Alias}\n");
 
 					// we found our alias, so decrypt the key
 					string encryptedKeyBase64 = recipient.Key;
@@ -137,20 +137,8 @@ class Unpack
 					var c = JsonSerializer.Deserialize<CertResult>(result);
 					var fromCertificate = c?.Certificate;
 
-					// now get the CA
-					if (opts.Verbose > 0)
-						Console.WriteLine($"GET: https://{domain}/cacerts");
-
-					result = await HttpHelper.Get($"https://{domain}/cacerts");
-					var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
-					var cacerts = ca?.CaCerts;
-
-					// now validate the certificate chain
-					bool valid = false;
-					if (fromCertificate != null && cacerts != null) // Add null check for cacerts
-					{
-						valid = BouncyCastleHelper.ValidateCertificateChain(fromCertificate, cacerts, domain);
-					}
+					// now verify the alias
+					bool valid = await BouncyCastleHelper.VerifyAliasAsync(domain, envelope.From, opts.Verbose);
 
 					// now check the signature
 					if (valid)

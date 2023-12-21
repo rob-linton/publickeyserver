@@ -21,14 +21,18 @@ class Create
 	{
 		try
 		{
-			Console.WriteLine("\nCreating alias...");
+			Console.WriteLine("\nCreating an alias");
+		Console.WriteLine("================================================\n");
 
 			// get the domain for requests
 			string domain = Misc.GetDomain(opts, "");
 
+			Console.WriteLine($"Requesting alias from: {domain}\n");
+
 			//
 			// create the public/private key pair using bouncy castle
 			//
+			Console.WriteLine("Generating public/private key pair...");
 			AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.GenerateKeyPair(2048);
 
 			//
@@ -47,6 +51,8 @@ class Create
 			// save it as PEM format
 			data["key"] = publicKeyPem;
 			string json = JsonSerializer.Serialize(data);
+
+			Console.WriteLine("Sending public key...");
 
 			if (opts.Verbose > 0)
 				Console.WriteLine($"POST: https://{domain}/simpleenroll");

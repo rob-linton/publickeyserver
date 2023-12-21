@@ -18,7 +18,18 @@ public class Storage
 		// save it as PEM format
 		File.WriteAllBytes($"{alias}.privatekey.pem", cipherText);
 	}
+	public static List<string> GetAliases()
+	{
+		List<string> aliases = new List<string>();
 
+		foreach (string file in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.privatekey.pem"))
+		{
+			string alias = Path.GetFileNameWithoutExtension(file).Replace(".privatekey", "");
+			aliases.Add(alias);
+		}
+
+		return aliases;
+	}
 	public static string GetPrivateKey(string alias, string password)
 	{
 		string sNonce = Misc.GetDomainFromAlias(alias);

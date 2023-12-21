@@ -57,15 +57,15 @@ class Pack
         	string[] relativePaths = fullPaths.Select(fullPath =>
             fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();
 
-			Console.WriteLine("\nPacking the following files for dead drop:");
-			Console.WriteLine("==========================================");
+			Console.WriteLine("\nPacking the following files for dead drop");
+			Console.WriteLine("================================================\n");
 			foreach (string filePath in relativePaths)
 			{
 				Console.WriteLine(filePath);
 			}
 
 			// continue?
-			Console.WriteLine("\nContinue? (Y/n)");
+			Console.WriteLine("Continue? (Y/n)");
 
 #if DEBUG
 			string? answer = "y";
@@ -88,30 +88,16 @@ class Pack
 			//
 
 			Console.WriteLine("\nValidating the sender...");
+			
 			string fromDomain = Misc.GetDomain(opts, opts.From);
+			bool valid = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, opts.Verbose);
 
-			// first get the CA
-			if (opts.Verbose > 0)
-				Console.WriteLine($"GET: https://{fromDomain}/cacerts");
-
-			var result = await HttpHelper.Get($"https://{fromDomain}/cacerts");
-			var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
-			var cacerts = ca?.CaCerts;
-
-			// now get the alias	
-			if (opts.Verbose > 0)
-				Console.WriteLine($"GET: https://{fromDomain}/cert/{Misc.GetAliasFromAlias(opts.From)}");
-
-			result = await HttpHelper.Get($"https://{fromDomain}/cert/{Misc.GetAliasFromAlias(opts.From)}");
-
-			var fromC = JsonSerializer.Deserialize<CertResult>(result);
-			var fromCertificate = fromC?.Certificate;
-
-			// now validate the certificate chain
-			bool valid = false;
-			if (fromCertificate != null && cacerts != null) // Add null check for cacerts
+			if (valid)
+				Console.WriteLine($"\nAlias {opts.From} is valid\n");
+			else
 			{
-				valid = BouncyCastleHelper.ValidateCertificateChain(fromCertificate, cacerts, fromDomain);
+				Console.WriteLine($"\nAlias {opts.From} is *NOT* valid\n");
+				return 1;
 			}
 
 			//
@@ -195,7 +181,7 @@ class Pack
 							if (opts.Verbose > 0)
 								Console.WriteLine($"GET: https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
 
-							result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+							var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
 							var c = JsonSerializer.Deserialize<CertResult>(result);
 							var certificate = c?.Certificate;
 

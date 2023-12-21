@@ -23,6 +23,7 @@ using System.Text;
 using System.Net.NetworkInformation;
 using Org.BouncyCastle.Crypto.Encodings;
 using Org.BouncyCastle.Crypto.Digests;
+using System.Text.Json;
 
 namespace deadrop;
 
@@ -495,4 +496,37 @@ public class BouncyCastleHelper
 			}
 		}
 		// --------------------------------------------------------------------------------------------------------
+		public static async Task<bool> VerifyAliasAsync(string domain, string alias, int verbose)
+		{
+			
+
+			// first get the CA
+			if (verbose > 0)
+				Console.WriteLine($"GET: https://{domain}/cacerts");
+
+			var result = await HttpHelper.Get($"https://{domain}/cacerts");
+			var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
+			var cacerts = ca?.CaCerts;
+
+			// now get the alias	
+			if (verbose > 0)
+				Console.WriteLine($"GET: https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+
+			result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+
+			var c = JsonSerializer.Deserialize<CertResult>(result);
+			var certificate = c?.Certificate;
+
+			// now validate the certificate chain
+			bool valid = false;
+			if (certificate != null && cacerts != null) // Add null check for cacerts
+			{
+				valid = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain);
+			}
+
+			if (valid)
+				return true;
+			else
+				return false;
+		}
 }
