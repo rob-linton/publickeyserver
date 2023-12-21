@@ -2,79 +2,104 @@
 <html>
 <head>
     <title>Public Key Server</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+            max-width: 1000px;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        pre {
+            background-color: #eaeaea;
+            border: 1px solid #d3d3d3;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        .key {
+            font-family: 'Courier New', monospace;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #777;
+        }
+    </style>
 </head>
-<body style="background-color: black; color: #41FF00; font-family: monospace; text-align: center; ">
-    <h1>This is a public key server</h1>
+<body>
+    <div class="container">
+        <h1>Public Key Server</h1>
+        <p>This key server generates anonymous public key certificates.</p>
+        <p>Certificates are randomly given a common name of three parts.</p>
+        <h2>Example</h2>
+        <p class="key">missions-locks-sox.publickeyserver.org</p>
+        
+        <h2>Quick Enrollment</h2>
+        <p><a href="https://publickeyserver.org/simpleenroll">https://publickeyserver.org/simpleenroll</a></p>
 
-    <p>
-        This key server generates anonymous public key certificates.
-    </p>
+        <h3>Security Note</h3>
+        <p>Using the quick method will generate a private/public RSA2048 key pair on our server, which means we'll see your private key momentarily.</p>
+        <p>Instead, create an RSA2048 public/private key pair locally on your device and send ONLY the public key to the POST endpoint of simpleenroll.</p>
+        
+        <h2>POST Endpoint</h2>
+        <pre>POST: https://publickeyserver.org/simpleenroll
+{
+  key : "-----BEGIN PUBLIC KEY-----
+         MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibaEsrl3Wgm1woCUDDeM
+         ... [rest of the key] ...
+         -----END PUBLIC KEY-----"
+}</pre>
 
-    <p>
-        Certificates are randonly given a common name of three parts.
-    </p>
+        <h2>Documentation</h2>
+        <p><a href="https://github.com/rob-linton/publickeyserver/blob/main/ACE/ace.md">GitHub Documentation</a></p>
 
-    <p>&nbsp;</p>
+        <h2>Server Purpose</h2>
+        <ol>
+            <li>Public key certificates are anonymous.</li>
+            <li>Retrieve any public key certificate by calling: <a href="https://missions-locks-sox.publickeyserver.org">https://missions-locks-sox.publickeyserver.org</a></li>
+            <li>Validate certificates using the certificate chain from: <a href="https://publickeyserver.org/cacerts">https://publickeyserver.org/cacerts</a></li>
+        </ol>
 
-    
-    
-    <pre>
-    Example is:    
+        <h2>Help and Support</h2>
+        <p><a href="https://github.com/rob-linton/publickeyserver/wiki">Public Key Server Wiki</a></p>
 
-    missions-locks-sox.publickeyserver.org       
-
-
-    </pre>
-
-    <pre>
-    The quick way to get one:                                                                     
-        <a style="background-color: black; color: #41FF00; font-family: monospace; text-align: center; " href="https://publickeyserver.org/simpleenroll">https://publickeyserver.org/simpleenroll</a>                                                          
-    </pre>
-
-
-    <pre>
-    However you should not use the quick way as we will generate a private/public RSA2048 key pair
-    on your behalf...which means we see your private key, if only for a moment.                   
-
-    Create an RSA2048 public/private key pair locally on your device and then send ONLY the public
-    key to the POST version of simpleenroll.                                                      
-
-    POST: https://publickeyserver.org/simpleenroll                                                
-    {                                                                                             
-      key : "-----BEGIN PUBLIC KEY-----                                                           
-             MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibaEsrl3Wgm1woCUDDeM                    
-             qBPHqt2fHfKsEar8BxgyUKKUVVySdYI7W1qdBHIUJvEKpDwAXoiyCsobeHNeYZbh                    
-             VcRy9gR5DHyDwJzUNmRQFu2JjVNnd6Yg9l0x6iJzY8DOb6kFukEWLY4xtuHsDc1v                    
-             ejBtpnXDWjvuR0SNfe1m5XvDbY2ya4lbREJjjdzfrXQhRkTcT1uRSPpn06AxFPZt                    
-             ooZba8WGkZfY9WCVLULwy2CcQ7oM+RIm4e+40k3dWgPqG+H6v0dnQPiUNiu1CUiw                    
-             kVQLAnySlc9r5htc+9kJXkczZVDQlbAz/7iOAT1EIaGMj4e3SFzT0u56PxjOaa1w                    
-             2QIDAQAB                                                                            
-             -----END PUBLIC KEY-----"                                                           
-    }                                                                                            
-
-
-    Documentation is located at:                                                                  
-    https://github.com/rob-linton/publickeyserver/blob/main/ACE/ace.md                            
-    </pre>
-
-    <pre>
-    The whole point of this server is that anyone can get your public key certificate by          
-    just calling:                                                                                 
-
-    GET: https://missions-locks-sox.publickeyserver.org                                           
-
-    And they can validate your certificate by using the certificate chain returned by calling:    
-
-    GET: https://publickeyserver.org/cacerts                                                      
-
-    </pre>
-
-    <pre>
-    Help located at:
-    https://github.com/rob-linton/publickeyserver/wiki
-
-    </pre>
-
-    
+        <div class="footer">
+            <p>&copy; 2023 Public Key Server</p>
+        </div>
+    </div>
 </body>
 </html>
