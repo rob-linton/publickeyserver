@@ -69,7 +69,7 @@ public class BouncyCastleHelper
 		return keyPair;
     }
 	// --------------------------------------------------------------------------------------------------------
-	public static bool ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName)
+	public static (bool, byte[]) ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName)
     {
         try
         {
@@ -116,18 +116,18 @@ public class BouncyCastleHelper
 				Console.WriteLine($"Certificate {i + 1} of {chain.Length} is valid");
             }
 
-            // Optionally, check the root certificate separately here
-			//byte[] fingerprint = GetFingerprint(intermediateAndRootCertificatePems[intermediateAndRootCertificatePems.Count-1]);
+            // get the fingerprint of the root certificate
+			byte[] fingerprint = GetFingerprint(intermediateAndRootCertificatePems[intermediateAndRootCertificatePems.Count-1]);
 
 			//DisplayVisualFingerprint(fingerprint);
 			//CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
 
-            return true;
+            return (true, fingerprint);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"*** Error: Certificate chain validation failed: {ex.Message} ***");
-            return false;
+            return (false, new byte[0]);
         }
     }
 	// --------------------------------------------------------------------------------------------------------
@@ -149,6 +149,13 @@ public class BouncyCastleHelper
 #endif
 
 		
+	}
+	// --------------------------------------------------------------------------------------------------------
+	public static byte[] GetHashOfBytes(byte[] b)
+	{
+		using SHA256 sha256 = SHA256.Create();
+		byte[] hashBytes = sha256.ComputeHash(b);
+		return hashBytes;
 	}
 	// --------------------------------------------------------------------------------------------------------
 	public static byte[] GetHashOfFile(string filename)
@@ -180,6 +187,8 @@ public class BouncyCastleHelper
 	{
 		// make sure the certificate is valid
 		Org.BouncyCastle.X509.X509Certificate cert = ReadCertificateFromPemString(pemString);
+
+		// now get the fingerprint
 		using SHA256 sha256 = SHA256.Create();
 		byte[] hashBytes = sha256.ComputeHash(pemString.ToBytes());
 		return hashBytes;
@@ -305,6 +314,18 @@ public class BouncyCastleHelper
 	// --------------------------------------------------------------------------------------------------------
 	public static byte[] SignData(byte[] message, AsymmetricKeyParameter privateKey)
 	{
+
+		var signer = SignerUtilities.GetSigner("SHA512WITHRSA");
+		signer.Init(true, privateKey);
+		signer.BlockUpdate(message, 0, message.Length);
+
+		byte[] signature = signer.GenerateSignature();
+
+		return signature;
+
+
+		/*
+
 		//
 		// sign the message using the private key
 		//
@@ -319,10 +340,25 @@ public class BouncyCastleHelper
 
 		// return the signature and the message
 		return signature;
+
+		*/
 	}
 	// --------------------------------------------------------------------------------------------------------
 	public static void verifySignature(byte[] message, byte[] signature, AsymmetricKeyParameter publicKey)
 	{
+
+		var signer = SignerUtilities.GetSigner("SHA512WITHRSA");
+		signer.Init(false, publicKey);
+		signer.BlockUpdate(message, 0, message.Length);
+
+		bool isValid =  signer.VerifySignature(signature);
+		if (!isValid)
+		{
+			throw new Exception("Signature is not valid");
+		}		
+
+
+		/*
 		//
 		// verify the message using the public key
 		//
@@ -331,6 +367,13 @@ public class BouncyCastleHelper
 		IAsymmetricBlockCipher engine = new Pkcs1Encoding(new RsaEngine());
 		engine.Init(false, publicKey); // false for verification
 
+		// Verify the data
+		bool isValid =  engine.ProcessBlock(message, 0, message.Length).SequenceEqual(signature);
+		if (!isValid)
+		{
+			throw new Exception("Signature is not valid");
+		}
+		*/
 	}
 	// --------------------------------------------------------------------------------------------------------
 	public static List<string> EncryptFileInBlocks(string filename, byte[] key, byte[] nonce)
@@ -496,7 +539,7 @@ public class BouncyCastleHelper
 			}
 		}
 		// --------------------------------------------------------------------------------------------------------
-		public static async Task<bool> VerifyAliasAsync(string domain, string alias, int verbose)
+		public static async Task<(bool, byte[])> VerifyAliasAsync(string domain, string alias, int verbose)
 		{
 			
 
@@ -519,14 +562,16 @@ public class BouncyCastleHelper
 
 			// now validate the certificate chain
 			bool valid = false;
+			byte[] fingerprint = new byte[0];
 			if (certificate != null && cacerts != null) // Add null check for cacerts
 			{
-				valid = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain);
+				(valid, fingerprint) = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain);
+
 			}
 
 			if (valid)
-				return true;
+				return (true, fingerprint);
 			else
-				return false;
+				return (false, new byte[0]);
 		}
 }

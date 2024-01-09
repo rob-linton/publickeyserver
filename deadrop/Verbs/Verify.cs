@@ -29,7 +29,7 @@ class Verify
 
 			string domain = Misc.GetDomain(opts, opts.Alias);
 
-			bool valid = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts.Verbose);
+			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts.Verbose);
 
 			if (valid)
 				Console.WriteLine($"\nAlias {opts.Alias} is valid\n");

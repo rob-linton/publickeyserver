@@ -15,5 +15,6 @@ public class Envelope
 
     [JsonPropertyName("version")]
     public required string Version { get; set; }
+
 }
 

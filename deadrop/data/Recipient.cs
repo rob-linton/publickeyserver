@@ -9,4 +9,5 @@ public class Recipient
 
     [JsonPropertyName("key")]
     public required string Key { get; set; }
+
 }

@@ -1,6 +1,9 @@
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.Json;
 using deadrop.Verbs;
 using Org.BouncyCastle.Asn1.Cmp;
+using Org.BouncyCastle.Crypto;
 
 namespace deadrop;
 
@@ -42,5 +45,23 @@ public class Misc
 				return GetDomainFromAlias(alias);
 			}
 		}
+		
+	}
+
+	public static async Task<Org.BouncyCastle.X509.X509Certificate> GetCertificate(Options opts, string alias)
+	{
+
+		string domain = Misc.GetDomain(opts, alias);
+
+		// now get the "from" alias	
+		if (opts.Verbose > 0)
+			Console.WriteLine($"GET: https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+
+		var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+
+		var c = JsonSerializer.Deserialize<CertResult>(result) ?? throw new Exception("Could not deserialize cert result");
+		var certificate = c.Certificate ?? throw new Exception("Could not get certificate from cert result");
+
+		return BouncyCastleHelper.ReadCertificateFromPemString(certificate);
 	}
 }

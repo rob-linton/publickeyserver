@@ -19,11 +19,12 @@ public class PackOptions : Options
 	[Option('a', "aliases", Required = true, HelpText = "Destination aliases (comma delimited)")]
     public IEnumerable<string>? InputAliases { get; set; }
 
-	[Option('o', "output", Default = "deadrop.zip", HelpText = "Output package file")]
-    public string Output { get; set; } = "deadrop.zip";	
+	[Option('o', "output", Default = "package", HelpText = "Output package file")]
+    public string Output { get; set; } = "package.deadpack";	
 
 	[Option('f', "from", Required = true, HelpText = "From alias")]
     public required string From { get; set; }
+	
 }
 class Pack 
 {
@@ -31,6 +32,8 @@ class Pack
 	{
 		try
 		{
+			opts.Output = opts.Output.Replace(".deadpack","") + ".deadpack";
+
 			long createDate = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
 			byte[] nonce = opts.From.ToLower().ToBytes();
 
@@ -75,7 +78,7 @@ class Pack
 
 			if (answer == null || answer.ToLower() != "n")
 			{
-				Console.WriteLine("\nCreating package...");
+				Console.WriteLine($"\nCreating package {opts.Output}...");
 			}
 			else
 			{
@@ -87,10 +90,10 @@ class Pack
 			// validate the sender
 			//
 
-			Console.WriteLine("\nValidating the sender...");
+			Console.WriteLine($"\nValidating sender alias  ->  {opts.From}");
 			
 			string fromDomain = Misc.GetDomain(opts, opts.From);
-			bool valid = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, opts.Verbose);
+			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, opts.Verbose);
 
 			if (valid)
 				Console.WriteLine($"\nAlias {opts.From} is valid\n");
@@ -162,63 +165,10 @@ class Pack
 				}
 
 				Console.WriteLine("");
-				
+
 				//
-				// create the envelope
+				// get the private key
 				//
-
-				// now loop through each of the aliases and add them to the envelope
-				Console.WriteLine("\nAddressing envelope...\n");
-				if (opts.InputAliases != null)
-				{
-					foreach (string alias in opts.InputAliases)
-					{
-						try
-						{
-							string domain = Misc.GetDomain(opts, alias);
-
-							// get their public key
-							if (opts.Verbose > 0)
-								Console.WriteLine($"GET: https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
-
-							var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
-							var c = JsonSerializer.Deserialize<CertResult>(result);
-							var certificate = c?.Certificate;
-
-							if (certificate != null)
-							{
-								var x509 = BouncyCastleHelper.ReadCertificateFromPemString(certificate);
-								var publicKey = x509.GetPublicKey();
-
-								// encrypt the key with the public key
-								byte[] encryptedKey = BouncyCastleHelper.EncryptWithPublicKey(key, publicKey);
-								string sEncryptedKey = Convert.ToBase64String(encryptedKey);
-
-								// add the encrypted key to the envelope
-								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedKey });
-
-								Console.WriteLine($"{alias}");
-							}
-						}
-						catch
-						{
-							Console.WriteLine($"Error: could not find alias {alias}");
-						}
-					}
-				}
-
-				Envelope envelope = new Envelope { 
-					To = recipients, 
-					From = opts.From,
-					Created = createDate,
-					Version = "1.0",
-				};
-
-				//envelope["asymmetric"] = "RSA2048";  
-				//envelope["symmetric"] = "AES_GCM_256";
-				//envelope["hash"] = "SHA256";
-
-				string envelopeJson = JsonSerializer.Serialize(envelope);
 
 				// get the from private key
 				AsymmetricCipherKeyPair privateKey;
@@ -236,21 +186,39 @@ class Pack
 					return 1;
 				}
 
-				Console.WriteLine("\nSigning the envelope...");
-				
-				// sign the envelope
-				byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);
-				byte[] envelopeSignature = BouncyCastleHelper.SignData(envelopeHash, privateKey.Private);
+				//
+				// make sure the public key from the cert matches the private key
+				//
+				var fromX509 = await Misc.GetCertificate(opts, opts.From);
+				if (fromX509 != null)
+				{
+					var fromPublicKey = fromX509.GetPublicKey();
+
+					// compare the two public keys and make sure that the private key is for the public key
+					if (!privateKey.Public.Equals(fromPublicKey))
+					{
+						Console.WriteLine($"Error: public key does not match private key for alias {opts.From}");
+						return 1;
+					}
+					else
+					{
+						Console.WriteLine($"Private key matches public certificate for alias {opts.From}");
+					}
+				}
+				else
+				{
+					Console.WriteLine($"Error: could not find certificate for {opts.From}");
+					return 1;
+				}
 
 				//
 				// create the manifest
 				//
 
-				// add the signature to the manifest
+				// add the files to the manifest
 				Manifest manifest = new Manifest 
 				{
 					Files = fileList,
-					Signature = Convert.ToBase64String(envelopeSignature)
 				};
 
 				string manifestJson = JsonSerializer.Serialize(manifest);
@@ -260,17 +228,117 @@ class Pack
 				// encrypt the manifest
 				byte[] encryptedManifest = BouncyCastleHelper.EncryptWithKey(manifestJson.ToBytes(), key, nonce);
 
-				// write them both to a file
+				//
+				// create the envelope
+				//
+
+				// now loop through each of the aliases and add them to the envelope
+				Console.WriteLine("\nAddressing envelope...\n");
+				if (opts.InputAliases != null)
+				{
+					foreach (string alias in opts.InputAliases)
+					{
+						try
+						{
+							// validate the alias
+							Console.WriteLine($"\nValidating recipient alias  ->  {alias}");
+							string domain = Misc.GetDomain(opts, alias);
+							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts.Verbose);
+
+							if (valid)
+							{
+								//
+								// the root certificates must match between the sender and the recipient
+								//
+
+								if (!fromFingerprint.SequenceEqual(toFingerprint))
+								{
+									Console.WriteLine($"Aliases do not share the same root certificate {opts.From} -> {alias}");
+									return 1;
+								}
+
+								Console.WriteLine($"\nRecipient Alias {alias} is valid\n");
+								Console.WriteLine($"Aliases share the same root certificate {opts.From} -> {alias}");
+							}
+							else
+							{
+								Console.WriteLine($"\nRecipient Alias {alias} is *NOT* valid\n");
+								return 1;
+							}
+
+							var toX509 = await Misc.GetCertificate(opts, alias);
+							if (toX509 != null)
+							{
+								var publicKey = toX509.GetPublicKey();
+
+								// encrypt the key with the public key
+								byte[] encryptedKey = BouncyCastleHelper.EncryptWithPublicKey(key, publicKey);
+								string sEncryptedKey = Convert.ToBase64String(encryptedKey);
+
+								// sign the alias
+								//byte[] aliasHash = BouncyCastleHelper.GetHashOfString(alias);
+								//byte[] aliasSignature = BouncyCastleHelper.SignData(aliasHash, privateKey.Private);
+
+								// add the encrypted key to the envelope
+								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedKey });
+
+								Console.WriteLine($"Added alias {alias}");
+							}
+						}
+						catch
+						{
+							Console.WriteLine($"Error: could not find alias {alias}");
+						}
+					}
+				}
+
+				
+
+
+				Envelope envelope = new Envelope { 
+					To = recipients, 
+					From = opts.From,
+					Created = createDate,
+					Version = "1.0"
+				};
+
+				//envelope["asymmetric"] = "RSA2048";  
+				//envelope["symmetric"] = "AES_GCM_256";
+				//envelope["hash"] = "SHA256";
+
+				string envelopeJson = JsonSerializer.Serialize(envelope);
+				
+
+				Console.WriteLine("\nSigning the envelope...");
+				
+				// sign the manifest
+				byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);
+				byte[] envelopeSignature = BouncyCastleHelper.SignData(envelopeHash, privateKey.Private);
+
+				Console.WriteLine("\nSigning the manifest...");
+				
+				// sign the manifest
+				byte[] manifestHash = BouncyCastleHelper.GetHashOfBytes(encryptedManifest);
+				byte[] manifestSignature = BouncyCastleHelper.SignData(manifestHash, privateKey.Private);
+
+				// write them all to a file
 				File.WriteAllBytes("manifest", encryptedManifest);
+				File.WriteAllBytes("manifest.signature", manifestSignature);
 				File.WriteAllText("envelope", envelopeJson);
+				File.WriteAllBytes("envelope.signature", envelopeSignature);
 
 				// add them to the zip file
 				zip.CreateEntryFromFile("manifest", "manifest");
 				zip.CreateEntryFromFile("envelope", "envelope");
+				zip.CreateEntryFromFile("manifest.signature", "manifest.signature");
+				zip.CreateEntryFromFile("envelope.signature", "envelope.signature");
+
 
 				// now delete them
 				File.Delete("manifest");
 				File.Delete("envelope");
+				File.Delete("manifest.signature");
+				File.Delete("envelope.signature");
 
 				// add a comment to the zip file
 				zip.Comment = "This zip file was created by deadrop.org";
