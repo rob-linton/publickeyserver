@@ -230,12 +230,12 @@ class Unpack
 					// now unpack all of the files
 					//
 
-					Console.WriteLine("");
+					//Console.WriteLine("");
 
 					// now decrypt each file
 					foreach (FileItem file in manifest.Files)
 					{
-						Console.WriteLine($"  Unpacking {file.Name}");
+						Console.WriteLine($"\n  Unpacking {file.Name}");
 
 						// create a file stream to write the file to
 						using (FileStream fs = File.Create(Path.Combine(outputDirectory, file.Name)))

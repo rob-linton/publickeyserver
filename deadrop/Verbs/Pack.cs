@@ -68,6 +68,7 @@ class Pack
 
 			Console.WriteLine($"Deadpacking...");
 			Console.WriteLine($"Input: {opts.File}");
+			Console.WriteLine($"Search Subdirectories: {opts.subdirectories}");
 			Console.WriteLine($"Sender Alias: {opts.From}");
 			
 			foreach (string alias in opts.InputAliases)
@@ -114,7 +115,7 @@ class Pack
 				Console.WriteLine($"- Alias {opts.From} is valid\n");
 			else
 			{
-				Console.WriteLine($"\nAlias {opts.From} is *NOT* valid\n");
+				Console.WriteLine($"\nAlias {opts.From} is *NOT* valid");
 				return 1;
 			}
 
@@ -122,7 +123,7 @@ class Pack
 			// create the zip file
 			//
 
-			Console.WriteLine("  Packing files...");
+			//Console.WriteLine("  Packing files...");
 			
 			// create an empty zip stream 
 			using (FileStream zipFileStream = new FileStream(opts.Output, FileMode.Create))
@@ -130,7 +131,7 @@ class Pack
 			{
 				foreach (string filePath in relativePaths)
 				{
-					Console.WriteLine($"  {filePath}");
+					Console.WriteLine($"\n  deadpacking {filePath}");
 
 					List<string> blockList = new List<string>();
 

@@ -66,9 +66,13 @@ class Create
 
 			var j = JsonSerializer.Deserialize<SimpleEnrollResult>(result);
 			alias = j?.Alias ?? string.Empty;
-			string certificate = j?.Certificate ?? string.Empty;
-
-			Storage.StoreCert(alias, certificate);
+			if (String.IsNullOrEmpty(j?.Certificate))
+			{
+				Console.WriteLine("Error: no certificate returned");
+				return 1;
+			}
+		
+			//Storage.StoreCert(alias, certificate);
 
 			string privateKeyPem = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Private);
 			if (privateKeyPem == null)
