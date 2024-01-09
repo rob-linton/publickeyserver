@@ -40,7 +40,6 @@ class Unpack
 		Console.WriteLine($"Unpacking deadpack...");
 		Console.WriteLine($"Input: {opts.File}");
 		Console.WriteLine($"Recipient Alias: {opts.Alias}");
-		Console.WriteLine($"Output: {opts.Output}");
 
 		// get the output directory
 		if (String.IsNullOrEmpty(opts.Output))

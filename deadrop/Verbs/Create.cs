@@ -21,18 +21,23 @@ class Create
 	{
 		try
 		{
-			Console.WriteLine("\nCreating an alias");
-		Console.WriteLine("================================================\n");
+			Console.WriteLine("\n====================================================");
+			Console.WriteLine("deadpack v1.0...");
+			Console.WriteLine("Deadrop's Encrypted Archive and Distribution PACKage");
+			Console.WriteLine("Rob Linton, 2023");
+			Console.WriteLine("====================================================\n");
 
 			// get the domain for requests
 			string domain = Misc.GetDomain(opts, "");
 
-			Console.WriteLine($"Requesting alias from: {domain}\n");
+			Console.WriteLine($"Domain: {domain}\n");
+
+			Console.WriteLine($"- Requesting alias from: {domain}\n");
 
 			//
 			// create the public/private key pair using bouncy castle
 			//
-			Console.WriteLine("Generating public/private key pair...");
+			Console.WriteLine("- Generating public/private key pair...");
 			AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.GenerateKeyPair(2048);
 
 			//
@@ -52,7 +57,7 @@ class Create
 			data["key"] = publicKeyPem;
 			string json = JsonSerializer.Serialize(data);
 
-			Console.WriteLine("Sending public key...");
+			Console.WriteLine("- Sending public key...");
 
 			if (opts.Verbose > 0)
 				Console.WriteLine($"POST: https://{domain}/simpleenroll");
@@ -74,7 +79,7 @@ class Create
 
 			Storage.StorePrivateKey(alias, privateKeyPem, opts.Password);
 
-			Console.WriteLine($"\nAlias {alias} created\n");
+			Console.WriteLine($"- Alias {alias} created\n");
 		}
 		catch (Exception ex)
 		{
