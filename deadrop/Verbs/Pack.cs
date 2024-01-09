@@ -17,7 +17,7 @@ public class PackOptions : Options
 	public bool subdirectories { get; set; } = false;
 
 	[Option('a', "aliases", Required = true, HelpText = "Destination aliases (comma delimited)")]
-    public IEnumerable<string>? InputAliases { get; set; }
+    public required IEnumerable<string>? InputAliases { get; set; }
 
 	[Option('o', "output", Default = "package", HelpText = "Output package file")]
     public string Output { get; set; } = "package.deadpack";	
@@ -60,15 +60,30 @@ class Pack
         	string[] relativePaths = fullPaths.Select(fullPath =>
             fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();
 
-			Console.WriteLine("\nPacking the following files for dead drop");
-			Console.WriteLine("================================================\n");
+			Console.WriteLine("\n====================================================");
+			Console.WriteLine("deadpack v1.0...");
+			Console.WriteLine("Deadrop's Encrypted Archive and Distribution PACKage");
+			Console.WriteLine("Rob Linton, 2023");
+			Console.WriteLine("====================================================\n");
+
+			Console.WriteLine($"Deadpacking...");
+			Console.WriteLine($"Input: {opts.File}");
+			Console.WriteLine($"Sender Alias: {opts.From}");
+			
+			foreach (string alias in opts.InputAliases)
+			{
+				Console.WriteLine($"Recipient Alias: {alias}");
+			}
+			Console.WriteLine($"Output: {opts.Output}");
+
+			Console.WriteLine("\nFiles to be deadpacked:");
 			foreach (string filePath in relativePaths)
 			{
-				Console.WriteLine(filePath);
+				Console.WriteLine("  " + filePath);
 			}
 
 			// continue?
-			Console.WriteLine("Continue? (Y/n)");
+			Console.WriteLine("\nContinue? (Y/n)");
 
 #if DEBUG
 			string? answer = "y";
@@ -90,13 +105,13 @@ class Pack
 			// validate the sender
 			//
 
-			Console.WriteLine($"\nValidating sender alias  ->  {opts.From}");
+			Console.WriteLine($"\n- Validating sender alias  ->  {opts.From}");
 			
 			string fromDomain = Misc.GetDomain(opts, opts.From);
 			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, opts.Verbose);
 
 			if (valid)
-				Console.WriteLine($"\nAlias {opts.From} is valid\n");
+				Console.WriteLine($"- Alias {opts.From} is valid\n");
 			else
 			{
 				Console.WriteLine($"\nAlias {opts.From} is *NOT* valid\n");
@@ -107,15 +122,15 @@ class Pack
 			// create the zip file
 			//
 
-			Console.WriteLine("\nPacking files...\n");
-
+			Console.WriteLine("  Packing files...");
+			
 			// create an empty zip stream 
 			using (FileStream zipFileStream = new FileStream(opts.Output, FileMode.Create))
 			using (ZipArchive zip = new ZipArchive(zipFileStream, ZipArchiveMode.Create))
 			{
 				foreach (string filePath in relativePaths)
 				{
-					Console.WriteLine($"{filePath}");
+					Console.WriteLine($"  {filePath}");
 
 					List<string> blockList = new List<string>();
 
@@ -126,6 +141,7 @@ class Pack
 						
 						List<string> blockFileList = BouncyCastleHelper.EncryptFileInBlocks(filePath, key, nonce);
 
+						Console.Write("  ");
 						// Add each chunk to the zip file
 						foreach (string chunk in blockFileList)
 						{
@@ -202,7 +218,7 @@ class Pack
 					}
 					else
 					{
-						Console.WriteLine($"Private key matches public certificate for alias {opts.From}");
+						Console.WriteLine($"\n- Private key matches public certificate for alias {opts.From}");
 					}
 				}
 				else
@@ -223,7 +239,7 @@ class Pack
 
 				string manifestJson = JsonSerializer.Serialize(manifest);
 
-				Console.WriteLine("Encrypting the manifest...");
+				Console.WriteLine("- Encrypting the manifest...");
 
 				// encrypt the manifest
 				byte[] encryptedManifest = BouncyCastleHelper.EncryptWithKey(manifestJson.ToBytes(), key, nonce);
@@ -233,7 +249,7 @@ class Pack
 				//
 
 				// now loop through each of the aliases and add them to the envelope
-				Console.WriteLine("\nAddressing envelope...\n");
+				Console.WriteLine("- Addressing envelope...");
 				if (opts.InputAliases != null)
 				{
 					foreach (string alias in opts.InputAliases)
@@ -241,7 +257,7 @@ class Pack
 						try
 						{
 							// validate the alias
-							Console.WriteLine($"\nValidating recipient alias  ->  {alias}");
+							Console.WriteLine($"- Validating recipient alias  ->  {alias}");
 							string domain = Misc.GetDomain(opts, alias);
 							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts.Verbose);
 
@@ -257,8 +273,8 @@ class Pack
 									return 1;
 								}
 
-								Console.WriteLine($"\nRecipient Alias {alias} is valid\n");
-								Console.WriteLine($"Aliases share the same root certificate {opts.From} -> {alias}");
+								Console.WriteLine($"- Recipient Alias {alias} is valid");
+								Console.WriteLine($"- Aliases share the same root certificate {opts.From} -> {alias}");
 							}
 							else
 							{
@@ -282,7 +298,7 @@ class Pack
 								// add the encrypted key to the envelope
 								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedKey });
 
-								Console.WriteLine($"Added alias {alias}");
+								Console.WriteLine($"- Added alias {alias}");
 							}
 						}
 						catch
@@ -309,13 +325,13 @@ class Pack
 				string envelopeJson = JsonSerializer.Serialize(envelope);
 				
 
-				Console.WriteLine("\nSigning the envelope...");
+				Console.WriteLine("- Signing the envelope...");
 				
 				// sign the manifest
 				byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);
 				byte[] envelopeSignature = BouncyCastleHelper.SignData(envelopeHash, privateKey.Private);
 
-				Console.WriteLine("\nSigning the manifest...");
+				Console.WriteLine("- Signing the manifest...");
 				
 				// sign the manifest
 				byte[] manifestHash = BouncyCastleHelper.GetHashOfBytes(encryptedManifest);

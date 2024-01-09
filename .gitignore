@@ -13,3 +13,4 @@ deadrop/bin
 deadrop/obj
 deadrop.zip
 deadrop/output
+*.deadpack

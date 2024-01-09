@@ -73,7 +73,7 @@ public class BouncyCastleHelper
     {
         try
         {
-			Console.WriteLine("Validating certificate chain...");
+			Console.WriteLine("  Validating certificate chain...");
 
             X509CertificateParser parser = new X509CertificateParser();
 
@@ -97,6 +97,7 @@ public class BouncyCastleHelper
                 {
                     throw new CertificateException("*** ERROR: Issuer/Subject DN mismatch ***");
                 }
+				Console.WriteLine("  Issuer/Subject DN match");
 
 				// trows an exception if not valid
                 child.Verify(parent.GetPublicKey());
@@ -112,8 +113,9 @@ public class BouncyCastleHelper
 				{
 					throw new CertificateException("*** Error: Certificate not valid now ***");
 				}
+				Console.WriteLine("  Certificate dates valid");
 
-				Console.WriteLine($"Certificate {i + 1} of {chain.Length} is valid");
+				Console.WriteLine($"  Certificate {i + 1} of {chain.Length} is valid: {parent.SubjectDN.ToString()}");
             }
 
             // get the fingerprint of the root certificate
@@ -121,6 +123,7 @@ public class BouncyCastleHelper
 
 			//DisplayVisualFingerprint(fingerprint);
 			//CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
+			Console.WriteLine($"  Certificate is valid");
 
             return (true, fingerprint);
         }
@@ -138,10 +141,12 @@ public class BouncyCastleHelper
 
 		if (fullName.EndsWith(shortName))
 		{
+			Console.WriteLine($"  CommonName {shortName} is a member of {fullName}");
 			return true;
 		}		
 
 #if DEBUG
+		Console.WriteLine($"  DEBUG CommonName {shortName} is a member of {fullName}");
 		// allow domain mismatches in debug mode
 		return true;
 #else
@@ -323,25 +328,6 @@ public class BouncyCastleHelper
 
 		return signature;
 
-
-		/*
-
-		//
-		// sign the message using the private key
-		//
-
-		// Create an RSA engine for signing
-		IAsymmetricBlockCipher engine = new Pkcs1Encoding(new RsaEngine());
-		engine.Init(true, privateKey); // true for signing
-
-		// Sign the data
-		
-		byte[] signature = engine.ProcessBlock(message, 0, message.Length);
-
-		// return the signature and the message
-		return signature;
-
-		*/
 	}
 	// --------------------------------------------------------------------------------------------------------
 	public static void verifySignature(byte[] message, byte[] signature, AsymmetricKeyParameter publicKey)
@@ -356,24 +342,6 @@ public class BouncyCastleHelper
 		{
 			throw new Exception("Signature is not valid");
 		}		
-
-
-		/*
-		//
-		// verify the message using the public key
-		//
-
-		// Create an RSA engine for verification
-		IAsymmetricBlockCipher engine = new Pkcs1Encoding(new RsaEngine());
-		engine.Init(false, publicKey); // false for verification
-
-		// Verify the data
-		bool isValid =  engine.ProcessBlock(message, 0, message.Length).SequenceEqual(signature);
-		if (!isValid)
-		{
-			throw new Exception("Signature is not valid");
-		}
-		*/
 	}
 	// --------------------------------------------------------------------------------------------------------
 	public static List<string> EncryptFileInBlocks(string filename, byte[] key, byte[] nonce)
