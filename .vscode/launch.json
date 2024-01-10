@@ -46,7 +46,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadrop",
 			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-			"args": ["create","-v","0","-d", "localhost:5001", "-p","password"],
+			"args": ["create","-v","1","-d", "localhost:5001", "-p","password"],
 			"cwd": "${workspaceFolder}/deadrop",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
@@ -60,7 +60,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadrop",
 			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-			"args": ["verify","-v","0","-d", "localhost:5001", "-p","password", "-a","everything-developing-foods.publickeyserver.org"],
+			"args": ["verify","-v","0","-d", "localhost:5001", "-p","password", "-a","university-hospitality-he.publickeyserver.org"],
 			"cwd": "${workspaceFolder}/deadrop",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
@@ -74,7 +74,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadrop",
 			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-			"args": ["pack","-v","0","-d", "localhost:5001", "-p","password", "-o", "Rob Linton", "-a","university-hospitality-he.publickeyserver.org","bloggers-chapel-capital.publickeyserver.org","-i","*.jpg","-f","everything-developing-foods.publickeyserver.org"],
+			"args": ["pack","-v","1","-d", "localhost:5001", "-p","password", "-o", "Rob Linton", "-a","university-hospitality-he.publickeyserver.org","bloggers-chapel-capital.publickeyserver.org","-i","*.jpg","-f","everything-developing-foods.publickeyserver.org"],
 			"cwd": "${workspaceFolder}/deadrop",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
@@ -88,7 +88,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadrop",
 			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-			"args": ["unpack","-v","0","-i","Rob Linton","-d", "localhost:5001", "-p","password", "-a","university-hospitality-he.publickeyserver.org", "-o","output"],
+			"args": ["unpack","-v","1","-i","Rob Linton","-d", "localhost:5001", "-p","password", "-a","university-hospitality-he.publickeyserver.org", "-o","output"],
 			"cwd": "${workspaceFolder}/deadrop",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
@@ -102,6 +102,76 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadrop",
 			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"args": ["list","-v","1","-d", "localhost:5001", "-p","password"],
+			"cwd": "${workspaceFolder}/deadrop",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
+			"name": "deadrop (create)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_deadrop",
+			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"args": ["create","-v","0", "-p","password"],
+			"cwd": "${workspaceFolder}/deadrop",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
+			"name": "deadrop (verify)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_deadrop",
+			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"args": ["verify","-v","0","-p","password","-a","everything-developing-foods.publickeyserver.org"],
+			"cwd": "${workspaceFolder}/deadrop",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
+			"name": "deadrop (pack)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_deadrop",
+			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"args": ["pack","-v","0","-p","password","-a","university-hospitality-he.publickeyserver.org","-i","Rob Linton - Speed Week 2023.jpg","-f","everything-developing-foods.publickeyserver.org"],
+			"cwd": "${workspaceFolder}/deadrop",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
+			"name": "deadrop (unpack)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_deadrop",
+			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"args": ["unpack","-v","0","-i","deadrop.zip","-p","password","-a","university-hospitality-he.publickeyserver.org", "-o","output"],
+			"cwd": "${workspaceFolder}/deadrop",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
+			"name": "deadrop (list)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_deadrop",
+			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
 			"args": ["list","-v","0","-d", "localhost:5001", "-p","password"],
 			"cwd": "${workspaceFolder}/deadrop",
 			"stopAtEntry": false,
@@ -109,75 +179,6 @@
 			"env": {
 				"ASPNETCORE_ENVIRONMENT": "Development"
 			},
-			{
-				"name": "deadrop (create)",
-				"type": "coreclr",
-				"request": "launch",
-				"preLaunchTask": "build_deadrop",
-				"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-				"args": ["create","-v","0", "-p","password"],
-				"cwd": "${workspaceFolder}/deadrop",
-				"stopAtEntry": false,
-				"console":"integratedTerminal",
-				"env": {
-					"ASPNETCORE_ENVIRONMENT": "Development"
-				},
-			},
-			{
-				"name": "deadrop (verify)",
-				"type": "coreclr",
-				"request": "launch",
-				"preLaunchTask": "build_deadrop",
-				"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-				"args": ["verify","-v","0","-p","password","-a","everything-developing-foods.publickeyserver.org"],
-				"cwd": "${workspaceFolder}/deadrop",
-				"stopAtEntry": false,
-				"console":"integratedTerminal",
-				"env": {
-					"ASPNETCORE_ENVIRONMENT": "Development"
-				},
-			},
-			{
-				"name": "deadrop (pack)",
-				"type": "coreclr",
-				"request": "launch",
-				"preLaunchTask": "build_deadrop",
-				"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-				"args": ["pack","-v","0","-p","password","-a","university-hospitality-he.publickeyserver.org","-i","Rob Linton - Speed Week 2023.jpg","-f","everything-developing-foods.publickeyserver.org"],
-				"cwd": "${workspaceFolder}/deadrop",
-				"stopAtEntry": false,
-				"console":"integratedTerminal",
-				"env": {
-					"ASPNETCORE_ENVIRONMENT": "Development"
-				},
-			},
-			{
-				"name": "deadrop (unpack)",
-				"type": "coreclr",
-				"request": "launch",
-				"preLaunchTask": "build_deadrop",
-				"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-				"args": ["unpack","-v","0","-i","deadrop.zip","-p","password","-a","university-hospitality-he.publickeyserver.org", "-o","output"],
-				"cwd": "${workspaceFolder}/deadrop",
-				"stopAtEntry": false,
-				"console":"integratedTerminal",
-				"env": {
-					"ASPNETCORE_ENVIRONMENT": "Development"
-				},
-			},
-			{
-				"name": "deadrop (list)",
-				"type": "coreclr",
-				"request": "launch",
-				"preLaunchTask": "build_deadrop",
-				"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-				"args": ["list","-v","0","-d", "localhost:5001", "-p","password"],
-				"cwd": "${workspaceFolder}/deadrop",
-				"stopAtEntry": false,
-				"console":"integratedTerminal",
-				"env": {
-					"ASPNETCORE_ENVIRONMENT": "Development"
-				},
 		},
 		{
 			"name": ".NET Core Attach",

@@ -1,9 +1,9 @@
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using deadrop.Verbs;
 using Org.BouncyCastle.Asn1.Cmp;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.X509;
 
 namespace deadrop;
 
@@ -48,20 +48,104 @@ public class Misc
 		
 	}
 
-	public static async Task<Org.BouncyCastle.X509.X509Certificate> GetCertificate(Options opts, string alias)
+	public static async Task<X509Certificate> GetCertificate(Options opts, string alias)
 	{
 
 		string domain = Misc.GetDomain(opts, alias);
 
 		// now get the "from" alias	
-		if (opts.Verbose > 0)
-			Console.WriteLine($"GET: https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
-
-		var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+		var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}", opts);
 
 		var c = JsonSerializer.Deserialize<CertResult>(result) ?? throw new Exception("Could not deserialize cert result");
 		var certificate = c.Certificate ?? throw new Exception("Could not get certificate from cert result");
 
 		return BouncyCastleHelper.ReadCertificateFromPemString(certificate);
+	}
+
+	public static void LogLine(Options opts, string message)
+	{
+		if (opts.Verbose > 0)
+			Console.WriteLine(message);
+	}
+
+	public static void LogLine1(Options opts, string message)
+	{
+		if (opts.Verbose > 1)
+		{
+			Console.WriteLine("--------------------------------------------------------------------------------");
+			Console.WriteLine(message);
+			Console.WriteLine("--------------------------------------------------------------------------------");
+		}
+	}
+
+	public static void LogLine(string message)
+	{
+		Console.WriteLine(message);
+	}
+
+	public static void LogError(Options opts, string message, string details = "")
+	{
+		Console.WriteLine($"\n*** ERROR: {message} ***\n");
+
+		if (opts.Verbose > 0 && !String.IsNullOrEmpty(details))
+			Console.Write(details);
+	}
+
+	public static void LogChar(Options opts, string message)
+	{
+		if (opts.Verbose > 0)
+			Console.Write(message);
+	}
+
+	public static void LogChar(string message)
+	{
+		Console.Write(message);
+	}
+
+	public static void LogHeader()
+	{
+		LogLine("================================================================================");
+		LogLine("DEADPACK v1.0...");
+		LogLine("Deadrop's Encrypted Archive and Distribution PACKage");
+		LogLine("Copyright Rob Linton, 2023");
+		LogLine("================================================================================\n");
+	}
+
+	public static void LogArt()
+	{
+		string art = 
+@"
+################################################################################
+##########################  Dead Drop (deadrop.org)   ##########################
+################################################################################
+###############################                   ##############################
+###########################                           ##########################
+#########################                               ########################
+########################                                 #######################
+#######################*                                 *######################
+#######################                                   ######################
+#######################/                                 /######################
+########################,    *####&\         /&####*    ,#######################
+#########################   ##########     ##########   ########################
+########################   ###########     ###########   #######################
+#######################      #######/       \#######      ######################
+#######################&              #####              &######################
+##############################       #######       (############################
+###############################                   ##############################
+################,    ##########                   ##########    ,###############
+##############&        &############|#|#|#|#|############&        &#############
+#############               &#######################&               ############
+##############&                   (###########(                   &#############
+###########################/                         /##########################
+#################################               ################################
+################.*%&####&(             *#/             (&####&%*.(##############
+#############                   .###############.                   ############
+##############*           ,###########################,           *#############
+################      ,###################################,      ###############
+################################################################################
+################### Anonymous End to End Encrypted File Drops ##################
+################################################################################
+";
+		LogLine(art);
 	}
 }

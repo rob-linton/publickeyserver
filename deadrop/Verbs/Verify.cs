@@ -22,25 +22,26 @@ class Verify
 	{
 		try
 		{
-			Console.WriteLine($"\nVerifying alias");
-			Console.WriteLine("================================================\n");
+			Misc.LogArt();
+			Misc.LogHeader();
 
-			Console.WriteLine($"\nVerifying  {opts.Alias}");
+			Misc.LogLine($"Verifying...");
+
+			Misc.LogLine(opts, $"Verifying  {opts.Alias}");
+			Misc.LogLine($"");
 
 			string domain = Misc.GetDomain(opts, opts.Alias);
 
-			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts.Verbose);
+			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts);
 
 			if (valid)
-				Console.WriteLine($"\nAlias {opts.Alias} is valid\n");
+				Misc.LogLine($"\nValid: {opts.Alias}\n");
 			else
-				Console.WriteLine($"\nAlias {opts.Alias} is *NOT* valid\n");
+				Misc.LogLine($"\nInvalid: {opts.Alias}\n");
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine("\nError: Unable to validate alias\n");
-			if (opts.Verbose > 0)
-				Console.WriteLine(ex.Message);
+			Misc.LogError(opts, "Unable to validate alias", ex.Message);
 			return 1;
 		}
 		

@@ -21,23 +21,20 @@ class Create
 	{
 		try
 		{
-			Console.WriteLine("\n====================================================");
-			Console.WriteLine("deadpack v1.0...");
-			Console.WriteLine("Deadrop's Encrypted Archive and Distribution PACKage");
-			Console.WriteLine("Rob Linton, 2023");
-			Console.WriteLine("====================================================\n");
+			Misc.LogHeader();
+			Misc.LogLine($"Creating...");
 
 			// get the domain for requests
 			string domain = Misc.GetDomain(opts, "");
 
-			Console.WriteLine($"Domain: {domain}\n");
-
-			Console.WriteLine($"- Requesting alias from: {domain}\n");
+			Misc.LogLine($"Domain: {domain}");
+			Misc.LogLine($"");
+			Misc.LogLine(opts, $"- Requesting alias from: {domain}\n");
 
 			//
 			// create the public/private key pair using bouncy castle
 			//
-			Console.WriteLine("- Generating public/private key pair...");
+			Misc.LogLine(opts, "- Generating public/private key pair...");
 			AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.GenerateKeyPair(2048);
 
 			//
@@ -49,7 +46,7 @@ class Create
 
 			if (publicKeyPem == null)
 			{
-				Console.WriteLine("Error: could not read public key");
+				Misc.LogError(opts, "Could not read public key from new key pair");
 				return 1;
 			}
 
@@ -57,18 +54,15 @@ class Create
 			data["key"] = publicKeyPem;
 			string json = JsonSerializer.Serialize(data);
 
-			Console.WriteLine("- Sending public key...");
+			Misc.LogLine(opts, "- Sending public key...");
 
-			if (opts.Verbose > 0)
-				Console.WriteLine($"POST: https://{domain}/simpleenroll");
-
-			var result = await HttpHelper.Post($"https://{domain}/simpleenroll", json);
+			var result = await HttpHelper.Post($"https://{domain}/simpleenroll", json, opts);
 
 			var j = JsonSerializer.Deserialize<SimpleEnrollResult>(result);
 			alias = j?.Alias ?? string.Empty;
 			if (String.IsNullOrEmpty(j?.Certificate))
 			{
-				Console.WriteLine("Error: no certificate returned");
+				Misc.LogError(opts, "No certificate returned from simpleenroll");
 				return 1;
 			}
 		
@@ -77,19 +71,19 @@ class Create
 			string privateKeyPem = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Private);
 			if (privateKeyPem == null)
 			{
-				Console.WriteLine("Error: could not read private key");
+				Misc.LogError(opts, "Could not read private key");
 				return 1;
 			}
 
 			Storage.StorePrivateKey(alias, privateKeyPem, opts.Password);
 
-			Console.WriteLine($"- Alias {alias} created\n");
+			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
+
+			Misc.LogLine($"\nAlias {alias} created\n");
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine("\nUnable to create alias\n");
-			if (opts.Verbose > 0)
-				Console.WriteLine(ex.Message);
+			Misc.LogError(opts, "Unable to create alias", ex.Message);
 			return 1;
 		}
 

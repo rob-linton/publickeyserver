@@ -60,45 +60,46 @@ class Pack
         	string[] relativePaths = fullPaths.Select(fullPath =>
             fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();
 
-			Console.WriteLine("\n====================================================");
-			Console.WriteLine("deadpack v1.0...");
-			Console.WriteLine("Deadrop's Encrypted Archive and Distribution PACKage");
-			Console.WriteLine("Rob Linton, 2023");
-			Console.WriteLine("====================================================\n");
+			Misc.LogHeader();
 
-			Console.WriteLine($"Deadpacking...");
-			Console.WriteLine($"Input: {opts.File}");
-			Console.WriteLine($"Search Subdirectories: {opts.subdirectories}");
-			Console.WriteLine($"Sender Alias: {opts.From}");
-			
-			foreach (string alias in opts.InputAliases)
+			Misc.LogLine($"Deadpacking...");
+			Misc.LogLine($"Input: {opts.File}");
+			Misc.LogLine($"Search Subdirectories: {opts.subdirectories}");
+			Misc.LogLine($"Sender Alias: {opts.From}");
+
+			if (opts.InputAliases != null)
 			{
-				Console.WriteLine($"Recipient Alias: {alias}");
+				foreach (var alias in opts.InputAliases)
+				{
+					Misc.LogLine(opts, $"Recipient Alias: {alias}");
+				}
 			}
-			Console.WriteLine($"Output: {opts.Output}");
 
-			Console.WriteLine("\nFiles to be deadpacked:");
+			Misc.LogLine($"Output: {opts.Output}");
+			Misc.LogLine($"");
+
+			Misc.LogLine("Files to be deadpacked:");
 			foreach (string filePath in relativePaths)
 			{
-				Console.WriteLine("  " + filePath);
+				Misc.LogLine("  " + filePath);
 			}
 
 			// continue?
-			Console.WriteLine("\nContinue? (Y/n)");
+			Misc.LogLine("\nContinue? (Y/n)");
 
 #if DEBUG
 			string? answer = "y";
 #else
-		string? answer = Console.ReadLine();
+			string? answer = Console.ReadLine();
 #endif
 
 			if (answer == null || answer.ToLower() != "n")
 			{
-				Console.WriteLine($"\nCreating package {opts.Output}...");
+				Misc.LogLine($"\nCreating package {opts.Output}...");
 			}
 			else
 			{
-				Console.WriteLine("\nAborting...");
+				Misc.LogLine("\nAborting...");
 				return 1;
 			}
 
@@ -106,16 +107,16 @@ class Pack
 			// validate the sender
 			//
 
-			Console.WriteLine($"\n- Validating sender alias  ->  {opts.From}");
+			Misc.LogLine(opts, $"\n- Validating sender alias  ->  {opts.From}");
 			
 			string fromDomain = Misc.GetDomain(opts, opts.From);
-			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, opts.Verbose);
+			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, opts);
 
 			if (valid)
-				Console.WriteLine($"- Alias {opts.From} is valid\n");
+				Misc.LogLine(opts, $"- Alias {opts.From} is valid\n");
 			else
 			{
-				Console.WriteLine($"\nAlias {opts.From} is *NOT* valid");
+				Misc.LogError(opts, $"Alias {opts.From} is *NOT* valid");
 				return 1;
 			}
 
@@ -123,7 +124,7 @@ class Pack
 			// create the zip file
 			//
 
-			//Console.WriteLine("  Packing files...");
+			//Misc.LogLine(opts, "  Packing files...");
 			
 			// create an empty zip stream 
 			using (FileStream zipFileStream = new FileStream(opts.Output, FileMode.Create))
@@ -131,7 +132,7 @@ class Pack
 			{
 				foreach (string filePath in relativePaths)
 				{
-					Console.WriteLine($"\n  deadpacking {filePath}");
+					Misc.LogLine($"\n  deadpacking {filePath}");
 
 					List<string> blockList = new List<string>();
 
@@ -142,7 +143,7 @@ class Pack
 						
 						List<string> blockFileList = BouncyCastleHelper.EncryptFileInBlocks(filePath, key, nonce);
 
-						Console.Write("  ");
+						Misc.LogChar("  ");
 						// Add each chunk to the zip file
 						foreach (string chunk in blockFileList)
 						{
@@ -158,7 +159,7 @@ class Pack
 							// delete the chunk
 							File.Delete(chunk);
 
-							Console.Write("#");
+							Misc.LogChar("#");
 						}
 
 						FileInfo fileInfo = new FileInfo(filePath);
@@ -177,11 +178,11 @@ class Pack
 					}
 					else
 					{
-						Console.WriteLine($"\nFile not found: {filePath}");
+						Misc.LogError(opts, $"File not found: {filePath}");
 					}
 				}
 
-				Console.WriteLine("");
+				Misc.LogLine("");
 
 				//
 				// get the private key
@@ -196,8 +197,7 @@ class Pack
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine($"Error: could not read private key for {opts.From}");
-					Console.WriteLine(ex.Message);
+					Misc.LogError(opts, $"Error: could not read private key for {opts.From}", ex.Message);
 
 					// application exit
 					return 1;
@@ -214,17 +214,17 @@ class Pack
 					// compare the two public keys and make sure that the private key is for the public key
 					if (!privateKey.Public.Equals(fromPublicKey))
 					{
-						Console.WriteLine($"Error: public key does not match private key for alias {opts.From}");
+						Misc.LogError(opts, $"Public key does not match private key for alias {opts.From}");
 						return 1;
 					}
 					else
 					{
-						Console.WriteLine($"\n- Private key matches public certificate for alias {opts.From}");
+						Misc.LogLine(opts, $"\n- Private key matches public certificate for alias {opts.From}");
 					}
 				}
 				else
 				{
-					Console.WriteLine($"Error: could not find certificate for {opts.From}");
+					Misc.LogError(opts, $"Could not find certificate for {opts.From}");
 					return 1;
 				}
 
@@ -240,7 +240,7 @@ class Pack
 
 				string manifestJson = JsonSerializer.Serialize(manifest);
 
-				Console.WriteLine("- Encrypting the manifest...");
+				Misc.LogLine(opts, "- Encrypting the manifest...");
 
 				// encrypt the manifest
 				byte[] encryptedManifest = BouncyCastleHelper.EncryptWithKey(manifestJson.ToBytes(), key, nonce);
@@ -250,7 +250,7 @@ class Pack
 				//
 
 				// now loop through each of the aliases and add them to the envelope
-				Console.WriteLine("- Addressing envelope...");
+				Misc.LogLine(opts, "- Addressing envelope...");
 				if (opts.InputAliases != null)
 				{
 					foreach (string alias in opts.InputAliases)
@@ -258,9 +258,9 @@ class Pack
 						try
 						{
 							// validate the alias
-							Console.WriteLine($"- Validating recipient alias  ->  {alias}");
+							Misc.LogLine(opts, $"- Validating recipient alias  ->  {alias}");
 							string domain = Misc.GetDomain(opts, alias);
-							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts.Verbose);
+							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
 
 							if (valid)
 							{
@@ -270,16 +270,16 @@ class Pack
 
 								if (!fromFingerprint.SequenceEqual(toFingerprint))
 								{
-									Console.WriteLine($"Aliases do not share the same root certificate {opts.From} -> {alias}");
+									Misc.LogLine(opts, $"Aliases do not share the same root certificate {opts.From} -> {alias}");
 									return 1;
 								}
 
-								Console.WriteLine($"- Recipient Alias {alias} is valid");
-								Console.WriteLine($"- Aliases share the same root certificate {opts.From} -> {alias}");
+								Misc.LogLine(opts, $"- Recipient Alias {alias} is valid");
+								Misc.LogLine(opts, $"- Aliases share the same root certificate {opts.From} -> {alias}");
 							}
 							else
 							{
-								Console.WriteLine($"\nRecipient Alias {alias} is *NOT* valid\n");
+								Misc.LogError(opts, $"Recipient Alias {alias} is *NOT* valid");
 								return 1;
 							}
 
@@ -299,19 +299,17 @@ class Pack
 								// add the encrypted key to the envelope
 								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedKey });
 
-								Console.WriteLine($"- Added alias {alias}");
+								Misc.LogLine(opts, $"- Added alias {alias}");
 							}
 						}
-						catch
+						catch (Exception ex)
 						{
-							Console.WriteLine($"Error: could not find alias {alias}");
+							Misc.LogError(opts, $"Error: could not find alias {alias}", ex.Message);
 						}
 					}
 				}
 
-				
-
-
+			
 				Envelope envelope = new Envelope { 
 					To = recipients, 
 					From = opts.From,
@@ -326,13 +324,13 @@ class Pack
 				string envelopeJson = JsonSerializer.Serialize(envelope);
 				
 
-				Console.WriteLine("- Signing the envelope...");
+				Misc.LogLine(opts, "- Signing the envelope...");
 				
 				// sign the manifest
 				byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);
 				byte[] envelopeSignature = BouncyCastleHelper.SignData(envelopeHash, privateKey.Private);
 
-				Console.WriteLine("- Signing the manifest...");
+				Misc.LogLine(opts, "- Signing the manifest...");
 				
 				// sign the manifest
 				byte[] manifestHash = BouncyCastleHelper.GetHashOfBytes(encryptedManifest);
@@ -361,13 +359,13 @@ class Pack
 				zip.Comment = "This zip file was created by deadrop.org";
 			}
 
-			Console.WriteLine("\nDone\n");
+			Misc.LogLine("\nDone\n");
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine("\nError: Unable to pack files\n");
+			Misc.LogLine(opts, "\nError: Unable to pack files\n");
 			if (opts.Verbose > 0)
-				Console.WriteLine(ex.Message);
+				Misc.LogLine(opts, ex.Message);
 			return 1;
 		}
 

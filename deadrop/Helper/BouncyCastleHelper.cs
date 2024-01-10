@@ -17,13 +17,15 @@ using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.X509.Store;
 using Org.BouncyCastle.Pkix;
 using Org.BouncyCastle.Security.Certificates;
-using System.Security.Cryptography.X509Certificates;
+//using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Text;
 using System.Net.NetworkInformation;
 using Org.BouncyCastle.Crypto.Encodings;
 using Org.BouncyCastle.Crypto.Digests;
 using System.Text.Json;
+using System.Collections;
+using deadrop.Verbs;
 
 namespace deadrop;
 
@@ -69,11 +71,11 @@ public class BouncyCastleHelper
 		return keyPair;
     }
 	// --------------------------------------------------------------------------------------------------------
-	public static (bool, byte[]) ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName)
+	public static (bool, byte[]) ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName, Options opts)
     {
         try
         {
-			Console.WriteLine("  Validating certificate chain...");
+			Misc.LogLine(opts, "  Validating certificate chain...");
 
             X509CertificateParser parser = new X509CertificateParser();
 
@@ -97,13 +99,13 @@ public class BouncyCastleHelper
                 {
                     throw new CertificateException("*** ERROR: Issuer/Subject DN mismatch ***");
                 }
-				Console.WriteLine("  Issuer/Subject DN match");
+				Misc.LogLine(opts, "  Issuer/Subject DN match");
 
-				// trows an exception if not valid
+				// throws an exception if not valid
                 child.Verify(parent.GetPublicKey());
 
 				// check if the commonname is a member
-				if (!CheckIfCommonNameIsAMember(child.SubjectDN.ToString(), commonName))
+				if (!CheckIfCommonNameIsAMember(child.SubjectDN.ToString(), commonName, opts))
 				{
 					throw new CertificateException("*** Error: CommonName is not a member ***");
 				}
@@ -113,9 +115,26 @@ public class BouncyCastleHelper
 				{
 					throw new CertificateException("*** Error: Certificate not valid now ***");
 				}
-				Console.WriteLine("  Certificate dates valid");
+				Misc.LogLine(opts, "  Certificate dates valid");
 
-				Console.WriteLine($"  Certificate {i + 1} of {chain.Length} is valid: {parent.SubjectDN.ToString()}");
+				// does the parent have authority to sign the child?
+				Asn1Object? asn1Object = GetAsn1Object(parent, X509Extensions.KeyUsage);
+
+				if (asn1Object == null)
+				{
+					throw new CertificateException("*** Error: KeyUsage extension not found in the certificate. ***");
+				}
+
+				KeyUsage keyUsageCheck = new KeyUsage(KeyUsage.KeyCertSign | KeyUsage.CrlSign);
+
+				// check if asn1Object == keyUsageCheck
+				if (!keyUsageCheck.Equals(asn1Object))
+				{
+					throw new CertificateException("*** Error: KeyUsage extension does not allow signing. ***");
+				}
+				Misc.LogLine(opts, "  Parent has authority to sign the child");
+
+				Misc.LogLine(opts, $"  Certificate {i + 1} of {chain.Length} is valid: {parent.SubjectDN.ToString()}");
             }
 
             // get the fingerprint of the root certificate
@@ -123,30 +142,41 @@ public class BouncyCastleHelper
 
 			//DisplayVisualFingerprint(fingerprint);
 			//CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
-			Console.WriteLine($"  Certificate is valid");
+			Misc.LogLine(opts, $"  Certificate is valid");
 
             return (true, fingerprint);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"*** Error: Certificate chain validation failed: {ex.Message} ***");
+            Misc.LogLine(opts, $"*** Error: Certificate chain validation failed: {ex.Message} ***");
             return (false, new byte[0]);
         }
     }
 	// --------------------------------------------------------------------------------------------------------
-	public static bool CheckIfCommonNameIsAMember(string fullName, string shortName)
+	private static Asn1Object? GetAsn1Object(Org.BouncyCastle.X509.X509Certificate certificate, DerObjectIdentifier oid)
+	{
+		Asn1OctetString akiBytes = certificate.GetExtensionValue(oid);
+		if (akiBytes == null) 
+		{
+			return null;
+		}
+
+		return Asn1Object.FromByteArray(akiBytes.GetOctets());
+	}
+	// --------------------------------------------------------------------------------------------------------
+	public static bool CheckIfCommonNameIsAMember(string fullName, string shortName, Options opts)
 	{
 		fullName = fullName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
 		shortName = shortName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
 
 		if (fullName.EndsWith(shortName))
 		{
-			Console.WriteLine($"  CommonName {shortName} is a member of {fullName}");
+			Misc.LogLine(opts, $"  CommonName {shortName} is a member of {fullName}");
 			return true;
 		}		
 
 #if DEBUG
-		Console.WriteLine($"  DEBUG CommonName {shortName} is a member of {fullName}");
+		Misc.LogLine(opts, $"  DEBUG CommonName {shortName} is a member of {fullName}");
 		// allow domain mismatches in debug mode
 		return true;
 #else
@@ -199,7 +229,7 @@ public class BouncyCastleHelper
 		return hashBytes;
 	}
 	// --------------------------------------------------------------------------------------------------------
-	private static void DisplayVisualFingerprint(string fingerprint)
+	private static void DisplayVisualFingerprint(string fingerprint, Options opts)
     {
         // Define the formatting parameters
         int bytesPerBlock = 2; // Number of bytes in each block
@@ -237,7 +267,7 @@ public class BouncyCastleHelper
         }
 
         sb.AppendLine("\n" + new string('-', 43)); // Decorative line
-        Console.WriteLine(sb.ToString());
+        Misc.LogLine(opts, sb.ToString());
     }
 	// --------------------------------------------------------------------------------------------------------
 	public static string ReadPemStringFromKey(AsymmetricKeyParameter key)
@@ -265,43 +295,6 @@ public class BouncyCastleHelper
 		PemReader pemReader = new PemReader(reader);
 		return (AsymmetricCipherKeyPair)pemReader.ReadObject();
 	}
-	// --------------------------------------------------------------------------------------------------------
-	public static bool ValidateCertificateChainDotNet(string primaryCertificatePath, List<string> intermediateCertificatesPaths)
-    {
-        try
-        {
-            X509CertificateParser certParser = new X509CertificateParser();
-
-            // Load the primary certificate (e.g., the end-entity certificate)
-            X509Certificate2 primaryCert = new X509Certificate2(primaryCertificatePath);
-            Org.BouncyCastle.X509.X509Certificate bcPrimaryCert = certParser.ReadCertificate(primaryCert.RawData);
-
-            // Load intermediate certificates
-            X509Chain chain = new X509Chain();
-            foreach (var certPath in intermediateCertificatesPaths)
-            {
-                X509Certificate2 intermediateCert = new X509Certificate2(certPath);
-                chain.ChainPolicy.ExtraStore.Add(intermediateCert);
-            }
-
-            // Perform the chain validation
-            bool isValid = chain.Build(primaryCert);
-            if (!isValid)
-            {
-                foreach (X509ChainStatus chainStatus in chain.ChainStatus)
-                {
-                    Console.WriteLine($"Chain error: {chainStatus.StatusInformation}");
-                }
-            }
-
-            return isValid;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Certificate chain validation failed: {ex.Message}");
-            return false;
-        }
-    }
 	// --------------------------------------------------------------------------------------------------------
 	public static byte[] Generate256BitRandom()
     {
@@ -507,23 +500,17 @@ public class BouncyCastleHelper
 			}
 		}
 		// --------------------------------------------------------------------------------------------------------
-		public static async Task<(bool, byte[])> VerifyAliasAsync(string domain, string alias, int verbose)
+		public static async Task<(bool, byte[])> VerifyAliasAsync(string domain, string alias, Options opts)
 		{
 			
 
 			// first get the CA
-			if (verbose > 0)
-				Console.WriteLine($"GET: https://{domain}/cacerts");
-
-			var result = await HttpHelper.Get($"https://{domain}/cacerts");
+			var result = await HttpHelper.Get($"https://{domain}/cacerts", opts);
 			var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
 			var cacerts = ca?.CaCerts;
 
 			// now get the alias	
-			if (verbose > 0)
-				Console.WriteLine($"GET: https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
-
-			result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+			result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}", opts);
 
 			var c = JsonSerializer.Deserialize<CertResult>(result);
 			var certificate = c?.Certificate;
@@ -533,7 +520,7 @@ public class BouncyCastleHelper
 			byte[] fingerprint = new byte[0];
 			if (certificate != null && cacerts != null) // Add null check for cacerts
 			{
-				(valid, fingerprint) = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain);
+				(valid, fingerprint) = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain, opts);
 
 			}
 

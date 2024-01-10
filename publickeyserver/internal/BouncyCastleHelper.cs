@@ -332,7 +332,6 @@ namespace publickeyserver
 
 			certificateGenerator.AddExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(true));
 
-
 			// selfsign certificate
 			Org.BouncyCastle.X509.X509Certificate certificate = certificateGenerator.Generate(signatureFactory);
 

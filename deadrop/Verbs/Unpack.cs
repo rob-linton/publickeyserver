@@ -24,11 +24,7 @@ class Unpack
 {
 	public static async Task<int> Execute(UnpackOptions opts)
 	{
-		Console.WriteLine("\n====================================================");
-		Console.WriteLine("deadpack v1.0...");
-		Console.WriteLine("Deadrop's Encrypted Archive and Distribution PACKage");
-		Console.WriteLine("Rob Linton, 2023");
-		Console.WriteLine("====================================================\n");
+		Misc.LogHeader();
 		
 
 		string toDomain = Misc.GetDomain(opts, opts.Alias);
@@ -37,9 +33,9 @@ class Unpack
 		opts.File = opts.File.Replace(".deadpack","") + ".deadpack";
 		string zipFile = opts.File;
 
-		Console.WriteLine($"Unpacking deadpack...");
-		Console.WriteLine($"Input: {opts.File}");
-		Console.WriteLine($"Recipient Alias: {opts.Alias}");
+		Misc.LogLine($"Unpacking deadpack...");
+		Misc.LogLine($"Input: {opts.File}");
+		Misc.LogLine($"Recipient Alias: {opts.Alias}");
 
 		// get the output directory
 		if (String.IsNullOrEmpty(opts.Output))
@@ -49,7 +45,8 @@ class Unpack
 		Directory.CreateDirectory(opts.Output);
 
 		string outputDirectory = opts.Output;
-		Console.WriteLine($"Output directory: {outputDirectory}\n");
+		Misc.LogLine($"Output directory: {outputDirectory}");
+		Misc.LogLine($"");
 
 		//string tmpOutputDirectory = "XXX" + outputDirectory;
 		string tmpOutputDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -59,10 +56,10 @@ class Unpack
 			
 
 			// read the zip file and output all of the files to the output directory
-			Console.WriteLine("  Extracting from zip file...");
+			Misc.LogLine(opts, "  Extracting from zip file...");
 			using (ZipArchive archive = ZipFile.OpenRead(zipFile))
 			{
-				Console.Write("  ");
+				Misc.LogChar(opts, "  ");
 				foreach (ZipArchiveEntry entry in archive.Entries)
 				{
 					string destinationPath = Path.GetFullPath(Path.Combine(tmpOutputDirectory, entry.FullName));
@@ -78,11 +75,11 @@ class Unpack
 						string directoryPath = Path.GetDirectoryName(destinationPath) ?? string.Empty;
 						Directory.CreateDirectory(directoryPath);
 						entry.ExtractToFile(destinationPath, true);
-						Console.Write("#");
+						Misc.LogChar(opts, "#");
 					}
 				}
 			}
-			Console.WriteLine("");
+			Misc.LogLine(opts, "");
 
 
 			// now read the envelope
@@ -108,11 +105,11 @@ class Unpack
 			var fromX509 = await Misc.GetCertificate(opts, envelope.From);
 
 			// now verify the alias
-			Console.WriteLine($"\n- Verifying sender alias: {envelope.From}");
-			(bool validAlias, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, envelope.From, opts.Verbose);
+			Misc.LogLine(opts, $"\n- Verifying sender alias: {envelope.From}");
+			(bool validAlias, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, envelope.From, opts);
 			if (!validAlias)
 			{
-				Console.WriteLine($"Error: could not verify alias {envelope.From}");
+				Misc.LogError(opts, $"Could not verify alias {envelope.From}");
 				return 1;
 			}
 
@@ -126,13 +123,13 @@ class Unpack
 			byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);				
 			try{
 				BouncyCastleHelper.verifySignature(envelopeHash, envelopeSignature, fromPublicKey);
-				Console.WriteLine("- Envelope signature is valid");
+				Misc.LogLine(opts, "- Envelope signature is valid");
 			}
 			catch(Exception ex)
 			{
-				Console.WriteLine("Envelope signature is *NOT* valid");
+				Misc.LogError(opts, "Envelope signature is *NOT* valid");
 				if (opts.Verbose > 0)
-					Console.WriteLine(ex.Message);
+					Misc.LogLine(opts, ex.Message);
 				return 1;
 			}
 
@@ -143,13 +140,11 @@ class Unpack
 			byte[] manifestHash = BouncyCastleHelper.GetHashOfBytes(manifestBytes);
 			try{
 				BouncyCastleHelper.verifySignature(manifestHash, manifestSignature, fromPublicKey);
-				Console.WriteLine("- Manifest signature is valid");
+				Misc.LogLine(opts, "- Manifest signature is valid");
 			}
 			catch(Exception ex)
 			{
-				Console.WriteLine("Manifest signature is *NOT* valid");
-				if (opts.Verbose > 0)
-					Console.WriteLine(ex.Message);
+				Misc.LogError(opts, "Manifest signature is *NOT* valid", ex.Message);
 				return 1;
 			}
 
@@ -161,14 +156,14 @@ class Unpack
 				if (recipient.Alias == opts.Alias)
 				{
 					found_alias = true;
-					//Console.WriteLine($"\nUsing alias: {recipient.Alias}");
+					//Misc.LogLine(opts, $"\nUsing alias: {recipient.Alias}");
 
 					// now verify the alias
-					Console.WriteLine($"- Verifying recipient alias: {opts.Alias}");
-					(bool validToAlias, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, opts.Alias, opts.Verbose);
+					Misc.LogLine(opts, $"- Verifying recipient alias: {opts.Alias}");
+					(bool validToAlias, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, opts.Alias, opts);
 					if (!validToAlias)
 					{
-						Console.WriteLine($"Error: could not verify alias {opts.Alias}");
+						Misc.LogError(opts, $"Could not verify alias {opts.Alias}");
 						return 1;
 					}		
 
@@ -177,12 +172,12 @@ class Unpack
 					//
 					if (!fromFingerprint.SequenceEqual(toFingerprint))
 					{
-						Console.WriteLine($"Aliases do not share the same root certificate {envelope.From} -> {opts.Alias}");
+						Misc.LogError(opts, $"Aliases do not share the same root certificate {envelope.From} -> {opts.Alias}");
 						return 1;
 					}
 					else
 					{
-						Console.WriteLine($"- Aliases share the same root certificate: {envelope.From} -> {opts.Alias}");
+						Misc.LogLine(opts, $"- Aliases share the same root certificate: {envelope.From} -> {opts.Alias}");
 					}
 
 					// get the public key from the alias
@@ -201,16 +196,16 @@ class Unpack
 					// compare the two public keys and make sure that the private key is for the public key
 					if (!keyPair.Public.Equals(toPublicKey))
 					{
-						Console.WriteLine($"Error: public key does not match for alias {opts.Alias}");
+						Misc.LogError(opts, $"Error: public key does not match for alias {opts.Alias}");
 						return 1;
 					}
 					else
 					{
-						Console.WriteLine($"- Private key matches public certificate for alias: {opts.Alias}");
+						Misc.LogLine(opts, $"- Private key matches public certificate for alias: {opts.Alias}");
 					}
 
 
-					Console.WriteLine("- Decrypting key...");
+					Misc.LogLine(opts, "- Decrypting key...");
 					byte[] key = BouncyCastleHelper.DecryptWithPrivateKey(encryptedKey, keyPair.Private);
 
 					//
@@ -218,7 +213,7 @@ class Unpack
 					//
 				
 					// now decrypt the manifest
-					Console.WriteLine("- Decrypting manifest...");
+					Misc.LogLine(opts, "- Decrypting manifest...");
 
 					byte[] nonce = envelope.From.ToLower().ToBytes();
 					byte[] manifestJsonBytes = BouncyCastleHelper.DecryptWithKey(manifestBytes, key, nonce);
@@ -230,17 +225,17 @@ class Unpack
 					// now unpack all of the files
 					//
 
-					//Console.WriteLine("");
+					//Misc.LogLine(opts, "");
 
 					// now decrypt each file
 					foreach (FileItem file in manifest.Files)
 					{
-						Console.WriteLine($"\n  Unpacking {file.Name}");
+						Misc.LogLine($"\n  Unpacking {file.Name}");
 
 						// create a file stream to write the file to
 						using (FileStream fs = File.Create(Path.Combine(outputDirectory, file.Name)))
 						{
-							Console.Write("  ");
+							Misc.LogChar("  ");
 							// decrypt the file and populate the file stream
 							foreach (var block in file.Blocks)
 							{
@@ -250,7 +245,7 @@ class Unpack
 								byte[] decryptedBlock = BouncyCastleHelper.DecryptWithKey(encryptedBlock, key, nonce);
 
 								fs.Write(decryptedBlock, 0, decryptedBlock.Length);
-								Console.Write("#");
+								Misc.LogChar("#");
 							}
 						}
 
@@ -262,21 +257,21 @@ class Unpack
 						File.SetCreationTime(Path.Combine(outputDirectory, file.Name), createDate);
 						File.SetLastWriteTime(Path.Combine(outputDirectory, file.Name), modifiedDate);
 					}
-					Console.WriteLine("\n\nDone\n");
+					Misc.LogLine("\n\nDone\n");
 				}
 			}
 
 			if (!found_alias)
 			{
-				Console.WriteLine($"Error: could not find alias {opts.Alias} in deadpack");
+				Misc.LogLine(opts, $"Error: could not find alias {opts.Alias} in deadpack");
 				return 1;
 			}
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine("\nError: Unable to unpack files\n");
+			Misc.LogLine(opts, "\nError: Unable to unpack files\n");
 			if (opts.Verbose > 0)
-				Console.WriteLine(ex.Message);
+				Misc.LogLine(opts, ex.Message);
 			return 1;
 		}
 		finally

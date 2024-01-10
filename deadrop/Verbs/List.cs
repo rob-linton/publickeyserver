@@ -19,39 +19,32 @@ class List
 {
 	public static async Task<int> Execute(ListOptions opts)
 	{
-		Console.WriteLine($"\nListing your aliases");
-		Console.WriteLine("================================================\n");
-
+		Misc.LogHeader();
+		Misc.LogLine($"Listing...");
+		Misc.LogLine($"");
+		
 		List<string> aliases = Storage.GetAliases();
 
 		foreach (string alias in aliases)
 		{
-			Console.WriteLine($"{alias}\n");
-
 			try
 			{
 				string domain = Misc.GetDomain(opts, alias);
 
-				(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts.Verbose);
+				(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
 
 				if (valid)
-					Console.WriteLine($"Alias {alias} is valid\n");
+					Misc.LogLine($"Valid:  {alias}");
 				else
-					Console.WriteLine($"Alias {alias} is *NOT* valid\n");
+					Misc.LogLine($"*** Invalid: {alias}");
 
-				Console.WriteLine("---\n");
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("\nError: Unable to validate alias\n");
-				if (opts.Verbose > 0)
-					Console.WriteLine(ex.Message);
+				Misc.LogError(opts, "Unable to validate alias", ex.Message);
 			}
 		}
 
-
-		
-		
 		return 0;
 	}
 }
