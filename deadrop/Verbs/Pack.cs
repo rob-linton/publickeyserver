@@ -71,7 +71,7 @@ class Pack
 			{
 				foreach (var alias in opts.InputAliases)
 				{
-					Misc.LogLine(opts, $"Recipient Alias: {alias}");
+					Misc.LogLine($"Recipient Alias: {alias}");
 				}
 			}
 
@@ -359,7 +359,8 @@ class Pack
 				zip.Comment = "This zip file was created by deadrop.org";
 			}
 
-			Misc.LogLine("\nDone\n");
+			Misc.LogLine("\nDone, only the anonymous recipients will be able to unpack this deadpack.");
+			Misc.LogLine("(Please note, this means you can't unpack this either!)\n");
 		}
 		catch (Exception ex)
 		{

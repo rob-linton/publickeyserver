@@ -104,8 +104,10 @@ public class Misc
 
 	public static void LogHeader()
 	{
+		LogArt();
+
 		LogLine("================================================================================");
-		LogLine("DEADPACK v1.0...");
+		LogLine("DEADPACK v1.0 (deadrop.org)");
 		LogLine("Deadrop's Encrypted Archive and Distribution PACKage");
 		LogLine("Copyright Rob Linton, 2023");
 		LogLine("================================================================================\n");

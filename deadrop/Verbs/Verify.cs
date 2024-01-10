@@ -22,7 +22,7 @@ class Verify
 	{
 		try
 		{
-			Misc.LogArt();
+			
 			Misc.LogHeader();
 
 			Misc.LogLine($"Verifying...");
