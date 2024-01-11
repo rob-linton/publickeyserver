@@ -26,6 +26,8 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.Reflection.Metadata;
+using System.Linq;
+
 
 namespace publickeyserver
 {
@@ -173,7 +175,7 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					raw = await AwsHelper.Get(client, $"{alias}.pem");
+					raw = await AwsHelper.Get(client, $"cert/{alias}.pem");
 				};
 
 				string cert = raw.FromBytes();
@@ -244,7 +246,7 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					raw = await AwsHelper.Get(client, $"{alias}.pem");
+					raw = await AwsHelper.Get(client, $"cert/{alias}.pem");
 				};
 
 				string cert = raw.FromBytes();
@@ -347,7 +349,7 @@ namespace publickeyserver
 				//
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					await AwsHelper.Put(client, $"{alias}.pem", certPEM.ToBytes());
+					await AwsHelper.Put(client, $"cert/{alias}.pem", certPEM.ToBytes());
 				}
 
 
@@ -416,7 +418,7 @@ namespace publickeyserver
 				//
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					await AwsHelper.Put(client, $"{alias}.pem", certPEM.ToBytes());
+					await AwsHelper.Put(client, $"cert/{alias}.pem", certPEM.ToBytes());
 				}
 
 
@@ -473,6 +475,6 @@ namespace publickeyserver
 			return new JsonResult(ret);
 
 		}
-		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		
 	}
 }

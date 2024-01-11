@@ -359,8 +359,8 @@ class Pack
 				zip.Comment = "This zip file was created by deadrop.org";
 			}
 
-			Misc.LogLine("\nDone, only the anonymous recipients will be able to unpack this deadpack.");
-			Misc.LogLine("(Please note, this means you can't unpack this either!)\n");
+			Misc.LogLine("\nDone. Only the anonymous recipient aliases will be able to unpack this deadpack.");
+			Misc.LogLine("(Please note, this means you can't unpack it either!)\n");
 		}
 		catch (Exception ex)
 		{

@@ -17,6 +17,10 @@ using Org.BouncyCastle.OpenSsl;
 using System.IO;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Engines;
+using System.Collections.Generic;
+using Org.BouncyCastle.Security.Certificates;
+using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace publickeyserver
 {
@@ -440,6 +444,169 @@ namespace publickeyserver
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static (bool, byte[]) ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName)
+		{
+			try
+			{
 
+				X509CertificateParser parser = new X509CertificateParser();
+
+				// Parse the target certificate from PEM string
+				Org.BouncyCastle.X509.X509Certificate targetCert = ReadCertificateFromPemString(targetCertificatePem);
+
+				// Parse intermediate and root certificates
+				Org.BouncyCastle.X509.X509Certificate[] chain = new Org.BouncyCastle.X509.X509Certificate[intermediateAndRootCertificatePems.Count];
+				for (int i = 0; i < intermediateAndRootCertificatePems.Count; i++)
+				{
+					chain[i] = ReadCertificateFromPemString(intermediateAndRootCertificatePems[i]);
+				}
+
+				// Check each certificate in the chain
+				for (int i = 0; i < chain.Length; i++)
+				{
+					Org.BouncyCastle.X509.X509Certificate child = (i == 0) ? targetCert : chain[i - 1];
+					Org.BouncyCastle.X509.X509Certificate parent = chain[i];
+
+					if (!child.IssuerDN.Equivalent(parent.SubjectDN))
+					{
+						throw new CertificateException("*** ERROR: Issuer/Subject DN mismatch ***");
+					}
+
+					// throws an exception if not valid
+					child.Verify(parent.GetPublicKey());
+
+					// check if the commonname is a member
+					if (!CheckIfCommonNameIsAMember(child.SubjectDN.ToString(), commonName))
+					{
+						throw new CertificateException("*** Error: CommonName is not a member ***");
+					}
+
+					// check if the certificate is valid now
+					if (!child.IsValidNow)
+					{
+						throw new CertificateException("*** Error: Certificate not valid now ***");
+					}
+
+
+					// does the parent have authority to sign the child?
+					Asn1Object? asn1Object = GetAsn1Object(parent, X509Extensions.KeyUsage);
+
+					if (asn1Object == null)
+					{
+						throw new CertificateException("*** Error: KeyUsage extension not found in the certificate. ***");
+					}
+
+					KeyUsage keyUsageCheck = new KeyUsage(KeyUsage.KeyCertSign | KeyUsage.CrlSign);
+
+					// check if asn1Object == keyUsageCheck
+					if (!keyUsageCheck.Equals(asn1Object))
+					{
+						throw new CertificateException("*** Error: KeyUsage extension does not allow signing. ***");
+					}
+					
+				}
+
+				// get the fingerprint of the root certificate
+				byte[] fingerprint = GetFingerprint(intermediateAndRootCertificatePems[intermediateAndRootCertificatePems.Count-1]);
+
+				//DisplayVisualFingerprint(fingerprint);
+				//CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
+
+				return (true, fingerprint);
+			}
+			catch (Exception ex)
+			{
+				return (false, new byte[0]);
+			}
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static Org.BouncyCastle.X509.X509Certificate ReadCertificateFromPemString(string pemString)
+		{
+			using StringReader reader = new StringReader(pemString);
+			PemReader pemReader = new PemReader(reader);
+			return (Org.BouncyCastle.X509.X509Certificate)pemReader.ReadObject();
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static bool CheckIfCommonNameIsAMember(string fullName, string shortName)
+		{
+			fullName = fullName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
+			shortName = shortName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
+
+			if (fullName.EndsWith(shortName))
+			{
+				return true;
+			}		
+
+	#if DEBUG
+			// allow domain mismatches in debug mode
+			return true;
+	#else
+			return false;
+	#endif
+
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static byte[] GetFingerprint(string pemString)
+		{
+			// make sure the certificate is valid
+			Org.BouncyCastle.X509.X509Certificate cert = ReadCertificateFromPemString(pemString);
+
+			// now get the fingerprint
+			using SHA256 sha256 = SHA256.Create();
+			byte[] hashBytes = sha256.ComputeHash(pemString.ToBytes());
+			return hashBytes;
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		private static Asn1Object? GetAsn1Object(Org.BouncyCastle.X509.X509Certificate certificate, DerObjectIdentifier oid)
+		{
+			Asn1OctetString akiBytes = certificate.GetExtensionValue(oid);
+			if (akiBytes == null) 
+			{
+				return null;
+			}
+
+			return Asn1Object.FromByteArray(akiBytes.GetOctets());
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static async Task<(bool, byte[])> VerifyAliasAsync(string domain, string alias)
+		{
+			
+
+			// first get the CA
+			var result = await HttpHelper.Get($"https://{domain}/cacerts");
+			var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
+			var cacerts = ca?.CaCerts;
+
+			// now get the alias	
+			result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+
+			var c = JsonSerializer.Deserialize<CertResult>(result);
+			var certificate = c?.Certificate;
+
+			// now validate the certificate chain
+			bool valid = false;
+			byte[] fingerprint = new byte[0];
+			if (certificate != null && cacerts != null) // Add null check for cacerts
+			{
+				(valid, fingerprint) = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain);
+
+			}
+
+			if (valid)
+				return (true, fingerprint);
+			else
+				return (false, new byte[0]);
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static bool VerifySignature(byte[] message, byte[] signature, AsymmetricKeyParameter publicKey)
+		{
+			var signer = SignerUtilities.GetSigner("SHA512WITHRSA");
+			signer.Init(false, publicKey);
+			signer.BlockUpdate(message, 0, message.Length);
+
+			return signer.VerifySignature(signature);
+					
+		}
+	// ------------------------------------------------------------------------------------------------------------------------------------------------------
 	}
 }
