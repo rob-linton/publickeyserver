@@ -607,6 +607,24 @@ namespace publickeyserver
 			return signer.VerifySignature(signature);
 					
 		}
-	// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static byte[] GetHashOfString(string s)
+		{
+			using SHA256 sha256 = SHA256.Create();
+			byte[] hashBytes = sha256.ComputeHash(s.ToBytes());
+			return hashBytes;
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static string ConvertHashToString(byte[] hash)
+		{
+			// Convert the byte array to a hexadecimal string
+			string hashString = BitConverter.ToString(hash);
+
+			// Remove the hyphens
+			hashString = hashString.Replace("-", "");
+
+			return hashString;
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 	}
 }

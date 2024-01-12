@@ -14,6 +14,10 @@ namespace publickeyserver
         public static string origin = "";
         public static string password = "";
 
+		public static string MaxBucketSize = "100000000";
+		public static string MaxBucketFiles = "100";
+
+
         public static int status_certs_enrolled = 0;
         public static int status_certs_served = 0;
     }

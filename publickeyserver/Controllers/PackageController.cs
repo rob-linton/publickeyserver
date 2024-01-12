@@ -33,7 +33,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 namespace publickeyserver
 {
 	[ApiController]
-	[Route("package")]
+	[Route("api/[controller]")]
 	public class PackageController : ControllerBase
 	{
 		private readonly ILogger<Controller> _logger;
@@ -46,75 +46,40 @@ namespace publickeyserver
 
 		// ------------------------------------------------------------------------------------------------------------
 		[Produces("application/json")]
-		[HttpPost("{sender, senderSignature, recipient, recipientSignature}")]
-		public async Task<IActionResult> UploadFile(string sender, string senderSignature, string recipient, string recipientSignature)
+		[HttpPost("{recipient}")]
+		public async Task<IActionResult> UploadPackage(string sender, string recipient, string timestamp, string signature)
 		{
-			// create a unique package name
-			string package = Guid.NewGuid().ToString();
-
 			try
 			{
-				// make sure the sender and recipient are part of the global domain
-				if (!sender.EndsWith(GLOBALS.origin))
-					return BadRequest($"Sender {sender} is not part of the global domain {GLOBALS.origin}");
-				
-				if (!recipient.EndsWith(GLOBALS.origin))
-					return BadRequest($"Recipient {recipient} is not part of the global domain {GLOBALS.origin}");
+				// signature is of the following:
+				// sender + recipient + timestamp + origin
+				// host is bare eg. publickeyserver.org
 
-				// validate the sender
-				(bool senderValid, byte[] senderRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(GLOBALS.origin, sender);
-				if (!senderValid)
-					return BadRequest($"Alias {sender} is not valid");
+				// get the url host header
+				string host = Request.Host.Host;
 
-				// validate the recipient
-				(bool recipientValid, byte[] recipientRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(GLOBALS.origin, recipient);
-				if (!recipientValid)
-					return BadRequest($"Alias {recipient} is not valid");
+				// create a unique package name
+				string packageName = Guid.NewGuid().ToString();
+				byte[] packageHash = BouncyCastleHelper.GetHashOfString(packageName);
+				string package = BouncyCastleHelper.ConvertHashToString(packageHash);
 
-				// now validate that they share the root certificate
-				if (!senderRootFingerprint.SequenceEqual(recipientRootFingerprint))
-				{
-					return BadRequest($"Aliases do not share the same root certificate {sender} -> {recipient}");
-				}
+				string key = $"packages/{recipient}/{package}";
 
-				// get the public key of the sender
-				var toX509 = await Misc.GetCertificate(sender);
-				AsymmetricKeyParameter publicKey;
-				if (toX509 != null)
-				{
-					publicKey = toX509.GetPublicKey();
-				}
-				else
-				{
-					return BadRequest($"Could not get certificate for alias {sender}");
-				}
-				
-				// now validate that the signature is valid of the sender
-				if (!BouncyCastleHelper.VerifySignature(sender.ToBytes(), senderSignature.ToBytes(), publicKey))
-				{
-					return BadRequest($"Signature is not valid for sender {sender}");
-				}
-
-				// now validate that the signature is valid of the recipient
-				if (!BouncyCastleHelper.VerifySignature(recipient.ToBytes(), recipientSignature.ToBytes(), publicKey))
-				{
-					return BadRequest($"Signature is not valid for recipient {recipient}");
-				}
+				string result = await PackageHelper.ValidateSenderAndRecipient(sender, recipient, host, signature, timestamp);
+				if (!String.IsNullOrEmpty(result))
+					return BadRequest(result);
 
 				//
 				// so if we have got here the sender and recipient are valid
 				// now we need to save the file
 				//
 
-				// set the key
-				string key = $"{package}/{filename}";
-
 				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
 					var initiateRequest = new InitiateMultipartUploadRequest
 					{
 						BucketName = GLOBALS.s3bucket,
-						Key = filename
+						Key = key
 					};
 
 					var initResponse = await _s3Client.InitiateMultipartUploadAsync(initiateRequest);
@@ -130,7 +95,7 @@ namespace publickeyserver
 						var uploadRequest = new UploadPartRequest
 						{
 							BucketName = GLOBALS.s3bucket,
-							Key = filename,
+							Key = key,
 							UploadId = initResponse.UploadId,
 							PartNumber = partNumber++,
 							PartSize = bytesRead,
@@ -144,14 +109,14 @@ namespace publickeyserver
 					var completeRequest = new CompleteMultipartUploadRequest
 					{
 						BucketName = GLOBALS.s3bucket,
-						Key = filename,
+						Key = key,
 						UploadId = initResponse.UploadId,
 						PartETags = uploadResponses.Select(r => new PartETag(r.PartNumber, r.ETag)).ToList()
 					};
 
 					await _s3Client.CompleteMultipartUploadAsync(completeRequest);
 
-					return Ok($"File {filename} uploaded successfully in {partNumber - 1} parts");
+					return Ok($"File {key} uploaded successfully in {partNumber - 1} parts");
 				}
 			}
 			catch (AmazonS3Exception e)
@@ -166,11 +131,52 @@ namespace publickeyserver
 		}
 		// ------------------------------------------------------------------------------------------------------------
 		[Produces("application/json")]
-		[HttpGet("{filename}")]
-		public async Task<IActionResult> DownloadFile(string filename)
+		[HttpGet("{recipient}/{package}")]
+		public async Task<IActionResult> DownloadPackage(string package, string recipient, string timestamp, string signature)
 		{
-			if (string.IsNullOrEmpty(filename))
-				return BadRequest("Filename is not provided.");
+			try
+			{
+				// get the url host header
+				string host = Request.Host.Host;
+				string key = $"packages/{recipient}/{package}";
+
+				string result = await PackageHelper.ValidateRecipient(recipient, host, signature, timestamp);
+				if (!String.IsNullOrEmpty(result))
+					return BadRequest(result);
+
+				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				{
+					var request = new GetObjectRequest
+					{
+						BucketName = GLOBALS.s3bucket,
+						Key = key
+					};
+
+					using var response = await _s3Client.GetObjectAsync(request);
+					Response.ContentType = response.Headers.ContentType;
+					Response.ContentLength = response.Headers.ContentLength;
+					Response.Headers.Append("Content-Disposition", $"attachment; filename={package}");
+
+					await using var responseStream = response.ResponseStream;
+					var buffer = new byte[ChunkSize];
+					int bytesRead;
+					while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+					{
+						await Response.Body.WriteAsync(buffer, 0, bytesRead);
+						await Response.Body.FlushAsync();
+					}
+
+					return new FileStreamResult(Response.Body, response.Headers.ContentType);
+				}
+			}
+			catch (AmazonS3Exception e)
+			{
+				return BadRequest($"Error encountered on server. Message:'{e.Message}'");
+			}
+			catch (Exception e)
+			{
+				return BadRequest($"Unknown error encountered on server. Message:'{e.Message}'");
+			}
 		}
 		// ------------------------------------------------------------------------------------------------------------
 	}
