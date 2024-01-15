@@ -16,7 +16,7 @@ namespace publickeyserver
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Public Key Server v1.0");
+            Console.WriteLine($"{GLOBALS.origin} {GLOBALS.version}");
             if (args.Length < 5)
             {
                 DotEnv.Load(options: new DotEnvOptions(trimValues: true));
@@ -27,6 +27,14 @@ namespace publickeyserver
                 GLOBALS.s3endpoint = envVars["S3ENDPOINT"];
                 GLOBALS.s3bucket = envVars["S3BUCKET"];
                 GLOBALS.origin = envVars["ORIGIN"];
+
+				// optional
+				if (envVars.ContainsKey("MAX_BUCKET_SIZE"))
+					GLOBALS.MaxBucketSize = envVars["MAX_BUCKET_SIZE"];
+				if (envVars.ContainsKey("MAX_BUCKET_FILES"))
+					GLOBALS.MaxBucketFiles = envVars["MAX_BUCKET_FILES"];
+				if (envVars.ContainsKey("MAX_PACKAGE_SIZE"))
+					GLOBALS.MaxBucketFiles = envVars["MAX_PACKAGE_SIZE"];
 
                 try
                 {

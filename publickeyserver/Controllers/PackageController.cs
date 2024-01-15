@@ -62,12 +62,35 @@ namespace publickeyserver
 				string packageName = Guid.NewGuid().ToString();
 				byte[] packageHash = BouncyCastleHelper.GetHashOfString(packageName);
 				string package = BouncyCastleHelper.ConvertHashToString(packageHash);
+				
+				// total package size
+				long packageSize = Request.ContentLength.Value;
 
 				string key = $"packages/{recipient}/{package}";
 
 				string result = await PackageHelper.ValidateSenderAndRecipient(sender, recipient, host, signature, timestamp);
 				if (!String.IsNullOrEmpty(result))
 					return BadRequest(result);
+
+				// check the package size
+				(int bucketCount, long bucketSize) = await PackageHelper.GetPackagesStatus(recipient);	
+
+				if (packageSize > Convert.ToInt32(GLOBALS.MaxPackageSize))
+				{
+					return BadRequest($"Package size limit exceeded. Max size {GLOBALS.MaxPackageSize} bytes");
+				}
+
+				// check the max bucket size
+				if (bucketSize + packageSize > Convert.ToInt32(GLOBALS.MaxBucketSize))
+				{
+					return BadRequest($"Bucket size limit exceeded. Maximum size is {GLOBALS.MaxPackageSize} bytes");
+				}
+
+				// check the max bucket count
+				if (bucketCount > Convert.ToInt32(GLOBALS.MaxBucketFiles))
+				{
+					return BadRequest($"Bucket count limit exceeded. Maximum count is {GLOBALS.MaxBucketFiles}");
+				}
 
 				//
 				// so if we have got here the sender and recipient are valid
@@ -87,6 +110,7 @@ namespace publickeyserver
 					var partNumber = 1;
 					var uploadResponses = new List<UploadPartResponse>();
 
+					
 					byte[] buffer = new byte[ChunkSize];
 					int bytesRead;
 					while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
@@ -116,6 +140,7 @@ namespace publickeyserver
 
 					await _s3Client.CompleteMultipartUploadAsync(completeRequest);
 
+					Log.Information($"File {key} uploaded successfully in {partNumber - 1} parts");
 					return Ok($"File {key} uploaded successfully in {partNumber - 1} parts");
 				}
 			}
@@ -166,6 +191,7 @@ namespace publickeyserver
 						await Response.Body.FlushAsync();
 					}
 
+					Log.Information($"File {key} downloaded");
 					return new FileStreamResult(Response.Body, response.Headers.ContentType);
 				}
 			}
