@@ -94,13 +94,25 @@ public class HttpHelper
 		{
 			content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
 
-			var response = await client.PostAsync(url, content);
-			if (response.StatusCode != System.Net.HttpStatusCode.OK)
+			try
 			{
-				throw new Exception($"POSTFILE failed: {response.StatusCode}: {response.Content.ReadAsStringAsync().Result}}}");
+				var response = await client.PostAsync(url, content);
+				if (response.StatusCode != System.Net.HttpStatusCode.OK)
+				{
+					throw new Exception($"POSTFILE failed: {response.StatusCode}: {response.Content.ReadAsStringAsync().Result}}}");
+				}
+				var data = await response.Content.ReadAsStringAsync();
+				return data;
 			}
-			var data = await response.Content.ReadAsStringAsync();
-			return data;
+			catch (Exception ex)
+			{
+				Misc.LogLine(opts, $"POSTFILE failed: {ex.Message}");
+				throw;
+			}
+
+			
+
+			
 
 		}
     }

@@ -121,7 +121,7 @@ namespace publickeyserver
 		// ---------------------------------------------------------------------
 		public static async Task<string> MultipartUpload(string key, HttpRequest Request, long bucketSize)
 		{
-			int ChunkSize = 10 * 1024 * 1024; // 10MB chunk size
+			int ChunkSize = 50 * 1024 * 1024; // 50MB chunk size
 
 			using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 			{
@@ -139,6 +139,8 @@ namespace publickeyserver
 				long totalBytesRead = 0;
 				byte[] buffer = new byte[ChunkSize];
 				int bytesRead;
+				// only upload when the buffer has more than 5mb of data
+				*** TBA ***
 				while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
 				{
 					totalBytesRead += bytesRead;
@@ -181,6 +183,22 @@ namespace publickeyserver
 
 				Log.Information($"File {key} uploaded successfully in {partNumber - 1} parts");
 				return $"OK: File {key} uploaded successfully in {partNumber - 1} parts";
+			}
+		}
+		// ------------------------------------------------------------------------------------
+		public static async Task<string> MultipartUploadBlank(HttpRequest Request)
+		{
+			int ChunkSize = 50 * 1024 * 1024; // 50MB chunk size
+
+			{
+				long totalBytesRead = 0;
+				byte[] buffer = new byte[ChunkSize];
+				int bytesRead;
+				while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
+				{
+					totalBytesRead += bytesRead;
+				}
+				return $"";
 			}
 		}
 		// ------------------------------------------------------------------------------------

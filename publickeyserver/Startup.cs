@@ -37,7 +37,8 @@ namespace publickeyserver
             });
             services.Configure<KestrelServerOptions>(options =>
             {
-                options.AllowSynchronousIO = true;
+                //options.AllowSynchronousIO = true;
+				options.Limits.MaxRequestBodySize = null;
             });
         }
 

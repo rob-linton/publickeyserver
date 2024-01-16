@@ -37,7 +37,7 @@ namespace publickeyserver
 	public class PackageController : ControllerBase
 	{
 		private readonly ILogger<Controller> _logger;
-		private const int ChunkSize = 10 * 1024 * 1024; // 10MB chunk size
+		private const int ChunkSize = 50 * 1024 * 1024; // 50MB chunk size
 
 		public PackageController(ILogger<Controller> logger)
 		{
@@ -85,18 +85,21 @@ namespace publickeyserver
 
 				if (packageSize > Convert.ToInt32(GLOBALS.MaxPackageSize))
 				{
+					await AwsHelper.MultipartUploadBlank(Request);
 					return BadRequest($"Package size limit exceeded. Maximum size {GLOBALS.MaxPackageSize} bytes");
 				}
 
 				// check the max bucket size
 				if (bucketSize + packageSize > Convert.ToInt32(GLOBALS.MaxBucketSize))
 				{
+					await AwsHelper.MultipartUploadBlank(Request);
 					return BadRequest($"Bucket size limit exceeded. Maximum size is {GLOBALS.MaxBucketSize} bytes");
 				}
 
 				// check the max bucket count
 				if (bucketCount > Convert.ToInt32(GLOBALS.MaxBucketFiles))
 				{
+					await AwsHelper.MultipartUploadBlank(Request);
 					return BadRequest($"Bucket count limit exceeded. Maximum count is {GLOBALS.MaxBucketFiles}");
 				}
 
