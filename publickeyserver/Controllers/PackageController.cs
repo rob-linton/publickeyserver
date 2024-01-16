@@ -33,11 +33,11 @@ using Microsoft.AspNetCore.Mvc.Routing;
 namespace publickeyserver
 {
 	[ApiController]
-	[Route("api/[controller]")]
+	[Route("package")]
 	public class PackageController : ControllerBase
 	{
 		private readonly ILogger<Controller> _logger;
-		private const int ChunkSize = 1024 * 1024; // 1MB chunk size
+		private const int ChunkSize = 10 * 1024 * 1024; // 10MB chunk size
 
 		public PackageController(ILogger<Controller> logger)
 		{
@@ -45,18 +45,22 @@ namespace publickeyserver
 		}
 
 		// ------------------------------------------------------------------------------------------------------------
+		
 		[Produces("application/json")]
 		[HttpPost("{recipient}")]
 		public async Task<IActionResult> UploadPackage(string sender, string recipient, string timestamp, string signature)
 		{
 			try
 			{
+				// fix the signature
+				signature = signature.Replace(" ", "+");
+
 				// signature is of the following:
 				// sender + recipient + timestamp + origin
 				// host is bare eg. publickeyserver.org
 
 				// get the url host header
-				string host = Request.Host.Host;
+				string host = Request.Host.Host + ":" + Request.Host.Port;
 
 				// create a unique package name
 				string packageName = Guid.NewGuid().ToString();
@@ -65,6 +69,10 @@ namespace publickeyserver
 				
 				// total package size
 				long packageSize = Request.ContentLength.Value;
+				if (packageSize <= 0)
+				{
+					return BadRequest("Package size is zero or less");
+				}
 
 				string key = $"packages/{recipient}/{package}";
 
@@ -72,18 +80,18 @@ namespace publickeyserver
 				if (!String.IsNullOrEmpty(result))
 					return BadRequest(result);
 
-				// check the package size
+				// check the bucket status
 				(int bucketCount, long bucketSize) = await PackageHelper.GetPackagesStatus(recipient);	
 
 				if (packageSize > Convert.ToInt32(GLOBALS.MaxPackageSize))
 				{
-					return BadRequest($"Package size limit exceeded. Max size {GLOBALS.MaxPackageSize} bytes");
+					return BadRequest($"Package size limit exceeded. Maximum size {GLOBALS.MaxPackageSize} bytes");
 				}
 
 				// check the max bucket size
 				if (bucketSize + packageSize > Convert.ToInt32(GLOBALS.MaxBucketSize))
 				{
-					return BadRequest($"Bucket size limit exceeded. Maximum size is {GLOBALS.MaxPackageSize} bytes");
+					return BadRequest($"Bucket size limit exceeded. Maximum size is {GLOBALS.MaxBucketSize} bytes");
 				}
 
 				// check the max bucket count
@@ -97,52 +105,32 @@ namespace publickeyserver
 				// now we need to save the file
 				//
 
-				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				// if size is larger than chunk size then use multipart upload
+				if (packageSize > ChunkSize)
 				{
-					var initiateRequest = new InitiateMultipartUploadRequest
+					try
 					{
-						BucketName = GLOBALS.s3bucket,
-						Key = key
-					};
-
-					var initResponse = await _s3Client.InitiateMultipartUploadAsync(initiateRequest);
-
-					var partNumber = 1;
-					var uploadResponses = new List<UploadPartResponse>();
-
-					
-					byte[] buffer = new byte[ChunkSize];
-					int bytesRead;
-					while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
-					{
-						var memStream = new MemoryStream(buffer, 0, bytesRead);
-						var uploadRequest = new UploadPartRequest
-						{
-							BucketName = GLOBALS.s3bucket,
-							Key = key,
-							UploadId = initResponse.UploadId,
-							PartNumber = partNumber++,
-							PartSize = bytesRead,
-							InputStream = memStream
-						};
-
-						var uploadResponse = await _s3Client.UploadPartAsync(uploadRequest);
-						uploadResponses.Add(uploadResponse);
+						string resultMultipart = await AwsHelper.MultipartUpload(key, Request, bucketSize);
+						return Ok(resultMultipart);
 					}
-
-					var completeRequest = new CompleteMultipartUploadRequest
+					catch (Exception ex)
 					{
-						BucketName = GLOBALS.s3bucket,
-						Key = key,
-						UploadId = initResponse.UploadId,
-						PartETags = uploadResponses.Select(r => new PartETag(r.PartNumber, r.ETag)).ToList()
-					};
-
-					await _s3Client.CompleteMultipartUploadAsync(completeRequest);
-
-					Log.Information($"File {key} uploaded successfully in {partNumber - 1} parts");
-					return Ok($"File {key} uploaded successfully in {partNumber - 1} parts");
+						return BadRequest($"Error uploading file: {ex.Message}");
+					}
 				}
+				else
+				{
+					try
+					{
+						string resultSingle = await AwsHelper.SingleUpload(key, Request);
+						return Ok(resultSingle);
+					}
+					catch (Exception ex)
+					{
+						return BadRequest($"Error uploading file: {ex.Message}");
+					}
+				}
+
 			}
 			catch (AmazonS3Exception e)
 			{
@@ -155,14 +143,16 @@ namespace publickeyserver
 
 		}
 		// ------------------------------------------------------------------------------------------------------------
+		
 		[Produces("application/json")]
 		[HttpGet("{recipient}/{package}")]
+		
 		public async Task<IActionResult> DownloadPackage(string package, string recipient, string timestamp, string signature)
 		{
 			try
 			{
 				// get the url host header
-				string host = Request.Host.Host;
+				string host = Request.Host.Host + ":" + Request.Host.Port;
 				string key = $"packages/{recipient}/{package}";
 
 				string result = await PackageHelper.ValidateRecipient(recipient, host, signature, timestamp);

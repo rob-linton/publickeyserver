@@ -121,19 +121,7 @@ namespace publickeyserver
 		{
 			return aliasAndDomain.Split('.')[0];
 		}
-		// ---------------------------------------------------------------------
-		public static async Task<X509Certificate> GetCertificate(string alias)
-		{
-
-			// now get the "from" alias	
-			string result = await HttpHelper.Get($"https://{GLOBALS.origin}/cert/{Misc.GetAliasFromAlias(alias)}");
-
-			var c = System.Text.Json.JsonSerializer.Deserialize<CertResult>(result) ?? throw new Exception("Could not deserialize cert result");
-			var certificate = c.Certificate ?? throw new Exception("Could not get certificate from cert result");
-
-			return BouncyCastleHelper.ReadCertificateFromPemString(certificate);
-		}
-		// ---------------------------------------------------------------------
+		
 		
 		// ---------------------------------------------------------------------
 	}

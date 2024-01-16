@@ -269,9 +269,7 @@ class Unpack
 		}
 		catch (Exception ex)
 		{
-			Misc.LogLine(opts, "\nError: Unable to unpack files\n");
-			if (opts.Verbose > 0)
-				Misc.LogLine(opts, ex.Message);
+			Misc.LogError(opts, "Unable to unpack package", ex.Message);
 			return 1;
 		}
 		finally

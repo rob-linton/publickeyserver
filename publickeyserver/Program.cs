@@ -34,7 +34,7 @@ namespace publickeyserver
 				if (envVars.ContainsKey("MAX_BUCKET_FILES"))
 					GLOBALS.MaxBucketFiles = envVars["MAX_BUCKET_FILES"];
 				if (envVars.ContainsKey("MAX_PACKAGE_SIZE"))
-					GLOBALS.MaxBucketFiles = envVars["MAX_PACKAGE_SIZE"];
+					GLOBALS.MaxPackageSize = envVars["MAX_PACKAGE_SIZE"];
 
                 try
                 {

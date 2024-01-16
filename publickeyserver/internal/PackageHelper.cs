@@ -28,6 +28,8 @@ using Org.BouncyCastle.Asn1.Ocsp;
 using System.Reflection.Metadata;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Org.BouncyCastle.X509;
+
 
 namespace publickeyserver
 {
@@ -74,17 +76,23 @@ namespace publickeyserver
 		// ------------------------------------------------------------------------------------------------------------
 		public static async Task<string> ValidateRecipient(string recipient, string host, string signature, string timestamp)
 		{
+#if !DEBUG
 			// make sure the host header matches the origin
 			if (!host.EndsWith(GLOBALS.origin))
 				return $"Host {host} is not part of the global domain {GLOBALS.origin}";
 
 			if (!recipient.EndsWith(GLOBALS.origin))
 				return $"Recipient {recipient} is not part of the global domain {GLOBALS.origin}";
-
+#endif
 			string internalSig = $"{recipient}{timestamp}{GLOBALS.origin}".ToLower();
 
+			string domain = GLOBALS.origin;
+#if DEBUG
+			domain = host;
+#endif
+
 			// get the public key of the recipient
-			var toX509 = await Misc.GetCertificate(recipient);
+			var toX509 = await GetCertificate(domain, recipient);
 			AsymmetricKeyParameter publicKey;
 			if (toX509 != null)
 			{
@@ -96,13 +104,13 @@ namespace publickeyserver
 			}
 
 			// now validate that the signature is valid of the recipient
-			if (!BouncyCastleHelper.VerifySignature(internalSig.ToBytes(), signature.ToBytes(), publicKey))
+			if (!BouncyCastleHelper.VerifySignature(internalSig.ToBytes(), Convert.FromBase64String(signature), publicKey))
 			{
 				return $"Signature is not valid for request {signature}, format is recipient + timestamp(UTC seconds since epoch) + origin";
 			}
 
 			// validate the recipient
-			(bool recipientValid, byte[] recipientRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(GLOBALS.origin, recipient);
+			(bool recipientValid, byte[] recipientRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, recipient);
 			if (!recipientValid)
 				return $"Alias {recipient} is not valid";
 
@@ -121,10 +129,11 @@ namespace publickeyserver
 		// ------------------------------------------------------------------------------------------------------------
 		public static async Task<string> ValidateSenderAndRecipient(string sender, string recipient, string host, string signature, string timestamp)
 		{
+#if !DEBUG
 			// make sure the host header matches the origin
 			if (!host.EndsWith(GLOBALS.origin))
 				return $"Host {host} is not part of the global domain {GLOBALS.origin}";
-
+#endif
 			// signature is of the following:
 			string internalSig = $"{sender}{recipient}{timestamp}{GLOBALS.origin}".ToLower();
 
@@ -136,12 +145,16 @@ namespace publickeyserver
 				return $"Recipient {recipient} is not part of the global domain {GLOBALS.origin}";
 
 			// validate the sender
-			(bool senderValid, byte[] senderRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(GLOBALS.origin, sender);
+			string domain = GLOBALS.origin;
+#if DEBUG
+			domain = host;
+#endif
+			(bool senderValid, byte[] senderRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, sender);
 			if (!senderValid)
 				return $"Alias {sender} is not valid";
 
 			// validate the recipient
-			(bool recipientValid, byte[] recipientRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(GLOBALS.origin, recipient);
+			(bool recipientValid, byte[] recipientRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, recipient);
 			if (!recipientValid)
 				return $"Alias {recipient} is not valid";
 
@@ -152,7 +165,7 @@ namespace publickeyserver
 			}
 
 			// get the public key of the sender
-			var toX509 = await Misc.GetCertificate(sender);
+			var toX509 = await PackageHelper.GetCertificate(domain, sender);
 			AsymmetricKeyParameter publicKey;
 			if (toX509 != null)
 			{
@@ -162,11 +175,17 @@ namespace publickeyserver
 			{
 				return $"Could not get certificate for alias {sender}";
 			}
-			
-			// now validate that the signature is valid of the recipient
-			if (!BouncyCastleHelper.VerifySignature(internalSig.ToBytes(), signature.ToBytes(), publicKey))
+			try
 			{
-				return $"Signature is not valid for request {signature}, format is sender + recipient + timestamp(UTC seconds since epoch) + origin";
+				// now validate that the signature is valid of the recipient
+				if (!BouncyCastleHelper.VerifySignature(internalSig.ToBytes(), Convert.FromBase64String(signature), publicKey))
+				{
+					return $"Signature is not valid for request {signature}, format is sender + recipient + timestamp(UTC seconds since epoch) + origin";
+				}
+			}
+			catch (Exception ex)
+			{
+				return $"Could not verify signature {ex.Message}";
 			}
 
 			// verify threat the unix timestamp is within 10 minutes of now
@@ -209,6 +228,18 @@ namespace publickeyserver
 
 				return (fileCount, totalSize);
 			}
+		}
+		// ------------------------------------------------------------------------------------------------------------
+		public static async Task<X509Certificate> GetCertificate(string domain, string alias)
+		{
+
+			// now get the "from" alias	
+			string result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
+
+			var c = System.Text.Json.JsonSerializer.Deserialize<CertResult>(result) ?? throw new Exception("Could not deserialize cert result");
+			var certificate = c.Certificate ?? throw new Exception("Could not get certificate from cert result");
+
+			return BouncyCastleHelper.ReadCertificateFromPemString(certificate);
 		}
 		// ------------------------------------------------------------------------------------------------------------
 	}

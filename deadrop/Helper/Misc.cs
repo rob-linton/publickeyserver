@@ -88,7 +88,7 @@ public class Misc
 		Console.WriteLine($"\n*** ERROR: {message} ***\n");
 
 		if (opts.Verbose > 0 && !String.IsNullOrEmpty(details))
-			Console.Write(details);
+			Console.Write($"*** ERROR: {details} ***\n");
 	}
 
 	public static void LogChar(Options opts, string message)

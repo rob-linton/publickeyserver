@@ -364,9 +364,7 @@ class Pack
 		}
 		catch (Exception ex)
 		{
-			Misc.LogLine(opts, "\nError: Unable to pack files\n");
-			if (opts.Verbose > 0)
-				Misc.LogLine(opts, ex.Message);
+			Misc.LogError(opts, "Unable to pack files", ex.Message);
 			return 1;
 		}
 
