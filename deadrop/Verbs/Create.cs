@@ -34,7 +34,7 @@ class Create
 			//
 			// create the public/private key pair using bouncy castle
 			//
-			Misc.LogLine(opts, "- Generating public/private key pair...");
+			Misc.LogCheckMark("Generated public/private key pair");
 			AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.GenerateKeyPair(2048);
 
 			//

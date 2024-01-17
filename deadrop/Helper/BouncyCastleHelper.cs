@@ -111,7 +111,7 @@ public class BouncyCastleHelper
                 {
                     throw new CertificateException("*** ERROR: Issuer/Subject DN mismatch ***");
                 }
-				Misc.LogLine(opts, "  Issuer/Subject DN match");
+				Misc.LogCheckMark("Subject name matches the parent certificate's Issuer name");
 
 				// throws an exception if not valid
                 child.Verify(parent.GetPublicKey());
@@ -127,7 +127,7 @@ public class BouncyCastleHelper
 				{
 					throw new CertificateException("*** Error: Certificate not valid now ***");
 				}
-				Misc.LogLine(opts, "  Certificate dates valid");
+				Misc.LogCheckMark("Certificate dates are valid");
 
 				// does the parent have authority to sign the child?
 				Asn1Object? asn1Object = GetAsn1Object(parent, X509Extensions.KeyUsage);
@@ -144,7 +144,7 @@ public class BouncyCastleHelper
 				{
 					throw new CertificateException("*** Error: KeyUsage extension does not allow signing. ***");
 				}
-				Misc.LogLine(opts, "  Parent has authority to sign the child");
+				Misc.LogCheckMark($"Parent has authority to sign the child {i + 1} of {chain.Length}");
 
 				Misc.LogLine(opts, $"  Certificate {i + 1} of {chain.Length} is valid: {parent.SubjectDN.ToString()}");
             }
@@ -154,7 +154,7 @@ public class BouncyCastleHelper
 
 			//DisplayVisualFingerprint(fingerprint);
 			//CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
-			Misc.LogLine(opts, $"  Certificate is valid");
+			Misc.LogCheckMark($"Certificate is valid");
 
             return (true, fingerprint);
         }
@@ -196,7 +196,7 @@ public class BouncyCastleHelper
 
 		if (fullName.EndsWith(shortName))
 		{
-			Misc.LogLine(opts, $"  CommonName {shortName} is a member of {fullName}");
+			Misc.LogCheckMark($"CommonName {shortName} is a member of {fullName}");
 			return true;
 		}		
 
@@ -371,7 +371,7 @@ public class BouncyCastleHelper
 		bool isValid =  signer.VerifySignature(signature);
 		if (!isValid)
 		{
-			throw new Exception("Signature is not valid");
+			throw new Exception("ERROR: Signature is not valid");
 		}		
 	}
 	// --------------------------------------------------------------------------------------------------------

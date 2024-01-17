@@ -9,6 +9,7 @@ namespace deadrop;
 
 public class Misc
 {
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Retrieves the alias from the given alias and domain string.
 	/// </summary>
@@ -18,7 +19,7 @@ public class Misc
 	{
 		return aliasAndDomain.Split('.')[0];
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Extracts the domain from an alias and domain string.
 	/// </summary>
@@ -38,7 +39,7 @@ public class Misc
 		}
 		return sb.ToString();
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Gets the domain based on the provided options and alias.
 	/// If the domain is specified in the options, it is returned.
@@ -66,7 +67,7 @@ public class Misc
 		}
 		
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Retrieves an X509 certificate based on the provided options and alias.
 	/// </summary>
@@ -86,7 +87,7 @@ public class Misc
 
 		return BouncyCastleHelper.ReadCertificateFromPemString(certificate);
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Logs a message to the console if the verbosity level is greater than 0.
 	/// </summary>
@@ -97,7 +98,7 @@ public class Misc
 		if (opts.Verbose > 0)
 			Console.WriteLine(message);
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Logs a message to the console if the verbosity level is greater than 1.
 	/// </summary>
@@ -112,7 +113,7 @@ public class Misc
 			Console.WriteLine("--------------------------------------------------------------------------------");
 		}
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Logs a message to the console.
 	/// </summary>
@@ -121,7 +122,7 @@ public class Misc
 	{
 		Console.WriteLine(message);
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Logs an error message with optional details.
 	/// </summary>
@@ -135,7 +136,7 @@ public class Misc
 		if (opts.Verbose > 0 && !String.IsNullOrEmpty(details))
 			Console.Write($"*** ERROR: {details} ***\n");
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Logs a character to the console if the verbose level is greater than 0.
 	/// </summary>
@@ -146,7 +147,7 @@ public class Misc
 		if (opts.Verbose > 0)
 			Console.Write(message);
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Logs a character to the console.
 	/// </summary>
@@ -155,7 +156,13 @@ public class Misc
 	{
 		Console.Write(message);
 	}
-
+	// --------------------------------------------------------------------------------------------------------
+	public static void LogCheckMark(string message)
+	{
+		message = message + "  ................................................................................................................";
+		Console.WriteLine(message.Substring(0, 110) + "  [ \u2713 ]");
+	}
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Logs the header information for the DEADPACK application.
 	/// </summary>
@@ -169,7 +176,7 @@ public class Misc
 		LogLine("Copyright Rob Linton, 2023");
 		LogLine("================================================================================\n");
 	}
-
+	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Displays the Dead Drop ASCII art logo in the console.
 	/// </summary>

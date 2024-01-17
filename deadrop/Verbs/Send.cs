@@ -31,6 +31,7 @@ class Send
 
 		// now get the "from" alias
 		string fromAlias = envelope.From;
+		Misc.LogLine($"Sending from {fromAlias}...\n");
 
 		// validate the from alias
 		string fromDomain = Misc.GetDomain(opts, fromAlias);
@@ -40,6 +41,7 @@ class Send
 			Misc.LogError(opts, "Invalid from alias", fromAlias);
 			return 1;
 		}
+		
 
 		// get the to aliases
 		List<string> toAliases = envelope.To.Select(r => r.Alias).ToList();
@@ -49,7 +51,7 @@ class Send
 		{
 			try
 			{
-				Misc.LogLine($"Recipient Alias: {toAlias}");
+				Misc.LogLine($"\nProcessing {toAlias}...\n");
 
 				// valiadate the to alias
 				string toDomain = Misc.GetDomain(opts, toAlias);
@@ -65,6 +67,7 @@ class Send
 					Misc.LogLine(opts, $"Aliases do not share the same root certificate {fromAlias} -> {toAlias}");
 					return 1;
 				}
+				Misc.LogCheckMark($"Shared root certificate {fromAlias} -> {toAlias}");
 
 				// send the file to the server
 				// UploadPackage(string sender, string timestamp, string signature)
@@ -96,15 +99,12 @@ class Send
 				byte[] signature = BouncyCastleHelper.SignData(data, privateKey.Private);
 				string base64Signature = Convert.ToBase64String(signature);
 
-				Misc.LogLine(opts, $"Sending deadpack to {toAlias}...");
+				Misc.LogLine($"\nSending deadpack to {toAlias}...\n");
 				// UploadPackage(string sender, string recipient, string timestamp, string signature)
 				var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", opts, opts.File);
 
 				// show result ok
-				Misc.LogLine(opts, $"\n{result}\n");
-
-
-
+				Misc.LogLine($"\n{result}\n");		
 			}
 			catch (Exception ex)
 			{

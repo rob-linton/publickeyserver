@@ -240,6 +240,7 @@ public class ProgressContent : HttpContent
 		var buffer = new byte[_bufferSize];
 		var bytesRead = 0;
 		var totalBytesRead = 0;
+		int hashesPrinted = 0;
 
 		_content.Seek(0, SeekOrigin.Begin);
 
@@ -250,8 +251,16 @@ public class ProgressContent : HttpContent
 
 			if (totalBytesRead / OneMB > (totalBytesRead - bytesRead) / OneMB)
 			{
+				hashesPrinted++;
 				Console.Write("#");
 			}
+
+			if (hashesPrinted > 109)
+			{
+				hashesPrinted = 0;
+				Console.WriteLine();
+			}
+			
 		}
 	}
 

@@ -95,7 +95,7 @@ class Pack
 
 			if (answer == null || answer.ToLower() != "n")
 			{
-				Misc.LogLine($"\nCreating package {opts.Output}...");
+				Misc.LogLine($"\nCreating package {opts.Output}...\n");
 			}
 			else
 			{
@@ -113,7 +113,7 @@ class Pack
 			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, opts);
 
 			if (valid)
-				Misc.LogLine(opts, $"- Alias {opts.From} is valid\n");
+				Misc.LogCheckMark($"Alias {opts.From} is valid");
 			else
 			{
 				Misc.LogError(opts, $"Alias {opts.From} is *NOT* valid");
@@ -182,7 +182,7 @@ class Pack
 					}
 				}
 
-				Misc.LogLine("");
+				Misc.LogLine("\n");
 
 				//
 				// get the private key
@@ -219,7 +219,7 @@ class Pack
 					}
 					else
 					{
-						Misc.LogLine(opts, $"\n- Private key matches public certificate for alias {opts.From}");
+						Misc.LogCheckMark($"Private key matches public certificate for alias {opts.From}");
 					}
 				}
 				else
@@ -274,8 +274,8 @@ class Pack
 									return 1;
 								}
 
-								Misc.LogLine(opts, $"- Recipient Alias {alias} is valid");
-								Misc.LogLine(opts, $"- Aliases share the same root certificate {opts.From} -> {alias}");
+								Misc.LogCheckMark($"Recipient Alias {alias} is valid");
+								Misc.LogCheckMark($"Shared root certificate {opts.From} -> {alias}");
 							}
 							else
 							{
@@ -359,8 +359,15 @@ class Pack
 				zip.Comment = "This zip file was created by deadrop.org";
 			}
 
-			Misc.LogLine("\nDone. Only the anonymous recipient aliases will be able to unpack this deadpack.");
-			Misc.LogLine("(Please note, this means you can't unpack it either!)\n");
+			Misc.LogLine("\nDone. Only the following anonymous recipient aliases will be able to unpack this deadpack.\n");
+			if (opts.InputAliases != null)
+			{
+				foreach (var alias in opts.InputAliases)
+				{
+					Misc.LogLine($"Recipient Alias: {alias}");
+				}
+			}
+			Misc.LogLine("");
 		}
 		catch (Exception ex)
 		{

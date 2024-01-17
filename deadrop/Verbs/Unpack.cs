@@ -123,7 +123,7 @@ class Unpack
 			byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);				
 			try{
 				BouncyCastleHelper.VerifySignature(envelopeHash, envelopeSignature, fromPublicKey);
-				Misc.LogLine(opts, "- Envelope signature is valid");
+				Misc.LogCheckMark("Envelope signature is valid");
 			}
 			catch(Exception ex)
 			{
@@ -140,7 +140,7 @@ class Unpack
 			byte[] manifestHash = BouncyCastleHelper.GetHashOfBytes(manifestBytes);
 			try{
 				BouncyCastleHelper.VerifySignature(manifestHash, manifestSignature, fromPublicKey);
-				Misc.LogLine(opts, "- Manifest signature is valid");
+				Misc.LogCheckMark("Manifest signature is valid");
 			}
 			catch(Exception ex)
 			{
@@ -177,7 +177,7 @@ class Unpack
 					}
 					else
 					{
-						Misc.LogLine(opts, $"- Aliases share the same root certificate: {envelope.From} -> {opts.Alias}");
+						Misc.LogCheckMark($"Aliases share the same root certificate: {envelope.From} -> {opts.Alias}");
 					}
 
 					// get the public key from the alias
@@ -201,7 +201,7 @@ class Unpack
 					}
 					else
 					{
-						Misc.LogLine(opts, $"- Private key matches public certificate for alias: {opts.Alias}");
+						Misc.LogCheckMark($"Private key matches public certificate for alias: {opts.Alias}");
 					}
 
 
@@ -257,7 +257,8 @@ class Unpack
 						File.SetCreationTime(Path.Combine(outputDirectory, file.Name), createDate);
 						File.SetLastWriteTime(Path.Combine(outputDirectory, file.Name), modifiedDate);
 					}
-					Misc.LogLine("\n\nDone\n");
+					Misc.LogLine($"\n\nYour files are located in {opts.Output}");
+					Misc.LogLine("\nDone\n");
 				}
 			}
 
