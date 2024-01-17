@@ -101,7 +101,7 @@ class Send
 				var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", opts, opts.File);
 
 				// show result ok
-				Misc.LogLine(opts, $"Result: {result}");
+				Misc.LogLine(opts, $"\n{result}\n");
 
 
 

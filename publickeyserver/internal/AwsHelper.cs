@@ -119,9 +119,13 @@ namespace publickeyserver
 			}
 		}
 		// ---------------------------------------------------------------------
-		public static async Task<string> MultipartUpload(string key, HttpRequest Request, long bucketSize)
+		public static async Task<string> MultipartUpload(string keyLocation, string keyFile, HttpRequest Request, long bucketSize)
 		{
-			int ChunkSize = 50 * 1024 * 1024; // 50MB chunk size
+			string key = keyLocation + keyFile;
+
+			int ChunkSize = 1 * 1024 * 1024; // 1MB chunk size
+			const int minChunkSize = 50 * 1024 * 1024; // 50 MB minimum chunk size
+
 
 			using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 			{
@@ -136,13 +140,14 @@ namespace publickeyserver
 				var partNumber = 1;
 				var uploadResponses = new List<UploadPartResponse>();
 
+/*
 				long totalBytesRead = 0;
 				byte[] buffer = new byte[ChunkSize];
 				int bytesRead;
 				// only upload when the buffer has more than 5mb of data
-				*** TBA ***
 				while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
 				{
+					
 					totalBytesRead += bytesRead;
 					var memStream = new MemoryStream(buffer, 0, bytesRead);
 					var uploadRequest = new UploadPartRequest
@@ -152,6 +157,63 @@ namespace publickeyserver
 						UploadId = initResponse.UploadId,
 						PartNumber = partNumber++,
 						PartSize = bytesRead,
+						InputStream = memStream
+					};
+
+					var uploadResponse = await _s3Client.UploadPartAsync(uploadRequest);
+					uploadResponses.Add(uploadResponse);
+				}
+*/
+
+				long totalBytesRead = 0;
+				
+				byte[] buffer = new byte[ChunkSize];
+				byte[] accumulatedBuffer = new byte[minChunkSize * 2]; // Buffer to accumulate data
+				int bytesRead;
+				int accumulatedBytesRead = 0;
+
+				while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
+				{
+					totalBytesRead += bytesRead;
+					//Log.Information($"Adding {bytesRead} bytes to total {totalBytesRead}");
+
+					// Copy data to accumulated buffer
+					Array.Copy(buffer, 0, accumulatedBuffer, accumulatedBytesRead, bytesRead);
+					accumulatedBytesRead += bytesRead;
+
+					// Check if accumulated data is greater than 5MB
+					if (accumulatedBytesRead >= minChunkSize)
+					{
+						var memStream = new MemoryStream(accumulatedBuffer, 0, accumulatedBytesRead);
+						var uploadRequest = new UploadPartRequest
+						{
+							BucketName = GLOBALS.s3bucket,
+							Key = key,
+							UploadId = initResponse.UploadId,
+							PartNumber = partNumber++,
+							PartSize = accumulatedBytesRead,
+							InputStream = memStream
+						};
+
+						var uploadResponse = await _s3Client.UploadPartAsync(uploadRequest);
+						uploadResponses.Add(uploadResponse);
+
+						// Reset the accumulated buffer
+						accumulatedBytesRead = 0;
+					}
+				}
+
+				// Handle the last chunk if it's less than 5MB and not empty
+				if (accumulatedBytesRead > 0)
+				{
+					var memStream = new MemoryStream(accumulatedBuffer, 0, accumulatedBytesRead);
+					var uploadRequest = new UploadPartRequest
+					{
+						BucketName = GLOBALS.s3bucket,
+						Key = key,
+						UploadId = initResponse.UploadId,
+						PartNumber = partNumber++,
+						PartSize = accumulatedBytesRead,
 						InputStream = memStream
 					};
 
@@ -182,7 +244,7 @@ namespace publickeyserver
 				await _s3Client.CompleteMultipartUploadAsync(completeRequest);
 
 				Log.Information($"File {key} uploaded successfully in {partNumber - 1} parts");
-				return $"OK: File {key} uploaded successfully in {partNumber - 1} parts";
+				return $"{keyFile} uploaded successfully in {partNumber - 1} parts";
 			}
 		}
 		// ------------------------------------------------------------------------------------
@@ -202,8 +264,9 @@ namespace publickeyserver
 			}
 		}
 		// ------------------------------------------------------------------------------------
-		public static async Task<string> SingleUpload(string key, HttpRequest Request)
+		public static async Task<string> SingleUpload(string keyLocation, string keyFile, HttpRequest Request)
 		{
+			string key = keyLocation + keyFile;
 			using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 			{
 				PutObjectResponse response = null;
@@ -234,7 +297,7 @@ namespace publickeyserver
 				}
 			}
 
-			return $"OK: File {key} uploaded successfully";
+			return $"{keyFile} uploaded successfully";
 		}
 	}
 }

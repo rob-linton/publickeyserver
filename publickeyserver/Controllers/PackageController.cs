@@ -37,7 +37,7 @@ namespace publickeyserver
 	public class PackageController : ControllerBase
 	{
 		private readonly ILogger<Controller> _logger;
-		private const int ChunkSize = 50 * 1024 * 1024; // 50MB chunk size
+		private const int ChunkSizeLimit = 10 * 1024 * 1024; // 10MB chunk size
 
 		public PackageController(ILogger<Controller> logger)
 		{
@@ -74,7 +74,8 @@ namespace publickeyserver
 					return BadRequest("Package size is zero or less");
 				}
 
-				string key = $"packages/{recipient}/{package}";
+				string keyLocation = $"packages/{recipient}/";
+				string keyFile = $"{package}";
 
 				string result = await PackageHelper.ValidateSenderAndRecipient(sender, recipient, host, signature, timestamp);
 				if (!String.IsNullOrEmpty(result))
@@ -109,11 +110,11 @@ namespace publickeyserver
 				//
 
 				// if size is larger than chunk size then use multipart upload
-				if (packageSize > ChunkSize)
+				if (packageSize > ChunkSizeLimit)
 				{
 					try
 					{
-						string resultMultipart = await AwsHelper.MultipartUpload(key, Request, bucketSize);
+						string resultMultipart = await AwsHelper.MultipartUpload(keyLocation, keyFile, Request, bucketSize);
 						return Ok(resultMultipart);
 					}
 					catch (Exception ex)
@@ -125,7 +126,7 @@ namespace publickeyserver
 				{
 					try
 					{
-						string resultSingle = await AwsHelper.SingleUpload(key, Request);
+						string resultSingle = await AwsHelper.SingleUpload(keyLocation, keyFile, Request);
 						return Ok(resultSingle);
 					}
 					catch (Exception ex)
@@ -176,7 +177,7 @@ namespace publickeyserver
 					Response.Headers.Append("Content-Disposition", $"attachment; filename={package}");
 
 					await using var responseStream = response.ResponseStream;
-					var buffer = new byte[ChunkSize];
+					var buffer = new byte[ChunkSizeLimit];
 					int bytesRead;
 					while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
 					{
