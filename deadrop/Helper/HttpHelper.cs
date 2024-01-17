@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
 using deadrop.Verbs;
 
 namespace deadrop;
@@ -83,6 +85,8 @@ public class HttpHelper
 	// stream a large file to the server
 	public static async Task<string> PostFile(string url, Options opts, string filePath)
     {
+		
+
 #if DEBUG
 		url = url.Replace("https://", "http://");	
 #endif
@@ -90,7 +94,7 @@ public class HttpHelper
 
 		using (var client = new HttpClient())
 		using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
-		using (var content = new StreamContent(fileStream))
+		using (var content = new ProgressContent(fileStream))
 		{
 			content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
 
@@ -102,6 +106,10 @@ public class HttpHelper
 					throw new Exception($"POSTFILE failed: {response.StatusCode}: {response.Content.ReadAsStringAsync().Result}}}");
 				}
 				var data = await response.Content.ReadAsStringAsync();
+				
+				// remove the double quotes
+				data = data.Substring(1, data.Length - 2);
+
 				return data;
 			}
 			catch (Exception ex)
@@ -110,10 +118,49 @@ public class HttpHelper
 				throw;
 			}
 
-			
-
-			
-
 		}
+    }
+}
+
+// ----------------------------------------------------------
+// helper class
+public class ProgressContent : HttpContent
+{
+    private const int OneMB = 1024 * 1024;
+    private readonly Stream _content;
+    private readonly int _bufferSize;
+
+    public ProgressContent(Stream content, int bufferSize = 4096)
+    {
+        _content = content ?? throw new ArgumentNullException(nameof(content));
+        _bufferSize = bufferSize;
+
+        this.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+    }
+
+    protected override async Task SerializeToStreamAsync(Stream stream, TransportContext context)
+    {
+        var buffer = new byte[_bufferSize];
+        var bytesRead = 0;
+        var totalBytesRead = 0;
+
+        _content.Seek(0, SeekOrigin.Begin);
+
+        while ((bytesRead = await _content.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        {
+            await stream.WriteAsync(buffer, 0, bytesRead);
+            totalBytesRead += bytesRead;
+
+            if (totalBytesRead / OneMB > (totalBytesRead - bytesRead) / OneMB)
+            {
+                Console.Write("#");
+            }
+        }
+    }
+
+    protected override bool TryComputeLength(out long length)
+    {
+        length = _content.Length;
+        return true;
     }
 }
