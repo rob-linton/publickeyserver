@@ -155,6 +155,9 @@ namespace publickeyserver
 		{
 			try
 			{
+				// fix the signature
+				signature = signature.Replace(" ", "+");
+				
 				// get the url host header
 				string host = Request.Host.Host + ":" + Request.Host.Port;
 				string key = $"packages/{recipient}/{package}";

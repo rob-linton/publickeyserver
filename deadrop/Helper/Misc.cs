@@ -9,11 +9,21 @@ namespace deadrop;
 
 public class Misc
 {
+	/// <summary>
+	/// Retrieves the alias from the given alias and domain string.
+	/// </summary>
+	/// <param name="aliasAndDomain">The alias and domain string.</param>
+	/// <returns>The alias extracted from the alias and domain string.</returns>
 	public static string GetAliasFromAlias(string aliasAndDomain)
 	{
 		return aliasAndDomain.Split('.')[0];
 	}
 
+	/// <summary>
+	/// Extracts the domain from an alias and domain string.
+	/// </summary>
+	/// <param name="aliasAndDomain">The alias and domain string.</param>
+	/// <returns>The domain extracted from the alias and domain string.</returns>
 	public static string GetDomainFromAlias(string aliasAndDomain)
 	{
 		string[] bits = aliasAndDomain.Split('.');
@@ -29,6 +39,15 @@ public class Misc
 		return sb.ToString();
 	}
 
+	/// <summary>
+	/// Gets the domain based on the provided options and alias.
+	/// If the domain is specified in the options, it is returned.
+	/// If the domain is not specified and the alias is null or empty, "publickeyserver.org" is returned.
+	/// If the domain is not specified and the alias is not null or empty, the domain is retrieved from the alias.
+	/// </summary>
+	/// <param name="opts">The options object containing the domain.</param>
+	/// <param name="alias">The alias used to retrieve the domain.</param>
+	/// <returns>The domain to be used.</returns>
 	public static string GetDomain(Options opts, string alias)
 	{
 		if (opts.Domain != null && opts.Domain.Length > 0)
@@ -48,6 +67,12 @@ public class Misc
 		
 	}
 
+	/// <summary>
+	/// Retrieves an X509 certificate based on the provided options and alias.
+	/// </summary>
+	/// <param name="opts">The options for retrieving the certificate.</param>
+	/// <param name="alias">The alias of the certificate.</param>
+	/// <returns>The X509 certificate.</returns>
 	public static async Task<X509Certificate> GetCertificate(Options opts, string alias)
 	{
 
@@ -62,12 +87,22 @@ public class Misc
 		return BouncyCastleHelper.ReadCertificateFromPemString(certificate);
 	}
 
+	/// <summary>
+	/// Logs a message to the console if the verbosity level is greater than 0.
+	/// </summary>
+	/// <param name="opts">The options object.</param>
+	/// <param name="message">The message to be logged.</param>
 	public static void LogLine(Options opts, string message)
 	{
 		if (opts.Verbose > 0)
 			Console.WriteLine(message);
 	}
 
+	/// <summary>
+	/// Logs a message to the console if the verbosity level is greater than 1.
+	/// </summary>
+	/// <param name="opts">The options object.</param>
+	/// <param name="message">The message to be logged.</param>
 	public static void LogLine1(Options opts, string message)
 	{
 		if (opts.Verbose > 1)
@@ -78,11 +113,21 @@ public class Misc
 		}
 	}
 
+	/// <summary>
+	/// Logs a message to the console.
+	/// </summary>
+	/// <param name="message">The message to be logged.</param>
 	public static void LogLine(string message)
 	{
 		Console.WriteLine(message);
 	}
 
+	/// <summary>
+	/// Logs an error message with optional details.
+	/// </summary>
+	/// <param name="opts">The options object.</param>
+	/// <param name="message">The error message.</param>
+	/// <param name="details">Optional details about the error.</param>
 	public static void LogError(Options opts, string message, string details = "")
 	{
 		Console.WriteLine($"\n*** ERROR: {message} ***\n");
@@ -91,17 +136,29 @@ public class Misc
 			Console.Write($"*** ERROR: {details} ***\n");
 	}
 
+	/// <summary>
+	/// Logs a character to the console if the verbose level is greater than 0.
+	/// </summary>
+	/// <param name="opts">The options object.</param>
+	/// <param name="message">The message to be logged.</param>
 	public static void LogChar(Options opts, string message)
 	{
 		if (opts.Verbose > 0)
 			Console.Write(message);
 	}
 
+	/// <summary>
+	/// Logs a character to the console.
+	/// </summary>
+	/// <param name="message">The character to be logged.</param>
 	public static void LogChar(string message)
 	{
 		Console.Write(message);
 	}
 
+	/// <summary>
+	/// Logs the header information for the DEADPACK application.
+	/// </summary>
 	public static void LogHeader()
 	{
 		LogArt();
@@ -113,6 +170,9 @@ public class Misc
 		LogLine("================================================================================\n");
 	}
 
+	/// <summary>
+	/// Displays the Dead Drop ASCII art logo in the console.
+	/// </summary>
 	public static void LogArt()
 	{
 		string art = 

@@ -4,6 +4,12 @@ namespace deadrop;
 
 public class Storage
 {
+	/// <summary>
+	/// Stores the private key in encrypted form as a PEM file.
+	/// </summary>
+	/// <param name="alias">The alias associated with the private key.</param>
+	/// <param name="privateKeyPem">The private key in PEM format.</param>
+	/// <param name="password">The password used for encryption.</param>
 	public static void StorePrivateKey(string alias, string privateKeyPem, string password)
 	{
 		// encrypt the private key
@@ -18,6 +24,10 @@ public class Storage
 		// save it as PEM format
 		File.WriteAllBytes($"{alias}.pem", cipherText);
 	}
+	/// <summary>
+	/// Retrieves a list of aliases from the current directory.
+	/// </summary>
+	/// <returns>A list of aliases.</returns>
 	public static List<string> GetAliases()
 	{
 		List<string> aliases = new List<string>();
@@ -30,6 +40,12 @@ public class Storage
 
 		return aliases;
 	}
+	/// <summary>
+	/// Retrieves the private key associated with the specified alias and password.
+	/// </summary>
+	/// <param name="alias">The alias of the private key.</param>
+	/// <param name="password">The password used to decrypt the private key.</param>
+	/// <returns>The decrypted private key as a string.</returns>
 	public static string GetPrivateKey(string alias, string password)
 	{
 		string sNonce = Misc.GetDomainFromAlias(alias);
@@ -43,16 +59,5 @@ public class Storage
 
 		return plainText.FromBytes();
 	}
-	/*
-	public static void StoreCert(string alias, string certPem)
-	{
-		// save it as PEM format
-		File.WriteAllText($"{alias}.pem", certPem);
-	}
-
-	public static string GetCert(string alias)
-	{
-		return File.ReadAllText($"{alias}.pem");
-	}
-	*/
+	
 }

@@ -38,6 +38,9 @@ public class BouncyCastleHelper
 
 	private const int NONCE_BIT_SIZE = 128;
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Represents a pair of asymmetric cryptographic keys, consisting of a public key and a private key.
+	/// </summary>
 	public static AsymmetricCipherKeyPair GenerateKeyPair(int keySize)
     {
 		
@@ -71,6 +74,15 @@ public class BouncyCastleHelper
 		return keyPair;
     }
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Validates the certificate chain using the target certificate, intermediate and root certificates,
+	/// common name, and options provided.
+	/// </summary>
+	/// <param name="targetCertificatePem">The PEM string of the target certificate.</param>
+	/// <param name="intermediateAndRootCertificatePems">The list of PEM strings of intermediate and root certificates.</param>
+	/// <param name="commonName">The common name to check against the certificate.</param>
+	/// <param name="opts">The options for certificate validation.</param>
+	/// <returns>A tuple containing a boolean indicating if the certificate chain is valid and the fingerprint of the root certificate.</returns>
 	public static (bool, byte[]) ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName, Options opts)
     {
         try
@@ -153,7 +165,13 @@ public class BouncyCastleHelper
         }
     }
 	// --------------------------------------------------------------------------------------------------------
-	private static Asn1Object? GetAsn1Object(Org.BouncyCastle.X509.X509Certificate certificate, DerObjectIdentifier oid)
+	/// <summary>
+	/// Retrieves the ASN.1 object from the specified X.509 certificate using the given object identifier (OID).
+	/// </summary>
+	/// <param name="certificate">The X.509 certificate.</param>
+	/// <param name="oid">The object identifier (OID) of the extension.</param>
+	/// <returns>The ASN.1 object if found; otherwise, null.</returns>
+	private static Asn1Object? GetAsn1Object(X509Certificate certificate, DerObjectIdentifier oid)
 	{
 		Asn1OctetString akiBytes = certificate.GetExtensionValue(oid);
 		if (akiBytes == null) 
@@ -164,6 +182,13 @@ public class BouncyCastleHelper
 		return Asn1Object.FromByteArray(akiBytes.GetOctets());
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Checks if the common name is a member of the full name.
+	/// </summary>
+	/// <param name="fullName">The full name to check.</param>
+	/// <param name="shortName">The common name to check.</param>
+	/// <param name="opts">The options.</param>
+	/// <returns>True if the common name is a member of the full name; otherwise, false.</returns>
 	public static bool CheckIfCommonNameIsAMember(string fullName, string shortName, Options opts)
 	{
 		fullName = fullName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
@@ -186,6 +211,11 @@ public class BouncyCastleHelper
 		
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Computes the SHA256 hash of the given byte array.
+	/// </summary>
+	/// <param name="b">The byte array to compute the hash for.</param>
+	/// <returns>The computed hash as a byte array.</returns>
 	public static byte[] GetHashOfBytes(byte[] b)
 	{
 		using SHA256 sha256 = SHA256.Create();
@@ -193,6 +223,11 @@ public class BouncyCastleHelper
 		return hashBytes;
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Computes the SHA256 hash of the specified file.
+	/// </summary>
+	/// <param name="filename">The path of the file to compute the hash for.</param>
+	/// <returns>The computed hash as a byte array.</returns>
 	public static byte[] GetHashOfFile(string filename)
 	{
 		using SHA256 sha256 = SHA256.Create();
@@ -200,6 +235,11 @@ public class BouncyCastleHelper
 		return hashBytes;
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Computes the SHA256 hash of a given string.
+	/// </summary>
+	/// <param name="s">The string to compute the hash for.</param>
+	/// <returns>The computed hash as a byte array.</returns>
 	public static byte[] GetHashOfString(string s)
 	{
 		using SHA256 sha256 = SHA256.Create();
@@ -207,6 +247,11 @@ public class BouncyCastleHelper
 		return hashBytes;
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Converts a byte array hash to a hexadecimal string representation.
+	/// </summary>
+	/// <param name="hash">The byte array hash to convert.</param>
+	/// <returns>The hexadecimal string representation of the hash.</returns>
 	public static string ConvertHashToString(byte[] hash)
     {
         // Convert the byte array to a hexadecimal string
@@ -218,6 +263,11 @@ public class BouncyCastleHelper
         return hashString;
     }
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Calculates the fingerprint of a certificate in PEM format.
+	/// </summary>
+	/// <param name="pemString">The certificate in PEM format.</param>
+	/// <returns>The fingerprint of the certificate.</returns>
 	public static byte[] GetFingerprint(string pemString)
 	{
 		// make sure the certificate is valid
@@ -229,47 +279,11 @@ public class BouncyCastleHelper
 		return hashBytes;
 	}
 	// --------------------------------------------------------------------------------------------------------
-	private static void DisplayVisualFingerprint(string fingerprint, Options opts)
-    {
-        // Define the formatting parameters
-        int bytesPerBlock = 2; // Number of bytes in each block
-        int blocksPerGroup = 4; // Number of blocks in each group
-        int groupsPerLine = 2; // Number of groups per line
-
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("\nCA Certificate Fingerprint (SHA-256):");
-        sb.AppendLine(new string('-', 43)); // Decorative line
-
-        int index = 0;
-
-        while (index < fingerprint.Length)
-        {
-            // Add a block
-            if (index + bytesPerBlock * 2 <= fingerprint.Length)
-            {
-                sb.Append(fingerprint.Substring(index, bytesPerBlock * 2));
-            }
-            else
-            {
-                // Append the remaining characters
-                sb.Append(fingerprint.Substring(index));
-            }
-
-            index += bytesPerBlock * 2;
-
-            // Formatting: add spaces and line breaks
-            bool isEndOfBlock = (index / (bytesPerBlock * 2)) % blocksPerGroup == 0;
-            bool isEndOfLine = (index / (bytesPerBlock * 2)) % (blocksPerGroup * groupsPerLine) == 0;
-            if (index < fingerprint.Length)
-            {
-                sb.Append(isEndOfLine ? "\n" + new string('-', 43) + "\n" : (isEndOfBlock ? "  |  " : " "));
-            }
-        }
-
-        sb.AppendLine("\n" + new string('-', 43)); // Decorative line
-        Misc.LogLine(opts, sb.ToString());
-    }
-	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Reads a PEM string from an AsymmetricKeyParameter object.
+	/// </summary>
+	/// <param name="key">The AsymmetricKeyParameter object.</param>
+	/// <returns>The PEM string representation of the key.</returns>
 	public static string ReadPemStringFromKey(AsymmetricKeyParameter key)
 	{
 		using TextWriter publicKeyTextWriter = new StringWriter();
@@ -282,13 +296,21 @@ public class BouncyCastleHelper
 		return sKey;
 	}
 	// --------------------------------------------------------------------------------------------------------
-	public static Org.BouncyCastle.X509.X509Certificate ReadCertificateFromPemString(string pemString)
+	/// <summary>
+	/// Reads an X.509 certificate from a PEM string.
+	/// </summary>
+	/// <param name="pemString">The PEM string containing the certificate.</param>
+	/// <returns>The X.509 certificate.</returns>
+	public static X509Certificate ReadCertificateFromPemString(string pemString)
     {
 		using StringReader reader = new StringReader(pemString);
 		PemReader pemReader = new PemReader(reader);
-		return (Org.BouncyCastle.X509.X509Certificate)pemReader.ReadObject();
+		return (X509Certificate)pemReader.ReadObject();
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Represents a pair of asymmetric cryptographic keys.
+	/// </summary>
 	public static AsymmetricCipherKeyPair ReadKeyPairFromPemString(string pemString)
 	{
 		using StringReader reader = new StringReader(pemString);
@@ -296,6 +318,10 @@ public class BouncyCastleHelper
 		return (AsymmetricCipherKeyPair)pemReader.ReadObject();
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Generates a 256-bit random byte array using a secure random number generator.
+	/// </summary>
+	/// <returns>A byte array containing 256 random bits.</returns>
 	public static byte[] Generate256BitRandom()
     {
         // Create a secure random number generator using Bouncy Castle
@@ -310,6 +336,12 @@ public class BouncyCastleHelper
         return randomBytes;
     }
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Signs the provided data using the specified private key.
+	/// </summary>
+	/// <param name="message">The data to be signed.</param>
+	/// <param name="privateKey">The private key used for signing.</param>
+	/// <returns>The generated signature.</returns>
 	public static byte[] SignData(byte[] message, AsymmetricKeyParameter privateKey)
 	{
 
@@ -323,7 +355,13 @@ public class BouncyCastleHelper
 
 	}
 	// --------------------------------------------------------------------------------------------------------
-	public static void verifySignature(byte[] message, byte[] signature, AsymmetricKeyParameter publicKey)
+	/// <summary>
+	/// Verifies the signature of a message using the provided public key.
+	/// </summary>
+	/// <param name="message">The message to verify.</param>
+	/// <param name="signature">The signature to verify.</param>
+	/// <param name="publicKey">The public key used for verification.</param>
+	public static void VerifySignature(byte[] message, byte[] signature, AsymmetricKeyParameter publicKey)
 	{
 
 		var signer = SignerUtilities.GetSigner("SHA512WITHRSA");
@@ -337,6 +375,13 @@ public class BouncyCastleHelper
 		}		
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Encrypts a file in blocks using a specified key and nonce.
+	/// </summary>
+	/// <param name="filename">The path of the file to be encrypted.</param>
+	/// <param name="key">The encryption key.</param>
+	/// <param name="nonce">The nonce value.</param>
+	/// <returns>A list of file chunks generated during the encryption process.</returns>
 	public static List<string> EncryptFileInBlocks(string filename, byte[] key, byte[] nonce)
 	{
 		List<string> chunkList = new List<string>();
@@ -368,6 +413,12 @@ public class BouncyCastleHelper
 		}
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Decrypts the given cipher text using the provided private key.
+	/// </summary>
+	/// <param name="cipherText">The cipher text to be decrypted.</param>
+	/// <param name="privateKey">The private key used for decryption.</param>
+	/// <returns>The decrypted data.</returns>
 	public static byte[] DecryptWithPrivateKey(byte[] cipherText, AsymmetricKeyParameter privateKey)
 	{
 		//
@@ -382,6 +433,12 @@ public class BouncyCastleHelper
 		return engine.ProcessBlock(cipherText, 0, cipherText.Length);
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Encrypts the specified message using the provided public key.
+	/// </summary>
+	/// <param name="message">The message to be encrypted.</param>
+	/// <param name="publicKey">The public key used for encryption.</param>
+	/// <returns>The encrypted message.</returns>
 	public static byte[] EncryptWithPublicKey(byte[] message, AsymmetricKeyParameter publicKey)
 	{
 		//
@@ -397,6 +454,13 @@ public class BouncyCastleHelper
 
 	}
 	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Encrypts a message using a given key and optional non-secret payload.
+	/// </summary>
+	/// <param name="messageToEncrypt">The message to encrypt.</param>
+	/// <param name="key">The encryption key.</param>
+	/// <param name="nonSecretPayload">Optional non-secret payload to include in the encryption.</param>
+	/// <returns>The encrypted message.</returns>
 	public static byte[] EncryptWithKey(
 			byte[] messageToEncrypt,
 			byte[] key,
@@ -446,6 +510,13 @@ public class BouncyCastleHelper
 			}
 		}
 		// --------------------------------------------------------------------------------------------------------
+		/// <summary>
+		/// Decrypts an encrypted message using a key and non-secret payload.
+		/// </summary>
+		/// <param name="encryptedMessage">The encrypted message to decrypt.</param>
+		/// <param name="key">The key used for decryption.</param>
+		/// <param name="nonSecretPayload">The non-secret payload associated with the encrypted message.</param>
+		/// <returns>The decrypted plain text message.</returns>
 		public static byte[] DecryptWithKey(
 			byte[] encryptedMessage,
 			byte[] key,
@@ -500,6 +571,14 @@ public class BouncyCastleHelper
 			}
 		}
 		// --------------------------------------------------------------------------------------------------------
+		/// <summary>
+		/// Verifies the alias asynchronously by retrieving the CA certificates and the alias certificate from the specified domain.
+		/// Then, it validates the certificate chain using BouncyCastleHelper.ValidateCertificateChain method.
+		/// </summary>
+		/// <param name="domain">The domain to retrieve the certificates from.</param>
+		/// <param name="alias">The alias to verify.</param>
+		/// <param name="opts">The options for the HTTP request.</param>
+		/// <returns>A tuple containing a boolean indicating the validity of the alias and the fingerprint of the certificate.</returns>
 		public static async Task<(bool, byte[])> VerifyAliasAsync(string domain, string alias, Options opts)
 		{
 			

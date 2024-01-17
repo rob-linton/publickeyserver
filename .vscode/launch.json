@@ -97,6 +97,20 @@
 			},
 		},
 		{
+			"name": "deadrop (dev receive)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_deadrop",
+			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"args": ["receive","-v","2","-d", "localhost:5001", "-p","password","-o","My.deadpack", "-i","BF4188889A12C134CAB48BEAF0672DE06F9CC45F3164FD117651CC3E88C891BA","-a","expiration-obesity-aberdeen.publickeyserver.org"],
+			"cwd": "${workspaceFolder}/deadrop/test",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
 			"name": "deadrop (dev unpack)",
 			"type": "coreclr",
 			"request": "launch",

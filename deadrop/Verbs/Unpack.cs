@@ -122,7 +122,7 @@ class Unpack
 
 			byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);				
 			try{
-				BouncyCastleHelper.verifySignature(envelopeHash, envelopeSignature, fromPublicKey);
+				BouncyCastleHelper.VerifySignature(envelopeHash, envelopeSignature, fromPublicKey);
 				Misc.LogLine(opts, "- Envelope signature is valid");
 			}
 			catch(Exception ex)
@@ -139,7 +139,7 @@ class Unpack
 
 			byte[] manifestHash = BouncyCastleHelper.GetHashOfBytes(manifestBytes);
 			try{
-				BouncyCastleHelper.verifySignature(manifestHash, manifestSignature, fromPublicKey);
+				BouncyCastleHelper.VerifySignature(manifestHash, manifestSignature, fromPublicKey);
 				Misc.LogLine(opts, "- Manifest signature is valid");
 			}
 			catch(Exception ex)
