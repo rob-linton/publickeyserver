@@ -38,6 +38,12 @@ class Create
 			AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.GenerateKeyPair(2048);
 
 			//
+			// generate a kyber keypair using bouncy castle
+			//
+			Misc.LogCheckMark("Generated Kyber key pair");
+			AsymmetricCipherKeyPair KyberKeyPair = BouncyCastleQuantumHelper.GenerateKyberKeyPair();
+
+			//
 			// save your public and private key pair
 			//
 			var data = new Dictionary<string, string>();

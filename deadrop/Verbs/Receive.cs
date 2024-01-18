@@ -98,7 +98,7 @@ class Receive
 
 				// show the number of files and total size
 				if (opts.Interval == 0 || receiveCount > 0)
-					Misc.LogLine($"\n{receiveCount} deadpacks waiting of {Misc.FormatBytes(receiveSize)} total size\n");
+					Misc.LogLine($"\n{receiveCount} deadpack(s) waiting of {Misc.FormatBytes(receiveSize)} total size\n");
 
 				if (opts.Force)
 				{

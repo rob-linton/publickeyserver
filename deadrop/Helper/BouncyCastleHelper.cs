@@ -51,6 +51,8 @@ public class BouncyCastleHelper
         // Generate the key pair
         AsymmetricCipherKeyPair keyPair = generator.GenerateKeyPair();
 
+
+		/* Debugging
         // Write the private key to a file
         using (TextWriter privateKeyTextWriter = new StringWriter())
         {
@@ -58,7 +60,7 @@ public class BouncyCastleHelper
             pemWriter.WriteObject(keyPair.Private);
             pemWriter.Writer.Flush();
 
-            //File.WriteAllText("privateKey.pem", privateKeyTextWriter.ToString());
+            File.WriteAllText("privateKey.pem", privateKeyTextWriter.ToString());
         }
 
         // Write the public key to a file
@@ -68,11 +70,13 @@ public class BouncyCastleHelper
             pemWriter.WriteObject(keyPair.Public);
             pemWriter.Writer.Flush();
 
-            //File.WriteAllText("publicKey.pem", publicKeyTextWriter.ToString());
+            File.WriteAllText("publicKey.pem", publicKeyTextWriter.ToString());
         }
+		*/
 
 		return keyPair;
     }
+	
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Validates the certificate chain using the target certificate, intermediate and root certificates,
