@@ -13,25 +13,33 @@ namespace deadrop.Verbs;
 [Verb("receive", HelpText = "Receive a package")]
 public class ReceiveOptions : Options
 {
-	[Option('i', "input", Required = true, HelpText = "Package key to Receive")]
-    public required string Key { get; set; }
+	//[Option('i', "input", Required = true, HelpText = "Package key to Receive")]
+    //public required string Key { get; set; }
 
 	[Option('a', "alias", Required = true, HelpText = "Alias to use")]
     public required string Alias { get; set; }
 
-	[Option('o', "output", Default = "package", HelpText = "Output package file")]
-    public string Output { get; set; } = "My.deadpack";	
+	[Option('f', "force", Default = false, HelpText = "Download all deadpacks without prompting")]
+	public required bool Force { get; set; } = false;
+
+	[Option('i', "interval", Default = 0, HelpText = "Check for deadpacks every x seconds")]
+	public required int Interval { get; set; } = 0;
+
 }
 
 class Receive 
 {
 	public static async Task<int> Execute(ReceiveOptions opts)
 	{
+		// get a tmp output directory
+		string tmpOutputDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+		Directory.CreateDirectory(tmpOutputDirectory);
+		
+
 		try
 		{
 			Misc.LogHeader();
-			Misc.LogLine($"Receiveting package...");
-			Misc.LogLine($"Input: {opts.Key}");
+			Misc.LogLine($"Receiving packages...");
 			Misc.LogLine($"Alias: {opts.Alias}");
 			Misc.LogLine($"");
 
@@ -47,7 +55,7 @@ class Receive
 			// Receive a unix timestamp in seconds UTC
 			long unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-			// Receive the from private key
+			// get the private key
 			AsymmetricCipherKeyPair privateKey;
 			try
 			{
@@ -61,28 +69,196 @@ class Receive
 				// application exit
 				return 1;
 			}
+			
+			// if we are checking on an interval force downloading
+			if (opts.Interval > 0)
+			{
+				opts.Force = true;
+			}
+
+			bool first = true;
+			while (true)
+			{
+				// sign it with the sender
+				string domain = Misc.GetDomainFromAlias(opts.Alias);
+				byte[] data = $"{opts.Alias}{unixTimestamp.ToString()}{domain}".ToBytes();
+				byte[] signature = BouncyCastleHelper.SignData(data, privateKey.Private);
+				string base64Signature = Convert.ToBase64String(signature);
 
 
-			// signiture = sender + recipient + timestamp + origin
+				// get a list of deadpacks from the server
+				string result = await HttpHelper.Get($"https://{toDomain}/list/{opts.Alias}?timestamp={unixTimestamp}&signature={base64Signature}", opts);
 
-			// sign it with the sender
-			string domain = Misc.GetDomainFromAlias(opts.Alias);
-			byte[] data = $"{opts.Alias}{unixTimestamp.ToString()}{domain}".ToBytes();
-			byte[] signature = BouncyCastleHelper.SignData(data, privateKey.Private);
-			string base64Signature = Convert.ToBase64String(signature);
+				// parse the json
+				ListResult files = JsonSerializer.Deserialize<ListResult>(result) ?? throw new Exception($"Could not parse json: {result}");
 
-			Misc.LogLine(opts, $"Getting deadpack from {opts.Alias}...");
-			await HttpHelper.GetFile($"https://{toDomain}/package/{opts.Alias}/{opts.Key}?timestamp={unixTimestamp}&signature={base64Signature}", opts, opts.Output);
+				// get the number of files
+				int receiveCount = files.Count;
+				long receiveSize = files.Size;
 
-			// show result ok
-			Misc.LogLine(opts, $"\n{opts.Output} retrieved OK\n");
+				// show the number of files and total size
+				if (opts.Interval == 0 || receiveCount > 0)
+					Misc.LogLine($"\n{receiveCount} deadpacks waiting of {Misc.FormatBytes(receiveSize)} total size\n");
 
-			return 0;
+				if (opts.Force)
+				{
+					if (opts.Interval == 0)
+						Misc.LogLine($"Downloading all deadpacks without prompting");
+				}
+				else
+				{
+					Misc.LogLine($"Downloading deadpacks...");
+				}
+
+				// loop through them app and print out the size, date and nuber to the console
+				int i = 1;
+				foreach (ListFile file in files.Files)
+				{
+					string fullKey = file.Key;
+					long size = file.Size;
+					DateTime modified = file.LastModified;
+
+					// get the last bit of a/a/a
+					string[] parts = fullKey.Split("/");
+					string key = parts[parts.Length - 1];
+
+					Misc.LogLine($"{i}. {key} ({Misc.FormatBytes(size)}) {modified}");
+					i++;
+				}
+
+				// if no deadpacks then exit
+				if (receiveCount == 0 && opts.Interval == 0)
+				{
+					Misc.LogLine($"No deadpacks waiting\n");
+					return 0;
+				}
+
+				// if force then skip asking
+				ListResult selectedFiles;
+				if (opts.Force)
+				{
+					selectedFiles = files;
+				}
+				else
+				{
+					// ask for the number to download
+					Misc.LogLine($"\nWhich deadpack do you want to receive? ([1-{receiveCount}] or [a] for all, or [q] to quit)");
+					string input = Console.ReadLine();
+
+					// if a then download all
+					if (input.ToLower() == "a")
+					{
+						selectedFiles = files;
+					}
+					else if (input.ToLower() == "q")
+					{
+						return 0;
+					}
+					else
+					{
+						// get the number
+						int number = Convert.ToInt32(input);
+
+						// check the number is valid
+						if (number < 1 || number > receiveCount)
+						{
+							Misc.LogError(opts, "Invalid number", input);
+							return 1;
+						}
+
+						// get the file
+						ListFile file = files.Files[number - 1];
+
+						// create a new listresult with just the one file
+						selectedFiles = new ListResult()
+						{
+							Files = new List<ListFile>() { file },
+							Count = 1,
+							Size = file.Size
+						};
+					}
+				}
+
+				// loop through each package and receive it
+				foreach (ListFile file in selectedFiles.Files)
+				{
+					string fullKey = file.Key;
+					long size = file.Size;
+					DateTime modified = file.LastModified;
+
+					// get the last bit of a/a/a
+					string[] parts = fullKey.Split("/");
+					string key = parts[parts.Length - 1];
+
+					string tmpOutputName = Path.Combine(tmpOutputDirectory, key);
+
+					Misc.LogLine($"\nGetting deadpack {key}...");
+					await HttpHelper.GetFile($"https://{toDomain}/package/{opts.Alias}/{key}?timestamp={unixTimestamp}&signature={base64Signature}", opts, tmpOutputName);
+
+
+					// get the envelope from the file
+					Envelope envelope = Envelope.LoadFromFile(tmpOutputName);
+
+					// get the manifest from the file
+					Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, opts.Alias);
+
+					// get a compact string showing the date and time
+					long timestamp = envelope.Created;
+
+					// convert the unix timestamp to a readable datetime
+					DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+					dt = dt.AddSeconds(Convert.ToDouble(timestamp));
+
+					// convert utc date to localtime date
+					dt = dt.ToLocalTime();
+
+					string date = dt.ToString("yyyy-MM-dd HH-mm-ss");
+					string destFilename = $"{date} {manifest.Name}";
+
+					// check if the file already exists, and if it does then add a (1) to the end, loop until the file does not exist
+					int ii = 1;
+					while (File.Exists(destFilename))
+					{
+						destFilename = $"{date} {manifest.Name} ({ii})";
+						ii++;
+					}
+
+					// now move the deadpack to the destination filename
+					File.Move(tmpOutputName, destFilename);
+
+					// show result ok
+					Misc.LogLine($"\n{destFilename} retrieved OK\n");
+
+				}
+
+
+				if (opts.Interval == 0)
+				{
+					return 0;
+				}
+				else
+				{	if (first)
+					{
+						Misc.LogLine($"\nChecking every {opts.Interval} seconds...<crtl-c> to quit");
+						first = false;
+					}
+					await Task.Delay(opts.Interval * 1000);
+				}
+			}
 		}
 		catch (Exception ex)
 		{
 			Misc.LogError(opts, "Error receiving package", ex.Message);
 			return 1;
 		}
+		finally
+		{
+
+			// clean up
+			if (Directory.Exists(tmpOutputDirectory))
+				Directory.Delete(tmpOutputDirectory, true);
+
+		}
+		
 	}
 }

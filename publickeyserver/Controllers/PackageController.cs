@@ -33,7 +33,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 namespace publickeyserver
 {
 	[ApiController]
-	[Route("package")]
+	[Route("[controller]")]
 	public class PackageController : ControllerBase
 	{
 		private readonly ILogger<Controller> _logger;
@@ -153,15 +153,16 @@ namespace publickeyserver
 		
 		public async Task<IActionResult> DownloadPackage(string package, string recipient, string timestamp, string signature)
 		{
+			bool hasErrored = false;
+			string key = $"packages/{recipient}/{package}";
 			try
 			{
 				// fix the signature
 				signature = signature.Replace(" ", "+");
-				
+
 				// get the url host header
 				string host = Request.Host.Host + ":" + Request.Host.Port;
-				string key = $"packages/{recipient}/{package}";
-
+				
 				string result = await PackageHelper.ValidateRecipient(recipient, host, signature, timestamp);
 				if (!String.IsNullOrEmpty(result))
 					return BadRequest(result);
@@ -194,11 +195,24 @@ namespace publickeyserver
 			}
 			catch (AmazonS3Exception e)
 			{
+				hasErrored = true;
 				return BadRequest($"Error encountered on server. Message:'{e.Message}'");
 			}
 			catch (Exception e)
 			{
+				hasErrored = true;
 				return BadRequest($"Unknown error encountered on server. Message:'{e.Message}'");
+			}
+			finally
+			{
+				Response.Body.Close();
+				if (!hasErrored)
+				{
+					using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+					{
+						await AwsHelper.Delete(_s3Client, key);
+					}
+				}
 			}
 		}
 		// ------------------------------------------------------------------------------------------------------------

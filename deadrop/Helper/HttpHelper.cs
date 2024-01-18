@@ -167,6 +167,7 @@ public class HttpHelper
 		const int OneMB = 1024 * 1024;
 		int bytesDownloaded = 0;
 		int totalBytesDownloaded = 0;
+		int hashesPrinted = 0;
 
 	#if DEBUG
 		url = url.Replace("https://", "http://");
@@ -195,8 +196,15 @@ public class HttpHelper
 					// Print "#" for each 1MB downloaded
 					if (totalBytesDownloaded / OneMB > bytesDownloaded)
 					{
+						hashesPrinted++;
 						Console.Write("#");
 						bytesDownloaded++;
+					}
+
+					if (hashesPrinted > 109)
+					{
+						hashesPrinted = 0;
+						Console.WriteLine();
 					}
 				}
 			}

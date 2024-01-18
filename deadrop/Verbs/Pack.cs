@@ -236,6 +236,7 @@ class Pack
 				Manifest manifest = new Manifest 
 				{
 					Files = fileList,
+					Name = opts.Output,
 				};
 
 				string manifestJson = JsonSerializer.Serialize(manifest);

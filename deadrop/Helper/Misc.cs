@@ -3,6 +3,7 @@ using System.Text.Json;
 using deadrop.Verbs;
 using Org.BouncyCastle.Asn1.Cmp;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Tls.Crypto;
 using Org.BouncyCastle.X509;
 
 namespace deadrop;
@@ -164,6 +165,25 @@ public class Misc
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
+	/// Loads all bytes from the specified stream.
+	/// </summary>
+	/// <param name="stream">The stream to read from.</param>
+	/// <returns>An array of bytes containing the data read from the stream.</returns>
+	public static byte[] ReadAllBytes(Stream stream)
+	{
+		byte[] buffer = new byte[16 * 1024];
+		using (MemoryStream ms = new MemoryStream())
+		{
+			int read;
+			while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+			{
+				ms.Write(buffer, 0, read);
+			}
+			return ms.ToArray();
+		}
+	}
+	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
 	/// Logs the header information for the DEADPACK application.
 	/// </summary>
 	public static void LogHeader()
@@ -216,5 +236,25 @@ public class Misc
 ################################################################################
 ";
 		LogLine(art);
+	}
+
+	/// <summary>
+	/// Formats the given size in bytes to a human-readable string representation.
+	/// </summary>
+	/// <param name="receiveSize">The size in bytes to be formatted.</param>
+	/// <returns>A string representation of the formatted size.</returns>
+	internal static string FormatBytes(long receiveSize)
+	{
+		// format the btyes to a pretty string
+		string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+		double len = receiveSize;
+		int order = 0;
+		while (len >= 1024 && order < sizes.Length - 1)
+		{
+			order++;
+			len = len / 1024;
+		}
+		string result = String.Format("{0:0.##} {1}", len, sizes[order]);
+		return result;
 	}
 }

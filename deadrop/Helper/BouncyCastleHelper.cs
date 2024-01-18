@@ -201,7 +201,7 @@ public class BouncyCastleHelper
 		}		
 
 #if DEBUG
-		Misc.LogLine(opts, $"  DEBUG CommonName {shortName} is a member of {fullName}");
+		Misc.LogCheckMark($"DEBUG CommonName {shortName} is a member of {fullName}");
 		// allow domain mismatches in debug mode
 		return true;
 #else

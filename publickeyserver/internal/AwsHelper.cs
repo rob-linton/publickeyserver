@@ -18,6 +18,32 @@ namespace publickeyserver
 		{
 		}
 		// ---------------------------------------------------------------------
+		// delete an object in s3
+		public static async Task Delete(Amazon.S3.AmazonS3Client client, string key)
+		{
+
+			DeleteObjectResponse response = null;
+			try
+			{
+				DeleteObjectRequest request = new DeleteObjectRequest
+				{
+					BucketName = GLOBALS.s3bucket,
+					Key = key
+				};
+
+				response = await client.DeleteObjectAsync(request);
+				if (response.HttpStatusCode != System.Net.HttpStatusCode.NoContent)
+				{
+					throw new Exception("Unable to delete cert");
+				}
+			}
+			catch (AmazonS3Exception e)
+			{
+				Log.Error("HTTP reponse not 200 in AwsHelper.Delete: {a}, {b}", response.HttpStatusCode, e.Message);
+				throw;
+			}
+		}
+		// ---------------------------------------------------------------------
 		public static async Task<bool> Exists(Amazon.S3.AmazonS3Client client, string key)
 		{
 			GetObjectMetadataResponse response = null;
@@ -139,31 +165,6 @@ namespace publickeyserver
 
 				var partNumber = 1;
 				var uploadResponses = new List<UploadPartResponse>();
-
-/*
-				long totalBytesRead = 0;
-				byte[] buffer = new byte[ChunkSize];
-				int bytesRead;
-				// only upload when the buffer has more than 5mb of data
-				while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
-				{
-					
-					totalBytesRead += bytesRead;
-					var memStream = new MemoryStream(buffer, 0, bytesRead);
-					var uploadRequest = new UploadPartRequest
-					{
-						BucketName = GLOBALS.s3bucket,
-						Key = key,
-						UploadId = initResponse.UploadId,
-						PartNumber = partNumber++,
-						PartSize = bytesRead,
-						InputStream = memStream
-					};
-
-					var uploadResponse = await _s3Client.UploadPartAsync(uploadRequest);
-					uploadResponses.Add(uploadResponse);
-				}
-*/
 
 				long totalBytesRead = 0;
 				
