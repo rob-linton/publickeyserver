@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.X509;
@@ -254,12 +253,24 @@ namespace publickeyserver
 
 			// add the other data
 			if (!String.IsNullOrEmpty(data))
-			{
+			{	
 				string oid = "1.3.6.1.4.1.57055";
 
-				DerObjectIdentifier endpoint_internal_name_ID = new DerObjectIdentifier(oid);
-				GeneralNames endpoint_internal_name = new GeneralNames(new GeneralName(GeneralName.OtherName, data));
-				certificateGenerator.AddExtension(endpoint_internal_name_ID, false, endpoint_internal_name);
+				// Create an OID for the custom extension
+				DerObjectIdentifier customExtensionOid = new DerObjectIdentifier(oid);
+
+				// Create the OtherName ASN.1 structure
+				Asn1EncodableVector otherNameVec = new Asn1EncodableVector();
+				otherNameVec.Add(new DerObjectIdentifier(oid)); // OID representing the type of OtherName
+				otherNameVec.Add(new DerTaggedObject(true, 0, new DerUtf8String(data))); // The actual data, encoded as desired
+				OtherName otherName = OtherName.GetInstance(new DerSequence(otherNameVec));
+
+				// Create a GeneralName with the OtherName
+				GeneralNames generalNames = new GeneralNames(new GeneralName(GeneralName.OtherName, otherName.ToAsn1Object()));
+
+				// Add the extension to the certificate generator
+				certificateGenerator.AddExtension(customExtensionOid, false, generalNames);
+				
 			}
 			
 
@@ -279,6 +290,36 @@ namespace publickeyserver
 
 			return certificate;
 
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static string GetCustomExtensionData(X509Certificate cert, string oid)
+		{
+			// Get the custom extension
+			Asn1OctetString asn1OctetStr = cert.GetExtensionValue(new DerObjectIdentifier(oid));
+			if (asn1OctetStr == null) return null; // Extension not found
+
+			// Decode the extension
+			Asn1Object asn1Object = Asn1Object.FromByteArray(asn1OctetStr.GetOctets());
+			GeneralNames generalNames = GeneralNames.GetInstance(asn1Object);
+
+			foreach (GeneralName generalName in generalNames.GetNames())
+			{
+				if (generalName.TagNo == GeneralName.OtherName)
+				{
+					Asn1Sequence otherNameSeq = (Asn1Sequence)generalName.Name.ToAsn1Object();
+					OtherName otherName = OtherName.GetInstance(otherNameSeq);
+
+					if (otherName.TypeID.ToString() == oid)
+					{
+						Asn1Encodable otherNameValue = otherName.Value;
+						// Assuming the data is a DER UTF8String
+						DerUtf8String utf8String = DerUtf8String.GetInstance((Asn1TaggedObject)otherNameValue, false);
+						return utf8String.GetString();
+					}
+				}
+			}
+
+			return null; // Data not found or format not as expected
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
@@ -303,7 +344,7 @@ namespace publickeyserver
 			certificateGenerator.SetSerialNumber(serialNumber);
 
 			// Issuer and Subject Name
-			X509Name subjectDN = new X509Name("CN=" + subjectName);
+			X509Name subjectDN = new X509Name("CN=" + "root." + subjectName);
 			X509Name issuerDN = new X509Name("CN=" + GLOBALS.origin);
 			certificateGenerator.SetIssuerDN(issuerDN);
 			certificateGenerator.SetSubjectDN(subjectDN);
@@ -423,25 +464,7 @@ namespace publickeyserver
 			}		
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
-		public static bool AddCertificateToSpecifiedStore(X509Certificate2 cert, StoreName st, StoreLocation sl)
-		{
-			bool bRet = false;
-
-			try
-			{
-				X509Store store = new X509Store(st, sl);
-				store.Open(OpenFlags.ReadWrite);
-				store.Add(cert);
-
-				store.Close();
-			}
-			catch
-			{
-				Console.WriteLine("An error occured");
-			}
-
-			return bRet;
-		}
+		
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		public static (bool, byte[]) ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName)

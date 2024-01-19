@@ -7,6 +7,9 @@ using CommandLine;
 using Microsoft.VisualBasic;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Pqc.Crypto.Crystals.Dilithium;
+using Org.BouncyCastle.Pqc.Crypto.Crystals.Kyber;
+using Org.BouncyCastle.Security;
 
 namespace deadrop.Verbs;
 
@@ -34,19 +37,39 @@ class Create
 			//
 			// create the public/private key pair using bouncy castle
 			//
-			Misc.LogCheckMark("Generated public/private key pair");
+			Misc.LogCheckMark("Generated RSA key pair");
 			AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.GenerateKeyPair(2048);
 
 			//
-			// generate a kyber keypair using bouncy castle
+			// generate a Kyber keypair using bouncy castle
 			//
-			Misc.LogCheckMark("Generated Kyber key pair");
+			Misc.LogCheckMark("Generated Quantum Kyber key pair");
 			AsymmetricCipherKeyPair KyberKeyPair = BouncyCastleQuantumHelper.GenerateKyberKeyPair();
+			(byte[] KyberPublicKey, byte[] KyberPrivatyeKey) = BouncyCastleQuantumHelper.ReadKyberKeyPair(KyberKeyPair);
 
 			//
-			// save your public and private key pair
+			// generate a Dilithium keypair using bouncy castle
+			//
+			Misc.LogCheckMark("Generated Quantum Dilithium key pair");
+			AsymmetricCipherKeyPair DilithiumKeyPair = BouncyCastleQuantumHelper.GenerateDilithiumKeyPair();
+			(byte[] DilithiumPublicKey, byte[] DilithiumPrivateKey) = BouncyCastleQuantumHelper.ReadDilithiumKeyPair(DilithiumKeyPair);
+
+			//
+			// now create the data payload to send to the server
 			//
 			var data = new Dictionary<string, string>();
+			
+			data["kyber_key"] = Convert.ToBase64String(KyberPublicKey);
+			data["dilithium_key"] = Convert.ToBase64String(DilithiumPublicKey);
+
+			string jsondata = JsonSerializer.Serialize(data);
+			byte[] jsondataBytes = Encoding.UTF8.GetBytes(jsondata);
+			string jsondataBase64 = Convert.ToBase64String(jsondataBytes);
+
+			//
+			// save your public and private RSA key pair
+			//
+			var payload = new Dictionary<string, string>();
 			string alias = String.Empty;
 			string publicKeyPem = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Public);
 
@@ -57,8 +80,9 @@ class Create
 			}
 
 			// save it as PEM format
-			data["key"] = publicKeyPem;
-			string json = JsonSerializer.Serialize(data);
+			payload["key"] = publicKeyPem;
+			payload["data"] = jsondataBase64;
+			string json = JsonSerializer.Serialize(payload);
 
 			Misc.LogLine(opts, "- Sending public key...");
 
