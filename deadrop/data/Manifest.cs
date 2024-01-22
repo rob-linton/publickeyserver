@@ -2,6 +2,8 @@ using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Pqc.Crypto.Crystals.Kyber;
+using Org.BouncyCastle.Utilities;
 
 namespace deadrop;
 
@@ -13,7 +15,7 @@ class Manifest
 	[JsonPropertyName("files")]
 	public required List<FileItem> Files { get; set; }
 
-	public static Manifest LoadFromFile(string file, AsymmetricCipherKeyPair keyPair, string alias)
+	public static Manifest LoadFromFile(string file, AsymmetricCipherKeyPair keyPair, string alias, KyberPrivateKeyParameters kyberPrivateKey, byte[] kyberKey)
 	{
 		// open the zip file
 		using (ZipArchive archive = ZipFile.OpenRead(file))
@@ -34,6 +36,8 @@ class Manifest
 					{
 						string encryptedKeyBase64 = recipient.Key;
 						byte[] encryptedKey = Convert.FromBase64String(encryptedKeyBase64);
+
+						// decrypt with the kyber key
 
 						byte[] key = BouncyCastleHelper.DecryptWithPrivateKey(encryptedKey, keyPair.Private);
 

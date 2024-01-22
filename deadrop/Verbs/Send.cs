@@ -79,7 +79,7 @@ class Send
 				AsymmetricCipherKeyPair privateKey;
 				try
 				{
-					string privateKeyPem = Storage.GetPrivateKey(fromAlias, opts.Password);
+					string privateKeyPem = Storage.GetPrivateKey($"{fromAlias}.rsa", opts.Password);
 					privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 				}
 				catch (Exception ex)

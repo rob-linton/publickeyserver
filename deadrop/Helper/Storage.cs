@@ -22,7 +22,7 @@ public class Storage
 		byte[] cipherText = BouncyCastleHelper.EncryptWithKey(msg, key, nonce);
 
 		// save it as PEM format
-		File.WriteAllBytes($"{alias}.pem", cipherText);
+		File.WriteAllBytes($"{alias}", cipherText);
 	}
 	/// <summary>
 	/// Retrieves a list of aliases from the current directory.
@@ -32,9 +32,9 @@ public class Storage
 	{
 		List<string> aliases = new List<string>();
 
-		foreach (string file in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.pem"))
+		foreach (string file in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.rsa"))
 		{
-			string alias = Path.GetFileNameWithoutExtension(file).Replace(".privatekey", "");
+			string alias = Path.GetFileNameWithoutExtension(file).Replace(".rsa", "");
 			aliases.Add(alias);
 		}
 
@@ -51,7 +51,7 @@ public class Storage
 		string sNonce = Misc.GetDomainFromAlias(alias);
 		byte[] nonce = sNonce.ToBytes();
 
-		byte[] cipherText = File.ReadAllBytes($"{alias}.pem");
+		byte[] cipherText = File.ReadAllBytes($"{alias}");
 
 		byte[] key = password.ToBytes();
 

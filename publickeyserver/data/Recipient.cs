@@ -10,4 +10,7 @@ public class Recipient
     [JsonPropertyName("key")]
     public required string Key { get; set; }
 
+	[JsonPropertyName("kyber_key")]
+    public required string KyberKey { get; set; }
+
 }

@@ -344,7 +344,7 @@ namespace publickeyserver
 			certificateGenerator.SetSerialNumber(serialNumber);
 
 			// Issuer and Subject Name
-			X509Name subjectDN = new X509Name("CN=" + "root." + subjectName);
+			X509Name subjectDN = new X509Name("CN=" + subjectName);
 			X509Name issuerDN = new X509Name("CN=" + GLOBALS.origin);
 			certificateGenerator.SetIssuerDN(issuerDN);
 			certificateGenerator.SetSubjectDN(subjectDN);

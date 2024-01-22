@@ -7,6 +7,8 @@ using CommandLine;
 using Microsoft.VisualBasic;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Pqc.Crypto.Crystals.Kyber;
+using Org.BouncyCastle.Utilities;
 
 namespace deadrop.Verbs;
 
@@ -59,12 +61,28 @@ class Receive
 			AsymmetricCipherKeyPair privateKey;
 			try
 			{
-				string privateKeyPem = Storage.GetPrivateKey(opts.Alias, opts.Password);
+				string privateKeyPem = Storage.GetPrivateKey($"{opts.Alias}.rsa", opts.Password);
 				privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 			}
 			catch (Exception ex)
 			{
 				Misc.LogError(opts, $"Error: could not read private key for {opts.Alias}", ex.Message);
+
+				// application exit
+				return 1;
+			}
+
+			// get the kyber private key
+			AsymmetricKeyParameter kyberPrivateKey;
+			try
+			{
+				string privateKeyKyber = Storage.GetPrivateKey($"{opts.Alias}.kyber", opts.Password);
+				byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
+				kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
+			}
+			catch (Exception ex)
+			{
+				Misc.LogError(opts, $"Error: could not read kyber private key for {opts.Alias}", ex.Message);
 
 				// application exit
 				return 1;
@@ -198,10 +216,18 @@ class Receive
 
 					// get the envelope from the file
 					Envelope envelope = Envelope.LoadFromFile(tmpOutputName);
+					Recipient recipient = envelope.To.FirstOrDefault(r => r.Alias == opts.Alias);
+					if (recipient == null)
+					{
+						Misc.LogError(opts, $"Could not find recipient {opts.Alias} in package");
+						return 1;
+					}
+					string kyberKeyString = recipient.KyberKey;
+					byte[] kyberKey = Convert.FromBase64String(kyberKeyString);
 
 					// get the manifest from the file
-					Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, opts.Alias);
-
+// TODO					// *** TO DO Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, opts.Alias, kyberKey);
+					
 					// get a compact string showing the date and time
 					long timestamp = envelope.Created;
 
@@ -213,13 +239,16 @@ class Receive
 					dt = dt.ToLocalTime();
 
 					string date = dt.ToString("yyyy-MM-dd HH-mm-ss");
-					string destFilename = $"{date} {manifest.Name}";
+// TODO					string destFilename = $"{date} {manifest.Name}";
+					string destFilename = $"{date} {key}";  // <<-- TDO REMOVE
 
 					// check if the file already exists, and if it does then add a (1) to the end, loop until the file does not exist
 					int ii = 1;
 					while (File.Exists(destFilename))
 					{
-						destFilename = $"{date} {manifest.Name} ({ii})";
+						//destFilename = $"{date} {manifest.Name} ({ii})";
+						destFilename = $"{date} {key} ({ii})";  // <<-- TDO REMOVE
+
 						ii++;
 					}
 

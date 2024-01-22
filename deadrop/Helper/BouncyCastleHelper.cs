@@ -87,8 +87,8 @@ public class BouncyCastleHelper
                 Org.BouncyCastle.X509.X509Certificate child = (i == 0) ? targetCert : chain[i - 1];
                 Org.BouncyCastle.X509.X509Certificate parent = chain[i];
 
-                if (!child.IssuerDN.Equivalent(parent.SubjectDN))
-                {
+               { if (!child.IssuerDN.Equivalent(parent.SubjectDN))
+                
                     throw new CertificateException("*** ERROR: Issuer/Subject DN mismatch ***");
                 }
 				Misc.LogCheckMark("Subject name matches the parent certificate's Issuer name");
@@ -588,4 +588,42 @@ public class BouncyCastleHelper
 			else
 				return (false, new byte[0]);
 		}
+		// --------------------------------------------------------------------------------------------------------
+		public static string GetCustomExtensionData(X509Certificate cert, string oid)
+		{
+			// Get the custom extension
+			Asn1OctetString asn1OctetStr = cert.GetExtensionValue(new DerObjectIdentifier(oid));
+			if (asn1OctetStr == null) return null; // Extension not found
+
+			// Decode the extension
+			Asn1Object asn1Object = Asn1Object.FromByteArray(asn1OctetStr.GetOctets());
+			GeneralNames generalNames = GeneralNames.GetInstance(asn1Object);
+
+			foreach (GeneralName generalName in generalNames.GetNames())
+			{
+				if (generalName.TagNo == GeneralName.OtherName)
+				{
+					OtherName otherName = OtherName.GetInstance(generalName.Name.ToAsn1Object());
+
+					if (otherName.TypeID.ToString() == oid)
+					{
+						Asn1Encodable otherNameValue = otherName.Value;
+
+						// Check if the value is an instance of DerUtf8String
+						if (otherNameValue is DerUtf8String utf8String)
+						{
+							return utf8String.GetString();
+						}
+						else
+						{
+							// Handle other types of encodable values as necessary
+							// For instance, if it's a tagged object or another ASN.1 type
+						}
+					}
+				}
+			}
+
+			return null; // Data not found or format not as expected
+		}
+		// --------------------------------------------------------------------------------------------------------
 }

@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Text.Json;
 using CommandLine;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Pqc.Crypto.Crystals.Kyber;
 using Org.BouncyCastle.X509;
 
 namespace deadrop.Verbs;
@@ -189,7 +190,10 @@ class Unpack
 					string encryptedKeyBase64 = recipient.Key;
 					byte[] encryptedKey = Convert.FromBase64String(encryptedKeyBase64);
 
-					string privateKeyPem = Storage.GetPrivateKey(opts.Alias, opts.Password);
+					string encryptedKyberKeyBase64 = recipient.KyberKey;
+					byte[] encryptedKyberKey = Convert.FromBase64String(encryptedKyberKeyBase64);
+
+					string privateKeyPem = Storage.GetPrivateKey($"{opts.Alias}.rsa", opts.Password);
 
 					AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 
@@ -204,9 +208,36 @@ class Unpack
 						Misc.LogCheckMark($"Private key matches public certificate for alias: {opts.Alias}");
 					}
 
+					//
+					// post quantum cryptography
+					//
+					// get the kyber private key
+					KyberKeyParameters kyberPrivateKey;
+					try
+					{
+						string privateKeyKyber = Storage.GetPrivateKey($"{opts.Alias}.kyber", opts.Password);
+						byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
+						kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
+					}
+					catch (Exception ex)
+					{
+						Misc.LogError(opts, $"Error: could not read kyber private key for {opts.Alias}", ex.Message);
+
+						// application exit
+						return 1;
+					}
+					
+					// now decrypt the key using kyber
+					//Misc.LogLine(opts, "- Decrypting kyber key...");
+					var myKemExtractor = new KyberKemExtractor(kyberPrivateKey);
+					var kyberSecret = myKemExtractor.ExtractSecret(encryptedKyberKey);
+
+					// now decrypt the key
+					byte[] decryptedEncryptedKey = BouncyCastleHelper.DecryptWithKey(encryptedKey, kyberSecret, opts.Alias.ToLower().ToBytes());
+
 
 					Misc.LogLine(opts, "- Decrypting key...");
-					byte[] key = BouncyCastleHelper.DecryptWithPrivateKey(encryptedKey, keyPair.Private);
+					byte[] key = BouncyCastleHelper.DecryptWithPrivateKey(decryptedEncryptedKey, keyPair.Private);
 
 					//
 					// now we should have the key used to encrypt all of the files

@@ -1,9 +1,14 @@
 #pragma warning disable 1998
 using System.Formats.Asn1;
 using System.IO.Compression;
+using System.Text;
 using System.Text.Json;
 using CommandLine;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Pqc.Crypto.Crystals.Kyber;
+using Org.BouncyCastle.Pqc.Crypto.Utilities;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities;
 
 namespace deadrop.Verbs;
 
@@ -192,7 +197,7 @@ class Pack
 				AsymmetricCipherKeyPair privateKey;
 				try
 				{
-					string privateKeyPem = Storage.GetPrivateKey(opts.From, opts.Password);
+					string privateKeyPem = Storage.GetPrivateKey($"{opts.From}.rsa", opts.Password);
 					privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 				}
 				catch (Exception ex)
@@ -289,17 +294,66 @@ class Pack
 							{
 								var publicKey = toX509.GetPublicKey();
 
-								// encrypt the key with the public key
-								byte[] encryptedKey = BouncyCastleHelper.EncryptWithPublicKey(key, publicKey);
-								string sEncryptedKey = Convert.ToBase64String(encryptedKey);
+								//
+								// post quantum
+								//
+								string oid = "1.3.6.1.4.1.57055";
+								string data = BouncyCastleHelper.GetCustomExtensionData(toX509, oid);
+								byte[] dataBytes = Convert.FromBase64String(data);
+								string sData = Encoding.UTF8.GetString(dataBytes);
+								var jData = JsonSerializer.Deserialize<CustomExtensionData>(sData);
+								byte[] kyberPublicKeyBytes = Convert.FromBase64String(jData?.KyberKey ?? throw new Exception("Could not get Kyber public key from certificate"));
+								AsymmetricKeyParameter kyberPublicKey = BouncyCastleQuantumHelper.WriteKyberPublicKey(kyberPublicKeyBytes);
+								
+								var random = new SecureRandom(); // <-- this is the random number generator
+								var myKyberKemGenerator = new KyberKemGenerator(random); // <-- this is the key encapsulation mechanism
+								var encapsulatedSecret = myKyberKemGenerator.GenerateEncapsulated(kyberPublicKey); // <-- this is the encapsulated secret
+								var cipherText = encapsulatedSecret.GetEncapsulation(); // <-- this is the cipher text
+								string sCipherText = Convert.ToBase64String(cipherText); //	<-- this is the cipher text as a string
 
-								// sign the alias
-								//byte[] aliasHash = BouncyCastleHelper.GetHashOfString(alias);
-								//byte[] aliasSignature = BouncyCastleHelper.SignData(aliasHash, privateKey.Private);
+								// this  is the encapsulated secret that we will send to the recipient
+								var quantumSecret = encapsulatedSecret.GetSecret();	// <-- this is the secret
+								
+								
+								Misc.LogCheckMark($"Encrypted alias {alias} key with RSA");
+
+								// encrypt the key with the public key
+								byte[] encryptedKey = BouncyCastleHelper.EncryptWithPublicKey(key, publicKey); // <-- this is the encrypted key
+								//string sEncryptedKey = Convert.ToBase64String(encryptedKey);
+
+								// now encrypt the sEncryptedKey with quantumSecret
+								byte[] encryptedEncryptedKey = BouncyCastleHelper.EncryptWithKey(encryptedKey, quantumSecret, nonce); // <-- this is the encrypted key double encrypted with kyber
+								string sEncryptedEncryptedKey = Convert.ToBase64String(encryptedEncryptedKey); // <-- this is the encrypted key double encrypted with kyber as a string
+
+								Misc.LogCheckMark($"Re-encrypted alias {alias} key with Post Quantum Kyber");
 
 								// add the encrypted key to the envelope
-								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedKey });
+								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedEncryptedKey, KyberKey = sCipherText });
 
+								// --------- TEST ---------------
+								{
+									// get the kyber private key
+									KyberKeyParameters kyberPrivateKey;
+									try
+									{
+										string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", opts.Password);
+										byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
+										kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
+									}
+									catch (Exception ex)
+									{
+										Misc.LogError(opts, $"Error: could not read kyber private key for {alias}", ex.Message);
+
+										// application exit
+										return 1;
+									}
+
+									// now decrypt the key using kyber
+									//Misc.LogLine(opts, "- Decrypting kyber key...");
+									var myKemExtractor = new KyberKemExtractor((KyberKeyParameters)kyberPrivateKey);
+									var kyberSecret = myKemExtractor.ExtractSecret(cipherText);
+								}
+								// ----------TEST ---------------
 								Misc.LogLine(opts, $"- Added alias {alias}");
 							}
 						}

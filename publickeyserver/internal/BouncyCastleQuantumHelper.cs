@@ -25,17 +25,12 @@ using Org.BouncyCastle.Crypto.Encodings;
 using Org.BouncyCastle.Crypto.Digests;
 using System.Text.Json;
 using System.Collections;
-using deadrop.Verbs;
+
 using Org.BouncyCastle.Pqc.Crypto.Crystals.Kyber;
 using Org.BouncyCastle.Pqc.Crypto.Crystals.Dilithium;
 using Org.BouncyCastle.Pqc.Crypto.Utilities;
-using Org.BouncyCastle.Asn1.Pkcs;
-using Org.BouncyCastle.Asn1.BC;
-using Org.BouncyCastle.Asn1.Oiw;
-using Org.BouncyCastle.Pkcs;
-using Org.BouncyCastle.Asn1.Eac;
 
-namespace deadrop;
+namespace BouncyCastleHelper;
 
 public class BouncyCastleQuantumHelper
 {
@@ -93,13 +88,13 @@ public class BouncyCastleQuantumHelper
 	/// <returns>A tuple containing the public and private keys in PKCS8 format.</returns>
 	public static (byte[], byte[]) ReadKyberKeyPair(AsymmetricCipherKeyPair keyPair)
 	{
-		SubjectPublicKeyInfo i = PqcSubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keyPair.Public);
-		PrivateKeyInfo j = PqcPrivateKeyInfoFactory.CreatePrivateKeyInfo(keyPair.Private);
+		KyberPublicKeyParameters KyberPublicKey = (KyberPublicKeyParameters)keyPair.Public;
+		KyberPrivateKeyParameters KyberPrivateKey = (KyberPrivateKeyParameters)keyPair.Private;
 
-		var publicKey = i.ToAsn1Object().GetDerEncoded();
-		var privateKey = j.ToAsn1Object().GetDerEncoded();
+		var privPkcs8 = PqcPrivateKeyInfoFactory.CreatePrivateKeyInfo(KyberPrivateKey).ToAsn1Object().GetDerEncoded();
+		var pubPkcs8 = PqcSubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(KyberPublicKey).ToAsn1Object().GetDerEncoded();
 
-		return (publicKey, privateKey);
+		return (pubPkcs8, privPkcs8);
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
@@ -109,13 +104,33 @@ public class BouncyCastleQuantumHelper
 	/// <returns>A tuple containing the public and private keys in PKCS8 format.</returns>
 	public static (byte[], byte[]) ReadDilithiumKeyPair(AsymmetricCipherKeyPair keyPair)
 	{
-		SubjectPublicKeyInfo i = PqcSubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keyPair.Public);
-		PrivateKeyInfo j = PqcPrivateKeyInfoFactory.CreatePrivateKeyInfo(keyPair.Private);
+		DilithiumPublicKeyParameters DilithiumPublicKey = (DilithiumPublicKeyParameters)keyPair.Public;
+		DilithiumPrivateKeyParameters DilithiumPrivateKey = (DilithiumPrivateKeyParameters)keyPair.Private;
 
-		var publicKey = i.ToAsn1Object().GetDerEncoded();
-		var privateKey = j.ToAsn1Object().GetDerEncoded();
+		var privPkcs8 = PqcPrivateKeyInfoFactory.CreatePrivateKeyInfo(DilithiumPrivateKey).ToAsn1Object().GetDerEncoded();
+		var pubPkcs8 = PqcSubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(DilithiumPublicKey).ToAsn1Object().GetDerEncoded();
 
-		return (publicKey, privateKey);
+		return (pubPkcs8, privPkcs8);
+	}
+	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Represents a Dilithium public key.
+	/// </summary>
+	public static DilithiumPublicKeyParameters WriteDilithiumPublicKey(byte[] publicKey)
+	{
+        var key = (DilithiumPublicKeyParameters)PqcPublicKeyFactory.CreateKey(publicKey);
+
+		return key;
+	}
+	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
+	/// Represents a Dilithium private key.
+	/// </summary>
+	public static DilithiumPrivateKeyParameters WriteDilithiumPrivateKey(byte[] privateKey)
+	{
+		var key = (DilithiumPrivateKeyParameters)PqcPrivateKeyFactory.CreateKey(privateKey);
+
+		return key;
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
@@ -138,24 +153,4 @@ public class BouncyCastleQuantumHelper
 		return key;
 	}
 	// --------------------------------------------------------------------------------------------------------
-	/// <summary>
-	/// Represents a Dilithium public key.
-	/// </summary>
-	public static DilithiumPublicKeyParameters WriteDilithiumPublicKey(byte[] publicKey)
-	{
-        var key = (DilithiumPublicKeyParameters)PqcPublicKeyFactory.CreateKey(publicKey);
-
-		return key;
-	}
-	// --------------------------------------------------------------------------------------------------------
-	/// <summary>
-	/// Represents a Dilithium private key.
-	/// </summary>
-	public static DilithiumPrivateKeyParameters WriteDilithiumPrivateKey(byte[] privateKey)
-	{
-		var key = (DilithiumPrivateKeyParameters)PqcPrivateKeyFactory.CreateKey(privateKey);
-
-		return key;
-	}
-	
 }

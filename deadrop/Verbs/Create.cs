@@ -96,16 +96,23 @@ class Create
 				return 1;
 			}
 		
-			//Storage.StoreCert(alias, certificate);
-
+			
+			// store RSA private key
 			string privateKeyPem = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Private);
 			if (privateKeyPem == null)
 			{
 				Misc.LogError(opts, "Could not read private key");
 				return 1;
 			}
+			Storage.StorePrivateKey($"{alias}.rsa", privateKeyPem, opts.Password);
 
-			Storage.StorePrivateKey(alias, privateKeyPem, opts.Password);
+			// store kyber private key
+			string kyberPrivateKeyPem = Convert.ToBase64String(KyberPrivatyeKey);
+			Storage.StorePrivateKey($"{alias}.kyber", kyberPrivateKeyPem, opts.Password);
+
+			// store dilithium private key
+			string dilithiumPrivateKeyPem = Convert.ToBase64String(DilithiumPrivateKey);
+			Storage.StorePrivateKey($"{alias}.dilithium", dilithiumPrivateKeyPem, opts.Password);
 
 			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
 
