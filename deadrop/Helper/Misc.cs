@@ -163,6 +163,15 @@ public class Misc
 		message = message + "  ................................................................................................................";
 		Console.WriteLine(message.Substring(0, 110) + "  [ \u2713 ]");
 	}
+	public static void LogList(string col1, string col2, string col3, string col4)
+	{
+		string col1padded = col1 + ".                                                       ";
+		string col2padded = col2 + "                                                        ";
+		string col3padded = col3 + "                                                        ";
+		string col4padded = col4 + "                                                        ";
+
+		Console.WriteLine(col1padded.Substring(0, 3) + " " + col2padded.Substring(0, 80) + "  " + col3padded.Substring(0, 10) + "  " + col4padded.Substring(0, 20));
+	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Loads all bytes from the specified stream.

@@ -146,12 +146,13 @@ class Receive
 					string fullKey = file.Key;
 					long size = file.Size;
 					DateTime modified = file.LastModified;
+					string date = modified.ToString("yyyy-MM-dd.HH-mm-ss");
 
 					// get the last bit of a/a/a
 					string[] parts = fullKey.Split("/");
 					string key = parts[parts.Length - 1];
-
-					Misc.LogLine($"{i}. {key} ({Misc.FormatBytes(size)}) {modified}");
+					Misc.LogList(i.ToString(), key, Misc.FormatBytes(size), date);
+					//Misc.LogLine($"{i}. {key} ({Misc.FormatBytes(size)}) {date}");
 					i++;
 				}
 

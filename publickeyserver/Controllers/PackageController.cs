@@ -65,7 +65,12 @@ namespace publickeyserver
 				// create a unique package name
 				string packageName = Guid.NewGuid().ToString();
 				byte[] packageHash = BouncyCastleHelper.GetHashOfString(packageName);
-				string package = BouncyCastleHelper.ConvertHashToString(packageHash);
+
+				// get a datetime in utc
+				DateTime dt = DateTime.UtcNow;
+				string date = dt.ToString("yyyy-MM-dd.HH-mm-ss");
+
+				string package = sender + "." + BouncyCastleHelper.ConvertHashToString(packageHash).Substring(0, 20);
 				
 				// total package size
 				long packageSize = Request.ContentLength.Value;
