@@ -126,6 +126,7 @@ class Create
 			string rootFingerprintHex = Convert.ToBase64String(rootFingerprint);
 			Storage.StorePrivateKey($"{alias}.root", rootFingerprintHex, opts.Password);
 
+			Misc.LogCheckMark("Root certificate fingerprint saved");
 
 			Misc.LogLine($"\nAlias {alias} created\n");
 		}
