@@ -29,12 +29,27 @@ class List
 		{
 			try
 			{
+				// now load the root fingerprint from a file
+				string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", opts.Password);
+				byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
+
+
 				string domain = Misc.GetDomain(opts, alias);
 
 				(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
 
+				// validate the fingerprint
+				if (rootFingerprint.SequenceEqual(rootFingerprintFromFile))
+					Misc.LogCheckMark($"Root fingerprint matches");
+				else
+					Misc.LogLine($"Invalid: Root fingerprint does not match");
+
 				if (valid)
-					Misc.LogLine($"Valid:  {alias}");
+				{
+					Misc.LogLine("");
+					Misc.LogCheckMark($"*** {alias}");
+					Misc.LogLine("");
+				}
 				else
 					Misc.LogLine($"*** Invalid: {alias}");
 

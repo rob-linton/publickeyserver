@@ -132,10 +132,12 @@ public class Misc
 	/// <param name="details">Optional details about the error.</param>
 	public static void LogError(Options opts, string message, string details = "")
 	{
+		Console.ForegroundColor = ConsoleColor.Red;
 		Console.WriteLine($"\n*** ERROR: {message} ***\n");
 
 		if (opts.Verbose > 0 && !String.IsNullOrEmpty(details))
 			Console.Write($"*** ERROR: {details} ***\n");
+		Console.ResetColor();
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
@@ -163,6 +165,17 @@ public class Misc
 		message = message + "  ................................................................................................................";
 		Console.WriteLine(message.Substring(0, 110) + "  [ \u2713 ]");
 	}
+	// --------------------------------------------------------------------------------------------------------
+	// log a cross check mark
+	public static void LogCross(string message)
+	{
+		message = message + "  ................................................................................................................";
+		// print it in red
+		Console.ForegroundColor = ConsoleColor.Red;
+		Console.WriteLine(message.Substring(0, 110) + "  [ \u2717 ]");
+		Console.ResetColor();
+	}
+	// --------------------------------------------------------------------------------------------------------
 	public static void LogList(string col1, string col2, string col3, string col4)
 	{
 		string col1padded = col1 + ".                                                       ";
