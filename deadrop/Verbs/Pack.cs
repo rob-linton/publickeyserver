@@ -346,31 +346,6 @@ class Pack
 
 								// add the encrypted key to the envelope
 								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedEncryptedKey, KyberKey = sCipherText });
-
-								// --------- TEST ---------------
-								{
-									// get the kyber private key
-									KyberKeyParameters kyberPrivateKey;
-									try
-									{
-										string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", opts.Password);
-										byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
-										kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
-									}
-									catch (Exception ex)
-									{
-										Misc.LogError(opts, $"Error: could not read kyber private key for {alias}", ex.Message);
-
-										// application exit
-										return 1;
-									}
-
-									// now decrypt the key using kyber
-									//Misc.LogLine(opts, "- Decrypting kyber key...");
-									var myKemExtractor = new KyberKemExtractor((KyberKeyParameters)kyberPrivateKey);
-									var kyberSecret = myKemExtractor.ExtractSecret(cipherText);
-								}
-								// ----------TEST ---------------
 								Misc.LogLine(opts, $"- Added alias {alias}");
 							}
 						}
