@@ -26,6 +26,8 @@ class Send
 		Misc.LogLine($"Input: {opts.File}");
 		Misc.LogLine($"");
 		
+		
+
 		// get the envelop from the package file
 		Envelope envelope = Envelope.LoadFromFile(opts.File);
 
@@ -33,9 +35,20 @@ class Send
 		string fromAlias = envelope.From;
 		Misc.LogLine($"Sending from {fromAlias}...\n");
 
+		// now load the root fingerprint from a file
+		string rootFingerprintFromFileString = Storage.GetPrivateKey($"{fromAlias}.root", opts.Password);
+		byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
+
 		// validate the from alias
 		string fromDomain = Misc.GetDomain(opts, fromAlias);
 		(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, fromAlias, opts);
+		
+		// verify the fingerprint
+		if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
+			Misc.LogCheckMark($"Root fingerprint matches");
+		else
+			Misc.LogLine($"Invalid: Root fingerprint does not match");
+		
 		if (!fromValid)
 		{
 			Misc.LogError(opts, "Invalid from alias", fromAlias);
@@ -56,6 +69,13 @@ class Send
 				// valiadate the to alias
 				string toDomain = Misc.GetDomain(opts, toAlias);
 				(bool toValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, toAlias, opts);
+				
+				// verify the fingerprint
+				if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
+					Misc.LogCheckMark($"Root fingerprint matches");
+				else
+					Misc.LogLine($"Invalid: Root fingerprint does not match");
+
 				if (!toValid)
 				{
 					Misc.LogError(opts, "Invalid to alias", toAlias);

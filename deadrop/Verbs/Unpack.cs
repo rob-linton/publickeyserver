@@ -38,6 +38,10 @@ class Unpack
 		Misc.LogLine($"Input: {opts.File}");
 		Misc.LogLine($"Recipient Alias: {opts.Alias}");
 
+		// now load the root fingerprint from a file
+		string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.Alias}.root", opts.Password);
+		byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
+
 		// get the output directory
 		if (String.IsNullOrEmpty(opts.Output))
 			opts.Output = Path.GetFileNameWithoutExtension(zipFile);
@@ -108,6 +112,13 @@ class Unpack
 			// now verify the alias
 			Misc.LogLine(opts, $"\n- Verifying sender alias: {envelope.From}");
 			(bool validAlias, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, envelope.From, opts);
+			
+			// verify fingerprint
+			if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
+				Misc.LogCheckMark($"Root fingerprint matches");
+			else
+				Misc.LogLine($"Invalid: Root fingerprint does not match");
+
 			if (!validAlias)
 			{
 				Misc.LogError(opts, $"Could not verify alias {envelope.From}");
@@ -162,6 +173,13 @@ class Unpack
 					// now verify the alias
 					Misc.LogLine(opts, $"- Verifying recipient alias: {opts.Alias}");
 					(bool validToAlias, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, opts.Alias, opts);
+					
+					// verify alias
+					if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
+						Misc.LogCheckMark($"Root fingerprint matches");
+					else
+						Misc.LogLine($"Invalid: Root fingerprint does not match");
+					
 					if (!validToAlias)
 					{
 						Misc.LogError(opts, $"Could not verify alias {opts.Alias}");
@@ -184,7 +202,6 @@ class Unpack
 					// get the public key from the alias
 					var toX509 = await Misc.GetCertificate(opts, opts.Alias);
 					var toPublicKey = toX509.GetPublicKey();
-
 
 					// we found our alias, so decrypt the private key
 					string encryptedKeyBase64 = recipient.Key;
@@ -233,7 +250,7 @@ class Unpack
 					var kyberSecret = myKemExtractor.ExtractSecret(encryptedKyberKey);
 
 					// now decrypt the key
-					byte[] decryptedEncryptedKey = BouncyCastleHelper.DecryptWithKey(encryptedKey, kyberSecret, opts.Alias.ToLower().ToBytes());
+					byte[] decryptedEncryptedKey = BouncyCastleHelper.DecryptWithKey(encryptedKey, kyberSecret, envelope.From.ToLower().ToBytes());
 
 
 					Misc.LogLine(opts, "- Decrypting key...");

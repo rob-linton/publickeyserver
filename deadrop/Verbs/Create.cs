@@ -116,6 +116,17 @@ class Create
 
 			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
 
+			if (!valid)
+			{
+				Misc.LogError(opts, "Unable to verify alias");
+				return 1;
+			}
+
+			// now save the root fingerprint to a file
+			string rootFingerprintHex = Convert.ToBase64String(rootFingerprint);
+			Storage.StorePrivateKey($"{alias}.root", rootFingerprintHex, opts.Password);
+
+
 			Misc.LogLine($"\nAlias {alias} created\n");
 		}
 		catch (Exception ex)

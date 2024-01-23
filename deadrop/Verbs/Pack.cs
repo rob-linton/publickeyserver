@@ -108,6 +108,10 @@ class Pack
 				return 1;
 			}
 
+			// now load the root fingerprint from a file
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.From}.root", opts.Password);
+			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
+
 			// 
 			// validate the sender
 			//
@@ -117,6 +121,12 @@ class Pack
 			string fromDomain = Misc.GetDomain(opts, opts.From);
 			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, opts);
 
+			// validate the rootfingerprint
+			if (rootFingerprintFromFile.SequenceEqual(fromFingerprint))
+				Misc.LogCheckMark($"Root fingerprint matches");
+			else
+				Misc.LogLine($"Invalid: Root fingerprint does not match");
+
 			if (valid)
 				Misc.LogCheckMark($"Alias {opts.From} is valid");
 			else
@@ -124,6 +134,7 @@ class Pack
 				Misc.LogError(opts, $"Alias {opts.From} is *NOT* valid");
 				return 1;
 			}
+
 
 			//
 			// create the zip file
@@ -267,6 +278,12 @@ class Pack
 							Misc.LogLine(opts, $"- Validating recipient alias  ->  {alias}");
 							string domain = Misc.GetDomain(opts, alias);
 							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
+
+							// validate the fingerprint
+							if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
+								Misc.LogCheckMark($"Root fingerprint matches");
+							else
+								Misc.LogLine($"Invalid: Root fingerprint does not match");
 
 							if (valid)
 							{

@@ -12,7 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
+     <Reference Include="BouncyCastle.Cryptography">
+       <HintPath>../../bc-csharp/crypto/src/obj/Debug/net6.0/BouncyCastle.Cryptography.dll</HintPath>
+     </Reference>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
   </ItemGroup>
 

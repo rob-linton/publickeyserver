@@ -45,9 +45,20 @@ class Receive
 			Misc.LogLine($"Alias: {opts.Alias}");
 			Misc.LogLine($"");
 
+			// now load the root fingerprint from a file
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.Alias}.root", opts.Password);
+			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
+
 			// verify the alias
 			string toDomain = Misc.GetDomain(opts, opts.Alias);
 			(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, opts.Alias, opts);
+			
+			// verify the fingerprint
+			if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
+				Misc.LogCheckMark($"Root fingerprint matches");
+			else
+				Misc.LogLine($"Invalid: Root fingerprint does not match");
+
 			if (!fromValid)
 			{
 				Misc.LogError(opts, "Invalid alias", opts.Alias);

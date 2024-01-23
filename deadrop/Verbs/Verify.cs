@@ -34,10 +34,21 @@ class Verify
 
 			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts);
 
+			// now load the root fingerprint from a file
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.Alias}.root", opts.Password);
+			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
+
+			// and compare it to the rootfingerprint
+			if (rootFingerprint.SequenceEqual(rootFingerprintFromFile))
+				Misc.LogCheckMark($"Root fingerprint matches");
+			else
+				Misc.LogLine($"Invalid: Root fingerprint does not match");
+
 			if (valid)
 				Misc.LogLine($"\nValid: {opts.Alias}\n");
 			else
 				Misc.LogLine($"\nInvalid: {opts.Alias}\n");
+
 		}
 		catch (Exception ex)
 		{
