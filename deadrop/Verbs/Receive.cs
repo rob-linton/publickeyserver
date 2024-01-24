@@ -24,7 +24,7 @@ public class ReceiveOptions : Options
 	[Option('f', "force", Default = false, HelpText = "Download all deadpacks without prompting")]
 	public required bool Force { get; set; } = false;
 
-	[Option('i', "interval", Default = 0, HelpText = "Check for deadpacks every x seconds")]
+	[Option('s', "seconds", Default = 0, HelpText = "Check for deadpacks every x seconds")]
 	public required int Interval { get; set; } = 0;
 
 }
@@ -125,9 +125,32 @@ class Receive
 				int receiveCount = files.Count;
 				long receiveSize = files.Size;
 
-				// show the number of files and total size
+
+				// sound the bell if there are deadpacks waiting
 				if (opts.Interval == 0 || receiveCount > 0)
 					Misc.LogLine($"\n{receiveCount} deadpack(s) waiting of {Misc.FormatBytes(receiveSize)} total size\n");
+				
+				if (opts.Interval > 0 && receiveCount > 0)
+				{
+					if (receiveCount == 1)
+					{
+						// ring 1 bell
+						Console.Beep();
+					}
+					else if (receiveCount == 2)
+					{
+						// ring 2 bells
+						Console.Beep();
+						Console.Beep();
+					}
+					else if (receiveCount > 2)
+					{
+						// ring 3 bells
+						Console.Beep();
+						Console.Beep();
+						Console.Beep();
+					}
+				}
 
 				if (opts.Force)
 				{
