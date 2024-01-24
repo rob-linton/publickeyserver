@@ -45,6 +45,9 @@ class Receive
 			Misc.LogLine($"Alias: {opts.Alias}");
 			Misc.LogLine($"");
 
+			if (String.IsNullOrEmpty(opts.Password))
+			opts.Password = Misc.GetPassword();
+
 			// now load the root fingerprint from a file
 			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.Alias}.root", opts.Password);
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);

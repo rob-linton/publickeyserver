@@ -26,7 +26,8 @@ class Send
 		Misc.LogLine($"Input: {opts.File}");
 		Misc.LogLine($"");
 		
-		
+		if (String.IsNullOrEmpty(opts.Password))
+			opts.Password = Misc.GetPassword();
 
 		// get the envelop from the package file
 		Envelope envelope = Envelope.LoadFromFile(opts.File);

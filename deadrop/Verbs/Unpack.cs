@@ -53,6 +53,9 @@ class Unpack
 		Misc.LogLine($"Output directory: {outputDirectory}");
 		Misc.LogLine($"");
 
+		if (String.IsNullOrEmpty(opts.Password))
+			opts.Password = Misc.GetPassword();
+
 		//string tmpOutputDirectory = "XXX" + outputDirectory;
 		string tmpOutputDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 

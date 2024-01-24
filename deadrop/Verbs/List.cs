@@ -23,6 +23,9 @@ class List
 		Misc.LogLine($"Listing...");
 		Misc.LogLine($"");
 		
+		if (String.IsNullOrEmpty(opts.Password))
+			opts.Password = Misc.GetPassword();
+
 		List<string> aliases = Storage.GetAliases();
 
 		foreach (string alias in aliases)

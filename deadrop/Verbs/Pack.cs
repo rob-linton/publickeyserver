@@ -83,6 +83,9 @@ class Pack
 			Misc.LogLine($"Output: {opts.Output}");
 			Misc.LogLine($"");
 
+			if (String.IsNullOrEmpty(opts.Password))
+			opts.Password = Misc.GetPassword();
+
 			Misc.LogLine("Files to be deadpacked:");
 			foreach (string filePath in relativePaths)
 			{

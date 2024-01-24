@@ -1,0 +1,55 @@
+Welcome to Deadrop.org
+
+Dead drop is an anonymous way to send post quantum end-to-end encrypted files to a person without knowing their actual identity, or them knowing yours.
+
+This site is a thought experiment by Rob Linton, a Senior Developer based in Melbourne and uses Post Quantum Cryptography, specifically Crystal Kyber.
+
+Use this site at your own risk.
+
+The source for this site is available at:
+https://github/rob-linton
+
+
+Sounds impossible, but not really, the internet is already built around arbitrary addresses such as IP addresses, we add identity and a framework on top of these to identify people or organisations with artefacts such as domain names and email addresses. 
+
+Instead Dead Drop relies on something called an alias. An Alias looks a bit like this:
+
+missouri-precise-samsung.deadrop.org
+
+An alias is a randomly selected combination of three words which are unique, separated with a hyphen and appended with the deadrop.org domain. 
+
+The words are selected from a list of 1000 English words, giving a total pool of 1000 x 1000 x 1000 unique combinations, or 1000,000,000 (1 billion combinations). There are no duplicates.
+
+Every alias has a set of private keys which are generated on your computer and encrypted with a pass phrase of your own choosing.
+
+As well, every alias has a certificate containing your public keys which is stored here on deadrop.org. 
+
+Very elegantly, anyone can get your certificate containing your public keys by browsing to your alias name.
+
+So for the alias above, the following url will return information on your certificate with your public keys for anyone requiring them.
+
+	https://missouri-precise-samsung.deadrop.org
+
+An alias is randomly generated and contains only your public keys, there is no other identifying information contained in it at all.
+
+To send someone a Dead Drop Package (or a deadpack as it is called), all you need is their alias. How you get their alias is completely up to the both of you. You may decide that there is no problem knowing each others aliases, or only one of you, or none of you, but the decision is up to you.
+
+Some possible scenarios:
+
+1. A newspaper requests anonymous tips/files and publishes their alias on their website.
+
+2. Car/truck/delivery drivers can broadcast their alias without disclosing their identity.
+
+3. Store owners can ask for files anonymously.
+
+4. Flyers can ask for files anonymously.
+
+5. Or in any situation where you are uncomfortable disclosing your identity but still need to share files.
+
+The use of Dead Drop is the responsibility of each individual. It is important to comply with applicable laws and regulations regarding communication and data privacy. 
+
+In case of misuse, there is not much I can do other than delete the alias on Dead Drop. 
+I can't see what is being sent, I can't see who it is being sent from, I can't see who it is picking it up.
+
+Please note, I don't log the IP addresses of http requests, and I have not implemented any capability to do so. That doesn't mean that other people or organisations can do so. If you are really worried about anonymity, don't use your own wifi, use someone else's, such as a cafe or hotspot. 
+

@@ -32,6 +32,10 @@ class Create
 
 			Misc.LogLine($"Domain: {domain}");
 			Misc.LogLine($"");
+
+			if (String.IsNullOrEmpty(opts.Password))
+			opts.Password = Misc.GetPassword();
+			
 			Misc.LogLine(opts, $"- Requesting alias from: {domain}\n");
 
 			//

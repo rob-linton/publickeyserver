@@ -30,6 +30,9 @@ class Verify
 			Misc.LogLine(opts, $"Verifying  {opts.Alias}");
 			Misc.LogLine($"");
 
+			if (String.IsNullOrEmpty(opts.Password))
+			opts.Password = Misc.GetPassword();
+
 			string domain = Misc.GetDomain(opts, opts.Alias);
 
 			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts);
