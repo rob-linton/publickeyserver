@@ -25,9 +25,7 @@ class Verify
 			
 			Misc.LogHeader();
 
-			Misc.LogLine($"Verifying...");
-
-			Misc.LogLine(opts, $"Verifying  {opts.Alias}");
+			Misc.LogLine($"Verifying  {opts.Alias}");
 			Misc.LogLine($"");
 
 			if (String.IsNullOrEmpty(opts.Password))

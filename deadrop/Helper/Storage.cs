@@ -55,8 +55,16 @@ public class Storage
 
 		byte[] key = password.ToBytes();
 
-		byte[] plainText = BouncyCastleHelper.DecryptWithKey(cipherText, key, nonce);
-
+		byte[] plainText;
+		try
+		{
+			plainText = BouncyCastleHelper.DecryptWithKey(cipherText, key, nonce);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"\n*** Invalid passphrase ***\n");
+			throw new Exception($"Unable to decrypt private key for {alias}", ex);
+		}
 		return plainText.FromBytes();
 	}
 	

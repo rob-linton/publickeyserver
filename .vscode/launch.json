@@ -60,7 +60,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadrop",
 			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-			"args": ["verify","-v","0","-d", "localhost:5001", "-p","password", "-a", "isolation-alpine-villages.publickeyserver.org"],
+			"args": ["verify","-v","0","-d", "localhost:5001", "-a", "isolation-alpine-villages.publickeyserver.org"],
 			"cwd": "${workspaceFolder}/deadrop/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
