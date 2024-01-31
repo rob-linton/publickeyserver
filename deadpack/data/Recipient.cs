@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace publickeyserver;
+namespace deadrop;
 
 public class Recipient
 {

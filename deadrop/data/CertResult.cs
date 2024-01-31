@@ -1,6 +1,7 @@
+#nullable enable
 using System.Text.Json.Serialization;
 
-namespace deadrop;
+namespace publickeyserver;
 
 class CertResult
 {

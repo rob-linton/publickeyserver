@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace publickeyserver;
+namespace deadrop;
 
 class ListFile
 {
@@ -9,8 +9,8 @@ class ListFile
 	public required string Key { get; set; }
 
 	[JsonPropertyName("size")]
-	public long Size { get; set; }
+	public required long Size { get; set; }
 
 	[JsonPropertyName("last_modified")]
-	public DateTime LastModified { get; set; }
+	public required DateTime LastModified { get; set; }
 }

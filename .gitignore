@@ -16,3 +16,7 @@ deadrop/output
 *.deadpack
 leaves.jpg
 deadrop/test
+deadpack/bin
+deadpack/obj
+deadpack/output
+deadpack/test

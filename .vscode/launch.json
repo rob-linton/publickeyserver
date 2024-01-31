@@ -2,13 +2,13 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Public Key Server .NET Core Launch (console)",
+			"name": "Dead Drop .NET Core Launch (console)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_publickeyserver",
-			"program": "${workspaceFolder}/publickeyserver/bin/Debug/net8.0/publickeyserver.dll",
+			"preLaunchTask": "build_deadrop",
+			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
 			"args": [],
-			"cwd": "${workspaceFolder}/publickeyserver",
+			"cwd": "${workspaceFolder}/deadrop",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {
@@ -19,14 +19,14 @@
 			// Use IntelliSense to find out which attributes exist for C# debugging
 			// Use hover for the description of the existing attributes
 			// For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md.
-			"name": "Public Key Server .NET Core Launch (web)",
+			"name": "Dead Drop .NET Core Launch (web)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_publickeyserver",
+			"preLaunchTask": "build_deadrop",
 			// If you have changed target frameworks, make sure to update the program path.
-			"program": "${workspaceFolder}/publickeyserver/bin/Debug/net8.0/publickeyserver.dll",
+			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
 			"args": [],
-			"cwd": "${workspaceFolder}/publickeyserver",
+			"cwd": "${workspaceFolder}/deadrop",
 			"stopAtEntry": false,
 			// Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
 			"serverReadyAction": {
@@ -41,13 +41,13 @@
 			}
 		},
 		{
-			"name": "deadrop (dev create)",
+			"name": "deadpack (dev create)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_deadrop",
-			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"preLaunchTask": "build_deadpack",
+			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
 			"args": ["create","-v","0","-d", "localhost:5001", "-p","password"],
-			"cwd": "${workspaceFolder}/deadrop/test",
+			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {
@@ -55,13 +55,13 @@
 			},
 		},
 		{
-			"name": "deadrop (dev verify)",
+			"name": "deadpack (dev verify)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_deadrop",
-			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-			"args": ["verify","-v","0","-d", "localhost:5001", "-a", "isolation-alpine-villages.publickeyserver.org"],
-			"cwd": "${workspaceFolder}/deadrop/test",
+			"preLaunchTask": "build_deadpack",
+			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
+			"args": ["verify","-v","0","-d", "localhost:5001", "-a", "isolation-alpine-villages.deadrop.org"],
+			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {
@@ -69,13 +69,13 @@
 			},
 		},
 		{
-			"name": "deadrop (dev pack)",
+			"name": "deadpack (dev pack)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_deadrop",
-			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-			"args": ["pack","-v","0","-d", "localhost:5001", "-p","password", "-o", "Rob Linton", "-a","moses-amateur-ha.publickeyserver.org","thesis-upgrades-dna.publickeyserver.org","-i","*.jpg","-f","isolation-alpine-villages.publickeyserver.org"],
-			"cwd": "${workspaceFolder}/deadrop/test",
+			"preLaunchTask": "build_deadpack",
+			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
+			"args": ["pack","-v","0","-d", "localhost:5001", "-p","password", "-o", "Rob Linton", "-a","moses-amateur-ha.deadrop.org","thesis-upgrades-dna.deadrop.org","-i","*.jpg","-f","isolation-alpine-villages.deadrop.org"],
+			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {
@@ -83,13 +83,13 @@
 			},
 		},
 		{
-			"name": "deadrop (dev send)",
+			"name": "deadpack (dev send)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_deadrop",
-			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"preLaunchTask": "build_deadpack",
+			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
 			"args": ["send","-v","0","-d", "localhost:5001", "-p","password","-i","Rob Linton.deadpack"],
-			"cwd": "${workspaceFolder}/deadrop/test",
+			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {
@@ -97,13 +97,13 @@
 			},
 		},
 		{
-			"name": "deadrop (dev receive)",
+			"name": "deadpack (dev receive)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_deadrop",
-			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-			"args": ["receive","-v","0","-d", "localhost:5001", "-p","password","-a","moses-amateur-ha.publickeyserver.org", "-s","10"],
-			"cwd": "${workspaceFolder}/deadrop/test",
+			"preLaunchTask": "build_deadpack",
+			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
+			"args": ["receive","-v","0","-d", "localhost:5001", "-p","password","-a","moses-amateur-ha.deadrop.org", "-s","10"],
+			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {
@@ -111,13 +111,13 @@
 			},
 		},
 		{
-			"name": "deadrop (dev unpack)",
+			"name": "deadpack (dev unpack)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_deadrop",
-			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
-			"args": ["unpack","-v","0","-i","Rob Linton","-d", "localhost:5001", "-a","moses-amateur-ha.publickeyserver.org"],
-			"cwd": "${workspaceFolder}/deadrop/test",
+			"preLaunchTask": "build_deadpack",
+			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
+			"args": ["unpack","-v","0","-i","Rob Linton","-d", "localhost:5001", "-a","moses-amateur-ha.deadrop.org"],
+			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {
@@ -125,13 +125,13 @@
 			},
 		},
 		{
-			"name": "deadrop (dev list)",
+			"name": "deadpack (dev list)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_deadrop",
-			"program": "${workspaceFolder}/deadrop/bin/Debug/net8.0/deadrop.dll",
+			"preLaunchTask": "build_deadpack",
+			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
 			"args": ["list","-v","0","-d", "localhost:5001"],
-			"cwd": "${workspaceFolder}/deadrop/test",
+			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {

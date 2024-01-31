@@ -2,18 +2,6 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "build_publickeyserver",
-			"command": "dotnet",
-			"type": "process",
-			"args": [
-				"build",
-				"${workspaceFolder}/publickeyserver/publickeyserver.csproj",
-				"/property:GenerateFullPaths=true",
-				"/consoleloggerparameters:NoSummary;ForceNoAlign"
-			],
-			"problemMatcher": "$msCompile"
-		},
-		{
 			"label": "build_deadrop",
 			"command": "dotnet",
 			"type": "process",
@@ -26,12 +14,24 @@
 			"problemMatcher": "$msCompile"
 		},
 		{
+			"label": "build_deadpack",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"build",
+				"${workspaceFolder}/deadpack/deadpack.csproj",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary;ForceNoAlign"
+			],
+			"problemMatcher": "$msCompile"
+		},
+		{
 			"label": "publish",
 			"command": "dotnet",
 			"type": "process",
 			"args": [
 				"publish",
-				"${workspaceFolder}/publickeyserver/publickeyserver.csproj",
+				"${workspaceFolder}/deadrop/deadrop.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary;ForceNoAlign"
 			],
@@ -45,7 +45,7 @@
 				"watch",
 				"run",
 				"--project",
-				"${workspaceFolder}/publickeyserver/publickeyserver.csproj"
+				"${workspaceFolder}/deadrop/deadrop.csproj"
 			],
 			"problemMatcher": "$msCompile"
 		}

@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace publickeyserver;
+namespace deadrop;
 
 class CaCertsResult
 {
