@@ -14,10 +14,13 @@ namespace publickeyserver
 		public static string s3packages = "";
         public static string origin = "";
         public static string password = "";
+		public static string emailFrom = "";
 
 		public static string MaxBucketSize = "100000000"; // 100Mb
 		public static string MaxBucketFiles = "100";
 		public static string MaxPackageSize = "100000000"; //100Mb
+
+
 
 
         public static int status_certs_enrolled = 0;

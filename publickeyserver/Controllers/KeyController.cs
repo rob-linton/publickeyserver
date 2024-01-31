@@ -27,6 +27,7 @@ using System.Diagnostics;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.Reflection.Metadata;
 using System.Linq;
+using deadrop;
 
 
 namespace publickeyserver
@@ -313,58 +314,96 @@ namespace publickeyserver
 				//
 				string dataBase64 = createkey.data;
 				
-				// assume that data is already base64 encoded
-				
-				//string dataBase64 = "";
-				//if (!String.IsNullOrEmpty(data))
-				//{
-				//	Byte[] dataBytes = Encoding.UTF8.GetBytes(data);
-				//	dataBase64 = Convert.ToBase64String(dataBytes);
-				//}
+				// un base64 the data
+				byte[] bytes = Convert.FromBase64String(dataBase64);
+				string data = Encoding.UTF8.GetString(bytes);
 
-				// get a three word alias
-				string alias = await ControllerHelper.GenerateAlias(GLOBALS.origin, GLOBALS.s3endpoint, GLOBALS.s3key, GLOBALS.s3secret, words);
+				// convert to a dictionary
+				CustomExtensionData customExtensionData = JsonConvert.DeserializeObject<CustomExtensionData>(data) ?? new CustomExtensionData();
 
-				//
-				// get the CA private key
-				//
-				byte[] cakeysBytes = System.IO.File.ReadAllBytes($"subcakeys.{GLOBALS.origin}.pem");
-				byte[] cakeysDecrypted = BouncyCastleHelper.DecryptWithKey(cakeysBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
-				string cakeysPEM = cakeysDecrypted.FromBytes();
-				AsymmetricCipherKeyPair cakeys = (AsymmetricCipherKeyPair)BouncyCastleHelper.fromPEM(cakeysPEM);
-
-				//
-				// now create the certificate
-				//
-				Log.Information("Creating Certificate - " + alias);
-				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, dataBase64, GLOBALS.origin, cakeys.Private, publickeyRequestor);
-
-				// convert to PEM
-				string certPEM = BouncyCastleHelper.toPEM(cert);
-
-				Log.Information(certPEM);
-
-				//
-				// save the certificate in S3
-				//
-				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				string email = customExtensionData.Email ?? "";
+				string token = customExtensionData.Token ?? "";
+				if (email.Length > 0 && token.Length > 0)
 				{
-					await AwsHelper.Put(client, $"cert/{alias}.pem", certPEM.ToBytes());
+					// validate the token
+					string tokenFile = $"tokens/{email}.token";
+					string tokenFileContents = "";
+					try
+					{
+						byte[] raw;
+						using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+						{
+							raw = await AwsHelper.Get(client, tokenFile);
+						};
+						tokenFileContents = Encoding.UTF8.GetString(raw);
+					}
+					catch
+					{
+						return Misc.err(Response, "Invalid token", Help.simpleenroll);
+					}
+
+					if (tokenFileContents != token)
+					{
+						return Misc.err(Response, "Invalid token", Help.simpleenroll);
+					}
+					else
+					{
+						// delete the token file and continue
+						using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+						{
+							await AwsHelper.Delete(client, tokenFile);
+						};
+					}
+				}
+				else if (email.Length > 0 && token.Length == 0)
+				{
+					// need to generate the token and email to the email address
+					// generate a token
+					string tokenFile = $"tokens/{email}.token";
+					string tokenFileContents = "";
+					try
+					{
+						byte[] raw;
+						using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+						{
+							raw = await AwsHelper.Get(client, tokenFile);
+						};
+						tokenFileContents = Encoding.UTF8.GetString(raw);
+						return Misc.err(Response, "Token has already been sent to email address", Help.simpleenroll);
+					}
+					catch
+					{
+						// no token file, so generate one
+						string tokenFileContentsNew = Misc.GetRandomString(8);
+						byte[] tokenFileContentsNewBytes = Encoding.UTF8.GetBytes(tokenFileContentsNew);
+
+						using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+						{
+							await AwsHelper.Put(client, tokenFile, tokenFileContentsNewBytes);
+						};
+
+						// now send the email
+						string emailBody = $"Your token is {tokenFileContentsNew}";
+						string emailSubject = $"Your token for Dead Drop at {GLOBALS.origin}";
+						string emailFrom = GLOBALS.emailFrom;
+						string emailTo = email;
+
+						// send the email
+						await EmailHelper.SendEmail(emailFrom, emailTo, emailSubject, emailBody);
+
+						return Misc.err(Response, "Token sent to email address", Help.simpleenroll);
+					}
+				}
+				else if (email.Length == 0 && token.Length > 0)
+				{
+					return Misc.err(Response, "Email address required", Help.simpleenroll);
 				}
 
-
-				Response.StatusCode = StatusCodes.Status200OK;
-				Dictionary<string, string> ret = new Dictionary<string, string>();
-
-				ret["alias"] = alias;
-				ret["origin"] = GLOBALS.origin;
-				ret["publickey"] = BouncyCastleHelper.toPEM(publickeyRequestor);
-				ret["certificate"] = certPEM;
-				ret["help"] = Help.simpleenroll;
-
+				// create the cert
+				var ret = await KeyHelper.CreateKey(publickeyRequestor, words, dataBase64);
 
 				GLOBALS.status_certs_enrolled++;
-				return new JsonResult(ret);
+				return Ok(ret);
 
 			}
 			catch (Exception e)

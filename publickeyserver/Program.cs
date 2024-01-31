@@ -27,6 +27,7 @@ namespace publickeyserver
                 GLOBALS.s3endpoint = envVars["S3ENDPOINT"];
                 GLOBALS.s3bucket = envVars["S3BUCKET"];
                 GLOBALS.origin = envVars["ORIGIN"];
+				GLOBALS.emailFrom = envVars["EMAILFROM"];
 
 				// optional
 				if (envVars.ContainsKey("MAX_BUCKET_SIZE"))

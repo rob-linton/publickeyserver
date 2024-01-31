@@ -9,6 +9,7 @@
     <ExternalConsole>true</ExternalConsole>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.7.300.43" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" NoWarn="NU1605" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.9" NoWarn="NU1605" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
