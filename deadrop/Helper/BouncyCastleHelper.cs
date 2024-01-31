@@ -593,7 +593,7 @@ public class BouncyCastleHelper
 		{
 			// Get the custom extension
 			Asn1OctetString asn1OctetStr = cert.GetExtensionValue(new DerObjectIdentifier(oid));
-			if (asn1OctetStr == null) return null; // Extension not found
+			if (asn1OctetStr == null) return ""; // Extension not found
 
 			// Decode the extension
 			Asn1Object asn1Object = Asn1Object.FromByteArray(asn1OctetStr.GetOctets());
@@ -623,7 +623,7 @@ public class BouncyCastleHelper
 				}
 			}
 
-			return null; // Data not found or format not as expected
+			return ""; // Data not found or format not as expected
 		}
 		// --------------------------------------------------------------------------------------------------------
 }

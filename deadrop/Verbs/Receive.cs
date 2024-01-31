@@ -199,7 +199,7 @@ class Receive
 				{
 					// ask for the number to download
 					Misc.LogLine($"\nWhich deadpack do you want to receive? ([1-{receiveCount}] or [a] for all, or [q] to quit)");
-					string input = Console.ReadLine();
+					string input = Console.ReadLine() ?? throw new Exception("Could not read input");
 
 					// if a then download all
 					if (input.ToLower() == "a")
@@ -254,7 +254,7 @@ class Receive
 
 					// get the envelope from the file
 					Envelope envelope = Envelope.LoadFromFile(tmpOutputName);
-					Recipient recipient = envelope.To.FirstOrDefault(r => r.Alias == opts.Alias);
+					Recipient recipient = envelope.To.FirstOrDefault(r => r.Alias == opts.Alias) ?? throw new Exception($"Could not find recipient {opts.Alias} in package");
 					if (recipient == null)
 					{
 						Misc.LogError(opts, $"Could not find recipient {opts.Alias} in package");

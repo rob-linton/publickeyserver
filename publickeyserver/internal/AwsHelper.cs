@@ -39,7 +39,7 @@ namespace publickeyserver
 			}
 			catch (AmazonS3Exception e)
 			{
-				Log.Error("HTTP reponse not 200 in AwsHelper.Delete: {a}, {b}", response.HttpStatusCode, e.Message);
+				Log.Error("HTTP reponse not 200 in AwsHelper.Delete: {a}", e.Message);
 				throw;
 			}
 		}
@@ -92,7 +92,7 @@ namespace publickeyserver
 			}
 			catch (AmazonS3Exception e)
 			{
-				Log.Error("HTTP reponse not 200 in AwsHelper.Put: {a}, {b}", response.HttpStatusCode, e.Message);
+				Log.Error("HTTP reponse not 200 in AwsHelper.Put: {a}", e.Message);
 				throw;
 			}
 		}
@@ -140,7 +140,7 @@ namespace publickeyserver
 			}
 			catch (AmazonS3Exception e)
 			{
-				Log.Error("HTTP reponse not 200 in AwsHelper.Get: {a}, {b}", response.HttpStatusCode, e.Message);
+				Log.Error("HTTP reponse not 200 in AwsHelper.Get: {a}", e.Message);
 				throw;
 			}
 		}
@@ -293,7 +293,7 @@ namespace publickeyserver
 				}
 				catch (AmazonS3Exception e)
 				{
-					Log.Error("HTTP reponse not 200 in AwsHelper.Put: {a}, {b}", response.HttpStatusCode, e.Message);
+					Log.Error("HTTP reponse not 200 in AwsHelper.Put: {a}", e.Message);
 					throw;
 				}
 			}
