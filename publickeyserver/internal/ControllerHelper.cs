@@ -18,7 +18,7 @@ namespace publickeyserver
 		// ------------------------------------------------------------------------------------------------------------------
 		public static AsymmetricCipherKeyPair GenerateKey()
 		{
-			AsymmetricCipherKeyPair privatekeyACP = null;
+			AsymmetricCipherKeyPair? privatekeyACP = null;
 
 			// Generating Random Numbers
 			CryptoApiRandomGenerator randomGenerator = new CryptoApiRandomGenerator();

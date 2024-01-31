@@ -2,15 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
     <ExternalConsole>true</ExternalConsole>
   </PropertyGroup>
   <ItemGroup>
-  	<Reference Include="BouncyCastle.Cryptography">
-    	<HintPath>../../bc-csharp/crypto/src/obj/Debug/net6.0/BouncyCastle.Cryptography.dll</HintPath>
-    </Reference>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" NoWarn="NU1605" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.9" NoWarn="NU1605" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
@@ -29,5 +27,8 @@
   <ItemGroup>
     <None Remove="Portable.BouncyCastle" />
     <None Remove="dotenv.net" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\bc-csharp\crypto\src\BouncyCastle.Crypto.csproj" />
   </ItemGroup>
 </Project>

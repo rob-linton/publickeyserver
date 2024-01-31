@@ -73,7 +73,7 @@ namespace publickeyserver
 				string package = sender + "." + BouncyCastleHelper.ConvertHashToString(packageHash).Substring(0, 20);
 				
 				// total package size
-				long packageSize = Request.ContentLength.Value;
+				long? packageSize = Request.ContentLength;
 				if (packageSize <= 0)
 				{
 					return BadRequest("Package size is zero or less");

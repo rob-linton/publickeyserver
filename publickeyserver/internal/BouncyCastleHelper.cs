@@ -73,21 +73,24 @@ namespace publickeyserver
 			)
 		{
 			// one doesn't exist, so create it the first time
-			AsymmetricCipherKeyPair privatekeyCA = null;
+			AsymmetricCipherKeyPair? privatekeyCA = null;
 
 			Console.WriteLine("Creating CA");
-			Org.BouncyCastle.X509.X509Certificate ca = CreateCertificateAuthorityCertificate(GLOBALS.origin, ref privatekeyCA);
-			string cacertPEM = BouncyCastleHelper.toPEM(ca);
-			string cakeysPEM = BouncyCastleHelper.toPEM(privatekeyCA);
+			Org.BouncyCastle.X509.X509Certificate? ca = CreateCertificateAuthorityCertificate(GLOBALS.origin, ref privatekeyCA);
+			if (ca != null && privatekeyCA != null)
+			{
+				string cacertPEM = BouncyCastleHelper.toPEM(ca);
+				string cakeysPEM = BouncyCastleHelper.toPEM(privatekeyCA);
 
-			byte[] cacertBytes = cacertPEM.ToBytes();
-			byte[] cakeysBytes = cakeysPEM.ToBytes();
+				byte[] cacertBytes = cacertPEM.ToBytes();
+				byte[] cakeysBytes = cakeysPEM.ToBytes();
 
-			byte[] cacertEncrypted = EncryptWithKey(cacertBytes, password.ToBytes(), origin.ToBytes());
-			byte[] cakeysEncrypted = EncryptWithKey(cakeysBytes, password.ToBytes(), origin.ToBytes());
+				byte[] cacertEncrypted = EncryptWithKey(cacertBytes, password.ToBytes(), origin.ToBytes());
+				byte[] cakeysEncrypted = EncryptWithKey(cakeysBytes, password.ToBytes(), origin.ToBytes());
 
-			System.IO.File.WriteAllBytes($"cacert.{origin}.pem", cacertEncrypted);
-			System.IO.File.WriteAllBytes($"SAVE-ME-OFFLINE-cakeys.{origin}.pem", cakeysEncrypted);
+				System.IO.File.WriteAllBytes($"cacert.{origin}.pem", cacertEncrypted);
+				System.IO.File.WriteAllBytes($"SAVE-ME-OFFLINE-cakeys.{origin}.pem", cakeysEncrypted);
+			}
 		}
 		// --------------------------------------------------------------------------------------------------------
 		public static void CreateEncryptedSubCA(
@@ -97,21 +100,24 @@ namespace publickeyserver
 			)
 		{
 			// one doesn't exist, so create it the first time
-			AsymmetricCipherKeyPair privatekeySubCA = null;
+			AsymmetricCipherKeyPair? privatekeySubCA = null;
 
 			Console.WriteLine("Creating Sub CA");
-			Org.BouncyCastle.X509.X509Certificate ca = CreateSubCertificateAuthorityCertificate(GLOBALS.origin, ref privatekeySubCA, privatekeyCA);
-			string cacertPEM = BouncyCastleHelper.toPEM(ca);
-			string cakeysPEM = BouncyCastleHelper.toPEM(privatekeySubCA);
+			Org.BouncyCastle.X509.X509Certificate? ca = CreateSubCertificateAuthorityCertificate(GLOBALS.origin, ref privatekeySubCA, privatekeyCA);
+			if (ca != null && privatekeySubCA != null)
+			{
+				string cacertPEM = BouncyCastleHelper.toPEM(ca);
+				string cakeysPEM = BouncyCastleHelper.toPEM(privatekeySubCA);
 
-			byte[] cacertBytes = cacertPEM.ToBytes();
-			byte[] cakeysBytes = cakeysPEM.ToBytes();
+				byte[] cacertBytes = cacertPEM.ToBytes();
+				byte[] cakeysBytes = cakeysPEM.ToBytes();
 
-			byte[] cacertEncrypted = EncryptWithKey(cacertBytes, password.ToBytes(), origin.ToBytes());
-			byte[] cakeysEncrypted = EncryptWithKey(cakeysBytes, password.ToBytes(), origin.ToBytes());
+				byte[] cacertEncrypted = EncryptWithKey(cacertBytes, password.ToBytes(), origin.ToBytes());
+				byte[] cakeysEncrypted = EncryptWithKey(cakeysBytes, password.ToBytes(), origin.ToBytes());
 
-			System.IO.File.WriteAllBytes($"subcacert.{origin}.pem", cacertEncrypted);
-			System.IO.File.WriteAllBytes($"subcakeys.{origin}.pem", cakeysEncrypted);
+				System.IO.File.WriteAllBytes($"subcacert.{origin}.pem", cacertEncrypted);
+				System.IO.File.WriteAllBytes($"subcakeys.{origin}.pem", cakeysEncrypted);
+			}
 		}
 		// --------------------------------------------------------------------------------------------------------
 		public static byte[] EncryptWithKey(
@@ -124,9 +130,14 @@ namespace publickeyserver
 
 			if (key == null || key.Length != KEY_BIT_SIZE / 8)
 			{
-				using (SHA256 sha256Hash = SHA256.Create())
+				if (key != null)
 				{
-					key = sha256Hash.ComputeHash(key);
+					key = SHA256.HashData(key);
+				}
+				else
+				{
+					// Handle the case when the key is null.
+					throw new ArgumentNullException(nameof(key));
 				}
 			}
 
@@ -174,9 +185,13 @@ namespace publickeyserver
 			//User Error Checks
 			if (key == null || key.Length != KEY_BIT_SIZE / 8)
 			{
-				using (SHA256 sha256Hash = SHA256.Create())
+				if (key != null)
 				{
-					key = sha256Hash.ComputeHash(key);
+					key = SHA256.HashData(key);
+				}
+				else
+				{
+					throw new ArgumentNullException(nameof(key));
 				}
 			}
 
@@ -296,7 +311,7 @@ namespace publickeyserver
 		{
 			// Get the custom extension
 			Asn1OctetString asn1OctetStr = cert.GetExtensionValue(new DerObjectIdentifier(oid));
-			if (asn1OctetStr == null) return null; // Extension not found
+			if (asn1OctetStr == null) return ""; // Extension not found
 
 			// Decode the extension
 			Asn1Object asn1Object = Asn1Object.FromByteArray(asn1OctetStr.GetOctets());
@@ -319,7 +334,7 @@ namespace publickeyserver
 				}
 			}
 
-			return null; // Data not found or format not as expected
+			return ""; // Data not found or format not as expected
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
@@ -327,7 +342,7 @@ namespace publickeyserver
 		//
 		public static Org.BouncyCastle.X509.X509Certificate CreateCertificateAuthorityCertificate(
 			string subjectName,
-			ref AsymmetricCipherKeyPair subjectKeyPairCA
+			ref AsymmetricCipherKeyPair? subjectKeyPairCA
 			)
 		{
 			
@@ -385,7 +400,7 @@ namespace publickeyserver
 		// --------------------------------------------------------------------------------------------------------
 		public static Org.BouncyCastle.X509.X509Certificate CreateSubCertificateAuthorityCertificate(
 			string subjectName,
-			ref AsymmetricCipherKeyPair subjectKeyPairSubCA,
+			ref AsymmetricCipherKeyPair? subjectKeyPairSubCA,
 			AsymmetricCipherKeyPair subjectKeyPairCA
 			)
 		{
@@ -537,7 +552,7 @@ namespace publickeyserver
 
 				return (true, fingerprint);
 			}
-			catch (Exception ex)
+			catch 
 			{
 				return (false, new byte[0]);
 			}

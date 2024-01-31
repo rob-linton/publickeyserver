@@ -22,7 +22,7 @@ namespace publickeyserver
 		public static async Task Delete(Amazon.S3.AmazonS3Client client, string key)
 		{
 
-			DeleteObjectResponse response = null;
+			DeleteObjectResponse? response = null;
 			try
 			{
 				DeleteObjectRequest request = new DeleteObjectRequest
@@ -46,7 +46,7 @@ namespace publickeyserver
 		// ---------------------------------------------------------------------
 		public static async Task<bool> Exists(Amazon.S3.AmazonS3Client client, string key)
 		{
-			GetObjectMetadataResponse response = null;
+			GetObjectMetadataResponse? response = null;
 			
 			var request = new GetObjectMetadataRequest
 			{
@@ -69,7 +69,7 @@ namespace publickeyserver
 		{
 			string safeKey = key.Replace(" ", "-");
 
-			PutObjectResponse response = null;
+			PutObjectResponse? response = null;
 			try
 			{
 				using (MemoryStream ms = new MemoryStream())
@@ -101,7 +101,7 @@ namespace publickeyserver
 		{
 			string safeKey = key.Replace(" ", "-");
 
-			GetObjectResponse response = null;
+			GetObjectResponse? response = null;
 			try
 			{
 				GetObjectRequest request = new GetObjectRequest
@@ -270,7 +270,7 @@ namespace publickeyserver
 			string key = keyLocation + keyFile;
 			using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 			{
-				PutObjectResponse response = null;
+				PutObjectResponse? response = null;
 				try
 				{
 					using (MemoryStream ms = new MemoryStream())

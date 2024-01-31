@@ -31,7 +31,7 @@ namespace publickeyserver
 					buf = ms.ToArray();
 				}
 				string s_buf = Encoding.UTF8.GetString(buf);
-				dynamic d_buf = JsonConvert.DeserializeObject(s_buf);
+				dynamic d_buf = JsonConvert.DeserializeObject(s_buf) ?? getEmptyDynamic();
 
 				return d_buf;
 			}
@@ -82,7 +82,7 @@ namespace publickeyserver
 		// ---------------------------------------------------------------------
 		public static dynamic getEmptyDynamic()
 		{
-			return JsonConvert.DeserializeObject("{}");
+			return JsonConvert.DeserializeObject("{}") ?? new { };
 		}
 		// ---------------------------------------------------------------------
 		public static string getPasswordFromConsole(String displayMessage)

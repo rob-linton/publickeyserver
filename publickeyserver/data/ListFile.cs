@@ -6,7 +6,7 @@ namespace publickeyserver;
 class ListFile
 {
 	[JsonPropertyName("key")]
-	public string Key { get; set; }
+	public required string Key { get; set; }
 
 	[JsonPropertyName("size")]
 	public long Size { get; set; }

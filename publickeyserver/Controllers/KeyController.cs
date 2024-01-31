@@ -295,7 +295,7 @@ namespace publickeyserver
 				//
 				// get the user public key
 				//
-				AsymmetricKeyParameter publickeyRequestor = null;
+				AsymmetricKeyParameter? publickeyRequestor = null;
 				try
 				{
 					string key = createkey.key;
