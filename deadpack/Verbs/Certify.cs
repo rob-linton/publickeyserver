@@ -1,4 +1,5 @@
 #pragma warning disable 1998
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
@@ -13,8 +14,12 @@ namespace deadrop.Verbs;
 [Verb("certify", HelpText = "Certify an alias.")]
 public class CertifyOptions : Options
 {
-  [Option('a', "alias", Required = true, HelpText = "Alias to be certified")]
-    public required string Alias { get; set; }	
+  	[Option('a', "alias", Required = true, HelpText = "Alias to be certified")]
+	public required string Alias { get; set; }	
+
+	[Option('e', "email", HelpText = "Email to be certified in alias")]
+	public string Email { get; set; } = "";	
+
 }
 class Certify 
 {
@@ -33,7 +38,7 @@ class Certify
 
 			string domain = Misc.GetDomain(opts, opts.Alias);
 
-			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts);
+			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts.Email, opts);
 
 			// now load the root fingerprint from a file
 			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.Alias}.root", opts.Password);

@@ -52,7 +52,58 @@ public class BouncyCastleHelper
 
 		return keyPair;
     }
-	
+	public static bool CheckIfCertificateAltNamesMatch(string alias, string email, string targetCertificatePem, Options opts)
+	{
+		// get the certificate
+		Org.BouncyCastle.X509.X509Certificate cert = ReadCertificateFromPemString(targetCertificatePem);
+
+		// get the alt names
+		var altNames = cert.GetSubjectAlternativeNames();
+
+		// check if the alias is in the alt names
+		if (altNames != null)
+		{
+			bool aliasFound = false;
+			bool emailFound = false;
+			foreach (var altName in altNames)
+			{
+				if (altName[1].ToString() == alias)
+				{
+					Misc.LogCheckMark($"Alias {alias} is in the SubjectAlternativeNames");
+					aliasFound = true;
+				}
+				if (altName[1].ToString() == email)
+				{
+					Misc.LogCheckMark($"Email {email} is in the SubjectAlternativeNames");
+					emailFound = true;
+				}
+			}
+
+			if (String.IsNullOrEmpty(email))
+			{
+				if (aliasFound)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if (aliasFound && emailFound)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		return false;
+	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Validates the certificate chain using the target certificate, intermediate and root certificates,
@@ -559,7 +610,7 @@ public class BouncyCastleHelper
 		/// <param name="alias">The alias to verify.</param>
 		/// <param name="opts">The options for the HTTP request.</param>
 		/// <returns>A tuple containing a boolean indicating the validity of the alias and the fingerprint of the certificate.</returns>
-		public static async Task<(bool, byte[])> VerifyAliasAsync(string domain, string alias, Options opts)
+		public static async Task<(bool, byte[])> VerifyAliasAsync(string domain, string alias, string email, Options opts)
 		{
 			
 
@@ -580,8 +631,9 @@ public class BouncyCastleHelper
 			if (certificate != null && cacerts != null) // Add null check for cacerts
 			{
 				(valid, fingerprint) = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain, opts);
-
 			}
+
+			bool validAltName = CheckIfCertificateAltNamesMatch(alias, email, certificate, opts);
 
 			if (valid)
 				return (true, fingerprint);

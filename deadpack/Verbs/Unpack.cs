@@ -114,7 +114,7 @@ class Unpack
 
 			// now verify the alias
 			Misc.LogLine(opts, $"\n- Verifying sender alias: {envelope.From}");
-			(bool validAlias, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, envelope.From, opts);
+			(bool validAlias, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, envelope.From, "", opts);
 			
 			// verify fingerprint
 			if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
@@ -175,7 +175,7 @@ class Unpack
 
 					// now verify the alias
 					Misc.LogLine(opts, $"- Verifying recipient alias: {opts.Alias}");
-					(bool validToAlias, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, opts.Alias, opts);
+					(bool validToAlias, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, opts.Alias, "", opts);
 					
 					// verify alias
 					if (toFingerprint.SequenceEqual(rootFingerprintFromFile))

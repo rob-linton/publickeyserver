@@ -122,7 +122,7 @@ class Pack
 			Misc.LogLine(opts, $"\n- Validating sender alias  ->  {opts.From}");
 			
 			string fromDomain = Misc.GetDomain(opts, opts.From);
-			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, opts);
+			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, "", opts);
 
 			// validate the rootfingerprint
 			if (rootFingerprintFromFile.SequenceEqual(fromFingerprint))
@@ -280,7 +280,7 @@ class Pack
 							// validate the alias
 							Misc.LogLine(opts, $"- Validating recipient alias  ->  {alias}");
 							string domain = Misc.GetDomain(opts, alias);
-							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
+							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "", opts);
 
 							// validate the fingerprint
 							if (toFingerprint.SequenceEqual(rootFingerprintFromFile))

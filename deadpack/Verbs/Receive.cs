@@ -54,7 +54,7 @@ class Receive
 
 			// verify the alias
 			string toDomain = Misc.GetDomain(opts, opts.Alias);
-			(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, opts.Alias, opts);
+			(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, opts.Alias, "", opts);
 			
 			// verify the fingerprint
 			if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))

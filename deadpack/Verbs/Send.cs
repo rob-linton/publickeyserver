@@ -42,7 +42,7 @@ class Send
 
 		// validate the from alias
 		string fromDomain = Misc.GetDomain(opts, fromAlias);
-		(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, fromAlias, opts);
+		(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, fromAlias, "", opts);
 		
 		// verify the fingerprint
 		if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
@@ -69,7 +69,7 @@ class Send
 
 				// valiadate the to alias
 				string toDomain = Misc.GetDomain(opts, toAlias);
-				(bool toValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, toAlias, opts);
+				(bool toValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, toAlias, "", opts);
 				
 				// verify the fingerprint
 				if (toFingerprint.SequenceEqual(rootFingerprintFromFile))

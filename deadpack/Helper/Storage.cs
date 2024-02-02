@@ -21,8 +21,14 @@ public class Storage
 
 		byte[] cipherText = BouncyCastleHelper.EncryptWithKey(msg, key, nonce);
 
+		// get the users home userdata directoru
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string  deadDropFolder = Path.Join(localAppData, "deadrop");
+
+		Directory.CreateDirectory(deadDropFolder);
+
 		// save it as PEM format
-		File.WriteAllBytes($"{alias}", cipherText);
+		File.WriteAllBytes(Path.Join(deadDropFolder, $"{alias}"), cipherText);
 	}
 	/// <summary>
 	/// Retrieves a list of aliases from the current directory.
@@ -32,7 +38,11 @@ public class Storage
 	{
 		List<string> aliases = new List<string>();
 
-		foreach (string file in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.rsa"))
+		// get the users home userdata directoru
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string  deadDropFolder = Path.Join(localAppData, "deadrop");
+
+		foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.rsa"))
 		{
 			string alias = Path.GetFileNameWithoutExtension(file).Replace(".rsa", "");
 			aliases.Add(alias);
@@ -51,7 +61,14 @@ public class Storage
 		string sNonce = Misc.GetDomainFromAlias(alias);
 		byte[] nonce = sNonce.ToBytes();
 
-		byte[] cipherText = File.ReadAllBytes($"{alias}");
+		// get the users home userdata directoru
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string  deadDropFolder = Path.Join(localAppData, "deadrop");
+
+		Directory.CreateDirectory(deadDropFolder);
+
+		
+		byte[] cipherText = File.ReadAllBytes(Path.Join(deadDropFolder, $"{alias}"));
 
 		byte[] key = password.ToBytes();
 

@@ -124,7 +124,7 @@ class Create
 			string dilithiumPrivateKeyPem = Convert.ToBase64String(DilithiumPrivateKey);
 			Storage.StorePrivateKey($"{alias}.dilithium", dilithiumPrivateKeyPem, opts.Password);
 
-			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
+			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "", opts);
 
 			if (!valid)
 			{

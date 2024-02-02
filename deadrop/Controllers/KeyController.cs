@@ -336,8 +336,27 @@ namespace publickeyserver
 						{
 							raw = await AwsHelper.Get(client, tokenFile);
 						};
-						EmailToken emailTokenFile = JsonConvert.DeserializeObject<EmailToken>(Encoding.UTF8.GetString(raw));
-						tokenFileContents = emailTokenFile.Token;
+						EmailToken emailTokenFile = JsonConvert.DeserializeObject<EmailToken>(Encoding.UTF8.GetString(raw) ?? "") ?? new EmailToken();
+						
+						long timestamp = Convert.ToInt64(emailTokenFile.Timestamp);
+
+						// get the current timestamp
+						long unixTimestampFile = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+						// check if it is older than 1 hour, if it is then delete it
+						// else return the response that token exists
+						if (unixTimestampFile - timestamp > 3600)
+						{
+							// delete the old token
+							using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+							{
+								await AwsHelper.Delete(client, tokenFile);
+							};
+						}
+						else
+						{
+							tokenFileContents = emailTokenFile.Token ?? "";
+						}
 					}
 					catch
 					{

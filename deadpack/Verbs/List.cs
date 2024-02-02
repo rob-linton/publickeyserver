@@ -32,7 +32,7 @@ class List
 
 				string domain = Misc.GetDomain(opts, alias);
 
-				(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, opts);
+				(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "", opts);
 
 				if (valid)
 				{
