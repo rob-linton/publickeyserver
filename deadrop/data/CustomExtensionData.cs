@@ -13,9 +13,6 @@ class CustomExtensionData
 	[JsonPropertyName("email")]
 	public string? Email { get; set; }
 
-	[JsonPropertyName("mobile")]
-	public string? Mobile { get; set; }
-
 	[JsonPropertyName("token")]
 	public string? Token { get; set; }
 

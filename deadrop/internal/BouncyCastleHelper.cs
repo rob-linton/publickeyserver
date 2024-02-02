@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using Org.BouncyCastle.Security.Certificates;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Security.Cryptography.X509Certificates;
 
 namespace publickeyserver
 {
@@ -233,6 +234,7 @@ namespace publickeyserver
 		// --------------------------------------------------------------------------------------------------------
 		public static Org.BouncyCastle.X509.X509Certificate CreateCertificateBasedOnCertificateAuthorityPrivateKey(
 			string subjectName,
+			string email,
 			string data,
 			string issuerName,
 			AsymmetricKeyParameter issuerPrivKey,
@@ -259,6 +261,23 @@ namespace publickeyserver
 			certificateGenerator.SetIssuerDN(issuerDN);
 			certificateGenerator.SetSubjectDN(subjectDN);
 
+			// Subject Alternative Name
+			
+			//var a = new GeneralName(GeneralName.OtherName, CreateGeneralName(X509Extensions.SubjectAlternativeName, subjectName).ToAsn1Object());
+			var a = new GeneralName(GeneralName.DnsName, subjectName);
+			GeneralName[] names;
+
+			if (!String.IsNullOrEmpty(email))
+			{
+				//var b = new GeneralName(GeneralName.OtherName, CreateGeneralName(X509Extensions.SubjectAlternativeName, email).ToAsn1Object());
+				var b = new GeneralName(GeneralName.Rfc822Name, email);
+				names = [a, b];
+			}
+			else
+				names = [a];
+
+			certificateGenerator.AddExtension(X509Extensions.SubjectAlternativeName, false, new GeneralNames(names));
+
 			// Valid For
 			DateTime notBefore = DateTime.UtcNow.Date;
 			DateTime notAfter = notBefore.AddDays(397);
@@ -270,25 +289,18 @@ namespace publickeyserver
 			if (!String.IsNullOrEmpty(data))
 			{	
 				string oid = "1.3.6.1.4.1.57055";
-
-				// Create an OID for the custom extension
 				DerObjectIdentifier customExtensionOid = new DerObjectIdentifier(oid);
 
-				// Create the OtherName ASN.1 structure
-				Asn1EncodableVector otherNameVec = new Asn1EncodableVector();
-				otherNameVec.Add(new DerObjectIdentifier(oid)); // OID representing the type of OtherName
-				otherNameVec.Add(new DerTaggedObject(true, 0, new DerUtf8String(data))); // The actual data, encoded as desired
-				OtherName otherName = OtherName.GetInstance(new DerSequence(otherNameVec));
+				GeneralName generalName = CreateGeneralName(customExtensionOid, data);
 
 				// Create a GeneralName with the OtherName
-				GeneralNames generalNames = new GeneralNames(new GeneralName(GeneralName.OtherName, otherName.ToAsn1Object()));
+				GeneralNames generalNames = new GeneralNames(new GeneralName(GeneralName.OtherName, generalName.ToAsn1Object()));
 
 				// Add the extension to the certificate generator
 				certificateGenerator.AddExtension(customExtensionOid, false, generalNames);
 				
 			}
 			
-
 			// set the public key
 			certificateGenerator.SetPublicKey(requestorPublicKey);
 
@@ -307,7 +319,24 @@ namespace publickeyserver
 
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
-		public static string GetCustomExtensionData(X509Certificate cert, string oid)
+		public static GeneralName CreateGeneralName(DerObjectIdentifier customExtensionOid, string data)
+		{
+			// Create an OID for the custom extension
+			//DerObjectIdentifier customExtensionOid = new DerObjectIdentifier(oid);
+
+			// Create the OtherName ASN.1 structure
+			Asn1EncodableVector otherNameVec = new Asn1EncodableVector();
+			otherNameVec.Add(customExtensionOid); // OID representing the type of OtherName
+			otherNameVec.Add(new DerTaggedObject(true, 0, new DerUtf8String(data))); // The actual data, encoded as desired
+			OtherName otherName = OtherName.GetInstance(new DerSequence(otherNameVec));
+			
+	
+			// Create a GeneralName with the OtherName
+			return new GeneralName(GeneralName.OtherName, otherName.ToAsn1Object());
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		/*
+		public static string GetCustomExtensionData(Org.BouncyCastle.X509.X509Certificate cert, string oid)
 		{
 			// Get the custom extension
 			Asn1OctetString asn1OctetStr = cert.GetExtensionValue(new DerObjectIdentifier(oid));
@@ -336,6 +365,7 @@ namespace publickeyserver
 
 			return ""; // Data not found or format not as expected
 		}
+		*/
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
 		// create a self signed CA certificate

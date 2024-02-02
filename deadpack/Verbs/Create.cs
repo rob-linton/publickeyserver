@@ -16,7 +16,11 @@ namespace deadrop.Verbs;
 [Verb("create", HelpText = "Create an alias.")]
 public class CreateOptions : Options
 {
-  	
+  	[Option('e', "email", HelpText = "Optional email address to associate with alias")]
+    public string? Email { get; set; }
+	
+	[Option('t', "token", HelpText = "Email validation token")]
+    public string? Token { get; set; }
 }
 class Create 
 {
@@ -61,11 +65,13 @@ class Create
 			//
 			// now create the data payload to send to the server
 			//
-			var data = new Dictionary<string, string>();
+			var data = new CustomExtensionData{
+				KyberKey = Convert.ToBase64String(KyberPublicKey),
+				DilithiumKey = Convert.ToBase64String(DilithiumPublicKey),
+				Email = opts.Email ?? string.Empty,
+				Token = opts.Token ?? string.Empty
+			};
 			
-			data["kyber_key"] = Convert.ToBase64String(KyberPublicKey);
-			data["dilithium_key"] = Convert.ToBase64String(DilithiumPublicKey);
-
 			string jsondata = JsonSerializer.Serialize(data);
 			byte[] jsondataBytes = Encoding.UTF8.GetBytes(jsondata);
 			string jsondataBase64 = Convert.ToBase64String(jsondataBytes);

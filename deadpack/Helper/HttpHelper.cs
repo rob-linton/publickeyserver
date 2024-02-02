@@ -48,7 +48,7 @@ public class HttpHelper
 		var response = await client.PostAsync(url, content);
 		if (response.StatusCode != System.Net.HttpStatusCode.OK)
 		{
-			throw new Exception($"POST failed: {response.StatusCode}: {response.Content.ReadAsStringAsync().Result}}}");
+			throw new Exception($"{response.Content.ReadAsStringAsync().Result}}}");
 		}
 		string ret = await response.Content.ReadAsStringAsync();
 		Misc.LogLine1(opts, $"RESPONSE: {ret}");
@@ -76,7 +76,7 @@ public class HttpHelper
 		var response = await client.PutAsync(url, content);
 		if (response.StatusCode != System.Net.HttpStatusCode.OK)
 		{
-			throw new Exception($"PUT failed: {response.StatusCode}: {response.Content.ReadAsStringAsync().Result}}}");
+			throw new Exception($"{response.Content.ReadAsStringAsync().Result}}}");
 		}
 		string ret = await response.Content.ReadAsStringAsync();
 		Misc.LogLine1(opts, $"RESPONSE: {ret}");
@@ -102,7 +102,7 @@ public class HttpHelper
 		var response = await client.DeleteAsync(url);
 		if (response.StatusCode != System.Net.HttpStatusCode.OK)
 		{
-			throw new Exception($"DELETE failed: {response.StatusCode}: {response.Content.ReadAsStringAsync().Result}}}");
+			throw new Exception($"{response.Content.ReadAsStringAsync().Result}}}");
 		}
 
 		return await response.Content.ReadAsStringAsync();
@@ -137,7 +137,7 @@ public class HttpHelper
 				var response = await client.PostAsync(url, content);
 				if (response.StatusCode != System.Net.HttpStatusCode.OK)
 				{
-					throw new Exception($"POSTFILE failed: {response.StatusCode}: {response.Content.ReadAsStringAsync().Result}}}");
+					throw new Exception($"{response.Content.ReadAsStringAsync().Result}}}");
 				}
 				var data = await response.Content.ReadAsStringAsync();
 				
@@ -179,7 +179,7 @@ public class HttpHelper
 		{
 			if (response.StatusCode != System.Net.HttpStatusCode.OK)
 			{
-				throw new Exception($"GETFILE failed: {response.StatusCode}");
+				throw new Exception($"{response.StatusCode}");
 			}
 
 			using (var fileStream = new FileStream(saveFilePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))

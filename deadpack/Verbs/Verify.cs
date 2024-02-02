@@ -13,8 +13,8 @@ namespace deadrop.Verbs;
 [Verb("verify", HelpText = "Verify an alias.")]
 public class VerifyOptions : Options
 {
-  [Option('a', "alias", Required = true, HelpText = "Alias to be verified")]
-    public required string Alias { get; set; }	
+  [Option('e', "email", Required = true, HelpText = "Email to be verified")]
+    public required string Email { get; set; }	
 }
 class Verify 
 {
@@ -22,38 +22,24 @@ class Verify
 	{
 		try
 		{
-			
 			Misc.LogHeader();
+			Misc.LogLine($"Verifying...");
 
-			Misc.LogLine($"Verifying  {opts.Alias}");
+			// get the domain for requests
+			string domain = Misc.GetDomain(opts, "");
+
+			Misc.LogLine($"Domain: {domain}");
 			Misc.LogLine($"");
 
-			if (String.IsNullOrEmpty(opts.Password))
-			opts.Password = Misc.GetPassword();
+			Misc.LogLine(opts, "- verifying email...");
 
-			string domain = Misc.GetDomain(opts, opts.Alias);
+			var result = await HttpHelper.Post($"https://{domain}/verify/{opts.Email}", "", opts);
 
-			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts);
-
-			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.Alias}.root", opts.Password);
-			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
-
-			// and compare it to the rootfingerprint
-			if (rootFingerprint.SequenceEqual(rootFingerprintFromFile))
-				Misc.LogCheckMark($"Root fingerprint matches");
-			else
-				Misc.LogLine($"Invalid: Root fingerprint does not match");
-
-			if (valid)
-				Misc.LogLine($"\nValid: {opts.Alias}\n");
-			else
-				Misc.LogLine($"\nInvalid: {opts.Alias}\n");
-
+			Misc.LogLine($"\n{result}\n");
 		}
 		catch (Exception ex)
 		{
-			Misc.LogError(opts, "Unable to validate alias", ex.Message);
+			Misc.LogError(opts, "Unable to verify email", ex.Message);
 			return 1;
 		}
 		

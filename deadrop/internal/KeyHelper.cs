@@ -41,9 +41,9 @@ namespace publickeyserver
 		
 		}
 		// ------------------------------------------------------------------------------------------------------------
-		public static async Task<Dictionary<string, string>> CreateKey(AsymmetricKeyParameter publickeyRequestor, IWords words, string dataBase64)
+		public static async Task<Dictionary<string, string>> CreateKey(AsymmetricKeyParameter publickeyRequestor, IWords words, string dataBase64, string email)
 		{
-// get a three word alias
+				// get a three word alias
 				string alias = await ControllerHelper.GenerateAlias(GLOBALS.origin, GLOBALS.s3endpoint, GLOBALS.s3key, GLOBALS.s3secret, words);
 
 				//
@@ -58,7 +58,7 @@ namespace publickeyserver
 				// now create the certificate
 				//
 				Log.Information("Creating Certificate - " + alias);
-				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, dataBase64, GLOBALS.origin, cakeys.Private, publickeyRequestor);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, email, dataBase64, GLOBALS.origin, cakeys.Private, publickeyRequestor);
 
 				// convert to PEM
 				string certPEM = BouncyCastleHelper.toPEM(cert);
@@ -71,6 +71,10 @@ namespace publickeyserver
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
 					await AwsHelper.Put(client, $"cert/{alias}.pem", certPEM.ToBytes());
+					if (String.IsNullOrEmpty(email) == false)
+					{
+						await AwsHelper.Put(client, $"email/{email}/{alias}.pem", certPEM.ToBytes());
+					}
 				}
 
 

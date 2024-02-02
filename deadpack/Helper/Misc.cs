@@ -137,10 +137,10 @@ public class Misc
 	public static void LogError(Options opts, string message, string details = "")
 	{
 		Console.ForegroundColor = ConsoleColor.Red;
-		Console.WriteLine($"\n*** ERROR: {message} ***\n");
+		Console.WriteLine($"\n{message}\n");
 
-		if (opts.Verbose > 0 && !String.IsNullOrEmpty(details))
-			Console.Write($"*** ERROR: {details} ***\n");
+		if (!String.IsNullOrEmpty(details))
+			Console.Write($"{details}\n");
 		Console.ResetColor();
 	}
 	// --------------------------------------------------------------------------------------------------------

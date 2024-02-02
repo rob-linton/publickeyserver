@@ -319,10 +319,11 @@ namespace publickeyserver
 				string data = Encoding.UTF8.GetString(bytes);
 
 				// convert to a dictionary
-				CustomExtensionData customExtensionData = JsonConvert.DeserializeObject<CustomExtensionData>(data) ?? new CustomExtensionData();
+				CustomExtensionData emailTokenData = JsonConvert.DeserializeObject<CustomExtensionData>(data) ?? new CustomExtensionData();
 
-				string email = customExtensionData.Email ?? "";
-				string token = customExtensionData.Token ?? "";
+				string email = emailTokenData.Email ?? "";
+				string token = emailTokenData.Token ?? "";
+
 				if (email.Length > 0 && token.Length > 0)
 				{
 					// validate the token
@@ -335,7 +336,8 @@ namespace publickeyserver
 						{
 							raw = await AwsHelper.Get(client, tokenFile);
 						};
-						tokenFileContents = Encoding.UTF8.GetString(raw);
+						EmailToken emailTokenFile = JsonConvert.DeserializeObject<EmailToken>(Encoding.UTF8.GetString(raw));
+						tokenFileContents = emailTokenFile.Token;
 					}
 					catch
 					{
@@ -348,7 +350,7 @@ namespace publickeyserver
 					}
 					else
 					{
-						// delete the token file and continue
+						// delete the token file and continue *success*
 						using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 						{
 							await AwsHelper.Delete(client, tokenFile);
@@ -357,42 +359,7 @@ namespace publickeyserver
 				}
 				else if (email.Length > 0 && token.Length == 0)
 				{
-					// need to generate the token and email to the email address
-					// generate a token
-					string tokenFile = $"tokens/{email}.token";
-					string tokenFileContents = "";
-					try
-					{
-						byte[] raw;
-						using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
-						{
-							raw = await AwsHelper.Get(client, tokenFile);
-						};
-						tokenFileContents = Encoding.UTF8.GetString(raw);
-						return Misc.err(Response, "Token has already been sent to email address", Help.simpleenroll);
-					}
-					catch
-					{
-						// no token file, so generate one
-						string tokenFileContentsNew = Misc.GetRandomString(8);
-						byte[] tokenFileContentsNewBytes = Encoding.UTF8.GetBytes(tokenFileContentsNew);
-
-						using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
-						{
-							await AwsHelper.Put(client, tokenFile, tokenFileContentsNewBytes);
-						};
-
-						// now send the email
-						string emailBody = $"Your token is {tokenFileContentsNew}";
-						string emailSubject = $"Your token for Dead Drop at {GLOBALS.origin}";
-						string emailFrom = GLOBALS.emailFrom;
-						string emailTo = email;
-
-						// send the email
-						await EmailHelper.SendEmail(emailFrom, emailTo, emailSubject, emailBody);
-
-						return Misc.err(Response, "Token sent to email address", Help.simpleenroll);
-					}
+						return Misc.err(Response, "Token must be provided with an email address", Help.simpleenroll);
 				}
 				else if (email.Length == 0 && token.Length > 0)
 				{
@@ -400,7 +367,7 @@ namespace publickeyserver
 				}
 
 				// create the cert
-				var ret = await KeyHelper.CreateKey(publickeyRequestor, words, dataBase64);
+				var ret = await KeyHelper.CreateKey(publickeyRequestor, words, dataBase64, email);
 
 				GLOBALS.status_certs_enrolled++;
 				return Ok(ret);
@@ -445,7 +412,7 @@ namespace publickeyserver
 				// now create the certificate
 				//
 				Log.Information("Creating Certificate - " + alias);
-				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, "", GLOBALS.origin, cakeys.Private, publickeyRequestor);
+				Org.BouncyCastle.X509.X509Certificate cert = BouncyCastleHelper.CreateCertificateBasedOnCertificateAuthorityPrivateKey(alias, "", "", GLOBALS.origin, cakeys.Private, publickeyRequestor);
 
 				// convert to PEM
 				string certPEM = BouncyCastleHelper.toPEM(cert);
