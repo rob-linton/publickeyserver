@@ -1,9 +1,11 @@
+using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using deadrop.Verbs;
 using Org.BouncyCastle.Asn1.Cmp;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Tls.Crypto;
+using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
 
 namespace deadrop;
@@ -19,6 +21,44 @@ public class Misc
 	public static string GetAliasFromAlias(string aliasAndDomain)
 	{
 		return aliasAndDomain.Split('.')[0];
+	}
+	public static byte[] GetBytesFromZip(string filename, string archive)
+	{
+		using (ZipArchive zip = ZipFile.OpenRead(archive))
+		{
+			foreach (ZipArchiveEntry entry in zip.Entries)
+			{
+				if (entry.FullName == filename)
+				{
+					using (var stream = entry.Open())
+					{
+						return ReadAllBytes(stream);
+					}
+				}
+			}
+		}
+		
+		// Return null or throw an exception if the file is not found
+		throw new Exception("File not found in archive");
+	}
+	public static string GetTextFromZip(string filename, string archive)
+	{
+		using (ZipArchive zip = ZipFile.OpenRead(archive))
+		{
+			foreach (ZipArchiveEntry entry in zip.Entries)
+			{
+				if (entry.FullName == filename)
+				{
+					using (var stream = entry.Open())
+					{
+						return new StreamReader(stream).ReadToEnd();
+					}
+				}
+			}
+		}
+		
+		// Return null or throw an exception if the file is not found
+		throw new Exception("File not found in archive");
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
@@ -78,10 +118,28 @@ public class Misc
 	public static async Task<X509Certificate> GetCertificate(Options opts, string alias)
 	{
 
-		string domain = Misc.GetDomain(opts, alias);
+		// is the alias an email address
+		string url = "";
+		if (alias.Contains("@"))
+		{
+			string domain = Misc.GetDomain(opts, "");
+			url = $"https://{domain}/email/{alias}";
+
+			// get a list of files from the s3 bucket in this folder
+
+
+			
+		}
+		else
+		{
+			string domain = Misc.GetDomain(opts, alias);
+			url = $"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}";
+		}
+
+		
 
 		// now get the "from" alias	
-		var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}", opts);
+		var result = await HttpHelper.Get(url, opts);
 
 		var c = JsonSerializer.Deserialize<CertResult>(result) ?? throw new Exception("Could not deserialize cert result");
 		var certificate = c.Certificate ?? throw new Exception("Could not get certificate from cert result");

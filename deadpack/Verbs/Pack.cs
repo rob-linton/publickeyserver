@@ -21,7 +21,7 @@ public class PackOptions : Options
 	[Option('s', "subdirectories", HelpText = "Traverse sub directories")]
 	public bool subdirectories { get; set; } = false;
 
-	[Option('a', "aliases", Required = true, HelpText = "Destination aliases (comma delimited)")]
+	[Option('a', "aliases", Required = true, HelpText = "Destination aliases/emails (comma delimited)")]
     public required IEnumerable<string>? InputAliases { get; set; }
 
 	[Option('o', "output", Default = "package", HelpText = "Output package file")]
@@ -273,10 +273,18 @@ class Pack
 				Misc.LogLine(opts, "- Addressing envelope...");
 				if (opts.InputAliases != null)
 				{
-					foreach (string alias in opts.InputAliases)
+					foreach (string aliasOrEmail in opts.InputAliases)
 					{
+						string alias = aliasOrEmail;
 						try
 						{
+							// if it is an email then swap it out for an alias
+							if (aliasOrEmail.Contains("@"))
+							{
+								CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
+								alias = cert?.Alias ?? string.Empty;
+							}
+
 							// validate the alias
 							Misc.LogLine(opts, $"- Validating recipient alias  ->  {alias}");
 							string domain = Misc.GetDomain(opts, alias);

@@ -7,7 +7,7 @@ using Org.BouncyCastle.Utilities;
 
 namespace deadrop;
 
-class Manifest
+public class Manifest
 {
 	[JsonPropertyName("name")]
     public required string Name { get; set; }

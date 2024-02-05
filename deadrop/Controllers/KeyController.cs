@@ -201,6 +201,70 @@ namespace publickeyserver
 			}
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		// get a cert from the cert store using the email
+		// in this case an S3 bucket
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		[Route("email/{email}")]
+		[Produces("application/json")]
+		[HttpGet]
+		public async Task<IActionResult> CertUsingEmail(string email)
+		{
+			try
+			{
+				List<S3File> aliasList;
+				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				{
+					aliasList = await AwsHelper.List(client, $"email/{email}");
+				};
+
+				// loop through the list and get the newest s3file object
+				long oldest = 0;
+				string key = "";
+				foreach (var s3file in aliasList)
+				{
+					string name = s3file.Name;
+					long timestamp = s3file.Timestamp;
+
+					if (timestamp > oldest)
+					{
+						oldest = timestamp;
+						key = name;
+					}
+				}
+
+				string[] parts = key.Split("/");
+				string lastKey = parts[parts.Length - 1];
+				lastKey = lastKey.Replace(".pem", "");
+				string alias = lastKey;
+
+				byte[] raw;
+				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				{
+					raw = await AwsHelper.Get(client, $"cert/{alias}.pem");
+				};
+
+				string cert = raw.FromBytes();
+
+
+				Response.StatusCode = StatusCodes.Status200OK;
+				Dictionary<string, string> ret = new Dictionary<string, string>();
+
+				ret["alias"] = alias;
+				ret["origin"] = GLOBALS.origin;
+				ret["certificate"] = cert;
+				ret["help"] = Help.cert;
+
+				GLOBALS.status_certs_served++;
+				return new JsonResult(ret);
+				
+			}
+			catch (Exception e)
+			{
+				Log.Error(e, "Unable to get cert");
+				return Misc.err(Response, "Unable to get cert", Help.cert);
+			}
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		// get a cert from the cert store using the alias
 		// in this case an S3 bucket
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace deadrop;
 
-class SimpleEnrollResult
+public class SimpleEnrollResult
 {
 	[JsonPropertyName("alias")]
 	public string? Alias { get; set; }

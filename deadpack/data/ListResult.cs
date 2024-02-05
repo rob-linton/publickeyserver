@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace deadrop;
 
-class ListResult
+public class ListResult
 {
 	[JsonPropertyName("files")]
 	public required List<ListFile> Files { get; set; }

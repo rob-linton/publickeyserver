@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace deadrop;
 
-class CertResult
+public class CertResult
 {
 	[JsonPropertyName("alias")]
 	public string? Alias { get; set; }

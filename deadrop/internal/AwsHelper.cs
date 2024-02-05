@@ -300,5 +300,45 @@ namespace publickeyserver
 
 			return $"{keyFile} uploaded successfully";
 		}
+		// ------------------------------------------------------------------------------------
+		// get a list of all of the objects in an amazon s3 bucket
+		public static async Task<List<S3File>> List(Amazon.S3.AmazonS3Client client, string prefix)
+		{
+			ListObjectsV2Response? response = null;
+			try
+			{
+				ListObjectsV2Request request = new ListObjectsV2Request
+				{
+					BucketName = GLOBALS.s3bucket,
+					Prefix = prefix
+				};
+
+				response = await client.ListObjectsV2Async(request);
+				if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+				{
+					throw new Exception("Unable to list objects in S3");
+				}
+
+				List<S3File> keys = new List<S3File>();
+				foreach (S3Object entry in response.S3Objects)
+				{
+					var dt = entry.LastModified;
+					var unixTimestamp = (long)dt.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+
+					var s3file = new S3File { 
+						Name = entry.Key,
+						Timestamp = unixTimestamp,
+					 };
+					keys.Add(s3file);
+				}
+				return keys;
+			}
+			catch (AmazonS3Exception e)
+			{
+				Log.Error("HTTP reponse not 200 in AwsHelper.List: {a}", e.Message);
+				throw;
+			}
+		}
+		// ------------------------------------------------------------------------------------
 	}
 }

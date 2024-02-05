@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace deadrop;
 
-class CaCertsResult
+public class CaCertsResult
 {
 	[JsonPropertyName("origin")]
 	public string? Origin { get; set; }

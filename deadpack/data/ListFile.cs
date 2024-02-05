@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace deadrop;
 
-class ListFile
+public class ListFile
 {
 	[JsonPropertyName("key")]
 	public required string Key { get; set; }

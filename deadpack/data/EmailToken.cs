@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace deadrop;
 
-class EmailToken
+public class EmailToken
 {
 	[JsonPropertyName("token")]
 	public string? Token { get; set; }

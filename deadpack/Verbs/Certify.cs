@@ -36,12 +36,25 @@ class Certify
 			if (String.IsNullOrEmpty(opts.Password))
 			opts.Password = Misc.GetPassword();
 
-			string domain = Misc.GetDomain(opts, opts.Alias);
+			string alias = opts.Alias;
+			// if it is an email then swap it out for an alias
+			if (alias.Contains("@"))
+			{
+				CertResult cert = await EmailHelper.GetAliasFromEmail(alias, opts);
+				alias = cert?.Alias ?? string.Empty;
+			}
 
-			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, opts.Alias, opts.Email, opts);
+			string domain = Misc.GetDomain(opts, alias);
+			string email = opts.Email;
+			if (String.IsNullOrEmpty(opts.Email) && opts.Alias.Contains("@"))
+			{
+				email = opts.Alias;
+			}
+
+			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, email, opts);
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.Alias}.root", opts.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", opts.Password);
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// and compare it to the rootfingerprint
@@ -51,9 +64,9 @@ class Certify
 				Misc.LogLine($"Invalid: Root fingerprint does not match");
 
 			if (valid)
-				Misc.LogLine($"\nValid: {opts.Alias}\n");
+				Misc.LogLine($"\nValid: {alias}\n");
 			else
-				Misc.LogLine($"\nInvalid: {opts.Alias}\n");
+				Misc.LogLine($"\nInvalid: {alias}\n");
 
 		}
 		catch (Exception ex)

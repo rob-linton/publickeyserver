@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace deadrop;
 
-class CustomExtensionData
+public class CustomExtensionData
 {
 	[JsonPropertyName("kyber_key")]
 	public string? KyberKey { get; set; }
