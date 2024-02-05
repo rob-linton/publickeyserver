@@ -154,7 +154,7 @@ public class Misc
 	/// <param name="message">The message to be logged.</param>
 	public static void LogLine(Options opts, string message)
 	{
-		if (opts.Verbose > 0)
+		if (opts.Verbose > 1)
 			Console.WriteLine(message);
 	}
 	// --------------------------------------------------------------------------------------------------------
@@ -209,7 +209,7 @@ public class Misc
 	/// <param name="message">The message to be logged.</param>
 	public static void LogChar(Options opts, string message)
 	{
-		if (opts.Verbose > 0)
+		if (opts.Verbose > 1)
 			Console.Write(message);
 	}
 	// --------------------------------------------------------------------------------------------------------
@@ -222,10 +222,13 @@ public class Misc
 		Console.Write(message);
 	}
 	// --------------------------------------------------------------------------------------------------------
-	public static void LogCheckMark(string message)
+	public static void LogCheckMark(string message, Options opts)
 	{
-		message = message + "  ................................................................................................................";
-		Console.WriteLine(message.Substring(0, 110) + "  [ \u2713 ]");
+		if (opts.Verbose > 0)
+		{
+			message = message + "  ................................................................................................................";
+			Console.WriteLine(message.Substring(0, 110) + "  [ \u2713 ]");
+		}
 	}
 	// --------------------------------------------------------------------------------------------------------
 	// log a cross check mark

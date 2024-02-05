@@ -45,20 +45,20 @@ class Create
 			//
 			// create the public/private key pair using bouncy castle
 			//
-			Misc.LogCheckMark("Generated RSA key pair");
+			Misc.LogCheckMark("Generated RSA key pair", opts);
 			AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.GenerateKeyPair(2048);
 
 			//
 			// generate a Kyber keypair using bouncy castle
 			//
-			Misc.LogCheckMark("Generated Quantum Kyber key pair");
+			Misc.LogCheckMark("Generated Quantum Kyber key pair", opts);
 			AsymmetricCipherKeyPair KyberKeyPair = BouncyCastleQuantumHelper.GenerateKyberKeyPair();
 			(byte[] KyberPublicKey, byte[] KyberPrivatyeKey) = BouncyCastleQuantumHelper.ReadKyberKeyPair(KyberKeyPair);
 
 			//
 			// generate a Dilithium keypair using bouncy castle
 			//
-			Misc.LogCheckMark("Generated Quantum Dilithium key pair");
+			Misc.LogCheckMark("Generated Quantum Dilithium key pair", opts);
 			AsymmetricCipherKeyPair DilithiumKeyPair = BouncyCastleQuantumHelper.GenerateDilithiumKeyPair();
 			(byte[] DilithiumPublicKey, byte[] DilithiumPrivateKey) = BouncyCastleQuantumHelper.ReadDilithiumKeyPair(DilithiumKeyPair);
 
@@ -136,7 +136,7 @@ class Create
 			string rootFingerprintHex = Convert.ToBase64String(rootFingerprint);
 			Storage.StorePrivateKey($"{alias}.root", rootFingerprintHex, opts.Password);
 
-			Misc.LogCheckMark("Root certificate fingerprint saved");
+			Misc.LogCheckMark("Root certificate fingerprint saved", opts);
 
 			Misc.LogLine($"\nAlias {alias} created\n");
 		}

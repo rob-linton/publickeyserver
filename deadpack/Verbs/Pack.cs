@@ -37,6 +37,7 @@ class Pack
 	{
 		try
 		{
+			
 			opts.Output = opts.Output.Replace(".deadpack","") + ".deadpack";
 
 			long createDate = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
@@ -72,13 +73,26 @@ class Pack
 			Misc.LogLine($"Search Subdirectories: {opts.subdirectories}");
 			Misc.LogLine($"Sender Alias: {opts.From}");
 
-			if (opts.InputAliases != null)
+			
+
+			// first replace any email alias with their alias versions
+			List<string> aliases = new List<string>();
+			foreach (string aliasOrEmail in opts.InputAliases)
 			{
-				foreach (var alias in opts.InputAliases)
+				string alias = aliasOrEmail;
+				if (aliasOrEmail.Contains("@"))
 				{
-					Misc.LogLine($"Recipient Alias: {alias}");
+					CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
+					alias = cert?.Alias ?? string.Empty;
+					Misc.LogLine($"Recipient Alias: {alias} ({aliasOrEmail})");
 				}
+				else
+				{
+					Misc.LogLine($"Recipient Alias: {aliasOrEmail}");
+				}
+				aliases.Add(alias);
 			}
+			opts.InputAliases = aliases;
 
 			Misc.LogLine($"Output: {opts.Output}");
 			Misc.LogLine($"");
@@ -126,12 +140,12 @@ class Pack
 
 			// validate the rootfingerprint
 			if (rootFingerprintFromFile.SequenceEqual(fromFingerprint))
-				Misc.LogCheckMark($"Root fingerprint matches");
+				Misc.LogCheckMark($"Root fingerprint matches", opts);
 			else
 				Misc.LogLine($"Invalid: Root fingerprint does not match");
 
 			if (valid)
-				Misc.LogCheckMark($"Alias {opts.From} is valid");
+				Misc.LogCheckMark($"Alias {opts.From} is valid", opts);
 			else
 			{
 				Misc.LogError(opts, $"Alias {opts.From} is *NOT* valid");
@@ -238,7 +252,7 @@ class Pack
 					}
 					else
 					{
-						Misc.LogCheckMark($"Private key matches public certificate for alias {opts.From}");
+						Misc.LogCheckMark($"Private key matches public certificate for alias {opts.From}", opts);
 					}
 				}
 				else
@@ -273,17 +287,12 @@ class Pack
 				Misc.LogLine(opts, "- Addressing envelope...");
 				if (opts.InputAliases != null)
 				{
-					foreach (string aliasOrEmail in opts.InputAliases)
+					foreach (string alias in opts.InputAliases)
 					{
-						string alias = aliasOrEmail;
+						
 						try
 						{
-							// if it is an email then swap it out for an alias
-							if (aliasOrEmail.Contains("@"))
-							{
-								CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
-								alias = cert?.Alias ?? string.Empty;
-							}
+							
 
 							// validate the alias
 							Misc.LogLine(opts, $"- Validating recipient alias  ->  {alias}");
@@ -292,7 +301,7 @@ class Pack
 
 							// validate the fingerprint
 							if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
-								Misc.LogCheckMark($"Root fingerprint matches");
+								Misc.LogCheckMark($"Root fingerprint matches", opts);
 							else
 								Misc.LogLine($"Invalid: Root fingerprint does not match");
 
@@ -308,8 +317,8 @@ class Pack
 									return 1;
 								}
 
-								Misc.LogCheckMark($"Recipient Alias {alias} is valid");
-								Misc.LogCheckMark($"Shared root certificate {opts.From} -> {alias}");
+								Misc.LogCheckMark($"Recipient Alias {alias} is valid", opts);
+								Misc.LogCheckMark($"Shared root certificate {opts.From} -> {alias}", opts);
 							}
 							else
 							{
@@ -343,7 +352,7 @@ class Pack
 								var quantumSecret = encapsulatedSecret.GetSecret();	// <-- this is the secret
 								
 								
-								Misc.LogCheckMark($"Encrypted alias {alias} key with RSA");
+								Misc.LogCheckMark($"Encrypted alias {alias} key with RSA", opts);
 
 								// encrypt the key with the public key
 								byte[] encryptedKey = BouncyCastleHelper.EncryptWithPublicKey(key, publicKey); // <-- this is the encrypted key
@@ -353,7 +362,7 @@ class Pack
 								byte[] encryptedEncryptedKey = BouncyCastleHelper.EncryptWithKey(encryptedKey, quantumSecret, nonce); // <-- this is the encrypted key double encrypted with kyber
 								string sEncryptedEncryptedKey = Convert.ToBase64String(encryptedEncryptedKey); // <-- this is the encrypted key double encrypted with kyber as a string
 
-								Misc.LogCheckMark($"Re-encrypted alias {alias} key with Post Quantum Kyber");
+								Misc.LogCheckMark($"Re-encrypted alias {alias} key with Post Quantum Kyber", opts);
 
 								// add the encrypted key to the envelope
 								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedEncryptedKey, KyberKey = sCipherText });
@@ -417,7 +426,7 @@ class Pack
 				zip.Comment = "This zip file was created by deadrop.org";
 			}
 
-			Misc.LogLine("\nDone. Only the following anonymous recipient aliases will be able to unpack this deadpack.\n");
+			Misc.LogLine("\nDone. Only the following recipient aliases will be able to unpack this deadpack.\n");
 			if (opts.InputAliases != null)
 			{
 				foreach (var alias in opts.InputAliases)

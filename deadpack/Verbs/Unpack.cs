@@ -28,6 +28,8 @@ class Unpack
 		Misc.LogHeader();
 		Misc.LogLine($"Unpacking deadpack...");
 		Misc.LogLine($"Input: {opts.File}");
+		Misc.LogLine($"Output directory: {opts.Output}");
+			
 		//Misc.LogLine($"Recipient Alias: {alias}");
 
 		if (!String.IsNullOrEmpty(opts.Alias))
@@ -77,8 +79,7 @@ class Unpack
 			Directory.CreateDirectory(opts.Output);
 
 			string outputDirectory = opts.Output;
-			Misc.LogLine($"Output directory: {outputDirectory}");
-			Misc.LogLine($"");
+			
 
 			if (String.IsNullOrEmpty(opts.Password))
 				opts.Password = Misc.GetPassword();
@@ -112,7 +113,7 @@ class Unpack
 
 				// verify fingerprint
 				if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
-					Misc.LogCheckMark($"Root fingerprint matches");
+					Misc.LogCheckMark($"Root fingerprint matches", opts);
 				else
 					Misc.LogLine($"Invalid: Root fingerprint does not match");
 
@@ -133,7 +134,7 @@ class Unpack
 				try
 				{
 					BouncyCastleHelper.VerifySignature(envelopeHash, envelopeSignature, fromPublicKey);
-					Misc.LogCheckMark("Envelope signature is valid");
+					Misc.LogCheckMark("Envelope signature is valid", opts);
 				}
 				catch (Exception ex)
 				{
@@ -151,7 +152,7 @@ class Unpack
 				try
 				{
 					BouncyCastleHelper.VerifySignature(manifestHash, manifestSignature, fromPublicKey);
-					Misc.LogCheckMark("Manifest signature is valid");
+					Misc.LogCheckMark("Manifest signature is valid", opts);
 				}
 				catch (Exception ex)
 				{
@@ -174,7 +175,7 @@ class Unpack
 
 						// verify alias
 						if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
-							Misc.LogCheckMark($"Root fingerprint matches");
+							Misc.LogCheckMark($"Root fingerprint matches", opts);
 						else
 							Misc.LogLine($"Invalid: Root fingerprint does not match");
 
@@ -194,7 +195,7 @@ class Unpack
 						}
 						else
 						{
-							Misc.LogCheckMark($"Aliases share the same root certificate: {envelope.From} -> {alias}");
+							Misc.LogCheckMark($"Aliases share the same root certificate: {envelope.From} -> {alias}", opts);
 						}
 
 						// get the public key from the alias
@@ -220,7 +221,7 @@ class Unpack
 						}
 						else
 						{
-							Misc.LogCheckMark($"Private key matches public certificate for alias: {alias}");
+							Misc.LogCheckMark($"Private key matches public certificate for alias: {alias}", opts);
 						}
 
 						//

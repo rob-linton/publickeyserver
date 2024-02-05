@@ -58,7 +58,7 @@ class Receive
 			
 			// verify the fingerprint
 			if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
-				Misc.LogCheckMark($"Root fingerprint matches");
+				Misc.LogCheckMark($"Root fingerprint matches", opts);
 			else
 				Misc.LogLine($"Invalid: Root fingerprint does not match");
 

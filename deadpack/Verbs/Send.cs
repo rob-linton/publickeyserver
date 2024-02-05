@@ -46,7 +46,7 @@ class Send
 		
 		// verify the fingerprint
 		if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
-			Misc.LogCheckMark($"Root fingerprint matches");
+			Misc.LogCheckMark($"Root fingerprint matches", opts);
 		else
 			Misc.LogLine($"Invalid: Root fingerprint does not match");
 		
@@ -73,7 +73,7 @@ class Send
 				
 				// verify the fingerprint
 				if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
-					Misc.LogCheckMark($"Root fingerprint matches");
+					Misc.LogCheckMark($"Root fingerprint matches", opts);
 				else
 					Misc.LogLine($"Invalid: Root fingerprint does not match");
 
@@ -88,7 +88,7 @@ class Send
 					Misc.LogLine(opts, $"Aliases do not share the same root certificate {fromAlias} -> {toAlias}");
 					return 1;
 				}
-				Misc.LogCheckMark($"Shared root certificate {fromAlias} -> {toAlias}");
+				Misc.LogCheckMark($"Shared root certificate {fromAlias} -> {toAlias}", opts);
 
 				// send the file to the server
 				// UploadPackage(string sender, string timestamp, string signature)

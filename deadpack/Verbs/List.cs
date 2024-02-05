@@ -37,7 +37,7 @@ class List
 				if (valid)
 				{
 					Misc.LogLine("");
-					Misc.LogCheckMark($"*** {alias}");
+					Misc.LogCheckMark($"*** {alias}", opts);
 					Misc.LogLine("");
 				}
 				else

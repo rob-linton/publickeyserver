@@ -69,12 +69,12 @@ public class BouncyCastleHelper
 			{
 				if (altName[1].ToString() == alias)
 				{
-					Misc.LogCheckMark($"Alias {alias} is in the SubjectAlternativeNames");
+					Misc.LogCheckMark($"Alias {alias} is in the SubjectAlternativeNames", opts);
 					aliasFound = true;
 				}
 				if (altName[1].ToString() == email)
 				{
-					Misc.LogCheckMark($"Email {email} is in the SubjectAlternativeNames");
+					Misc.LogCheckMark($"Email {email} is in the SubjectAlternativeNames", opts);
 					emailFound = true;
 				}
 			}
@@ -142,7 +142,7 @@ public class BouncyCastleHelper
                 
                     throw new CertificateException("*** ERROR: Issuer/Subject DN mismatch ***");
                 }
-				Misc.LogCheckMark("Subject name matches the parent certificate's Issuer name");
+				Misc.LogCheckMark("Subject name matches the parent certificate's Issuer name", opts);
 
 				// throws an exception if not valid
                 child.Verify(parent.GetPublicKey());
@@ -158,7 +158,7 @@ public class BouncyCastleHelper
 				{
 					throw new CertificateException("*** Error: Certificate not valid now ***");
 				}
-				Misc.LogCheckMark("Certificate dates are valid");
+				Misc.LogCheckMark("Certificate dates are valid", opts);
 
 				// does the parent have authority to sign the child?
 				Asn1Object? asn1Object = GetAsn1Object(parent, X509Extensions.KeyUsage);
@@ -175,7 +175,7 @@ public class BouncyCastleHelper
 				{
 					throw new CertificateException("*** Error: KeyUsage extension does not allow signing. ***");
 				}
-				Misc.LogCheckMark($"Parent has authority to sign the child {i + 1} of {chain.Length}");
+				Misc.LogCheckMark($"Parent has authority to sign the child {i + 1} of {chain.Length}", opts);
 
 				Misc.LogLine(opts, $"  Certificate {i + 1} of {chain.Length} is valid: {parent.SubjectDN.ToString()}");
             }
@@ -185,7 +185,7 @@ public class BouncyCastleHelper
 
 			//DisplayVisualFingerprint(fingerprint);
 			//CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
-			Misc.LogCheckMark($"Certificate is valid");
+			Misc.LogCheckMark($"Certificate is valid", opts);
 
             return (true, fingerprint);
         }
@@ -227,7 +227,7 @@ public class BouncyCastleHelper
 
 		if (fullName.EndsWith(shortName))
 		{
-			Misc.LogCheckMark($"CommonName {shortName} is a member of {fullName}");
+			Misc.LogCheckMark($"CommonName {shortName} is a member of {fullName}", opts);
 			return true;
 		}		
 
