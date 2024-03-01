@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../bc-csharp"
+		}
+	],
+	"settings": {
+		"debug.terminal.clearBeforeReusing": true,
+		"powershell.cwd": "publickeyserver"
+	}
+}

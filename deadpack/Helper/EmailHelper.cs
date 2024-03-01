@@ -15,7 +15,33 @@ public class EmailHelper
 			// get the domain for requests
 			string domain = Misc.GetDomain(opts, "");
 
-			var result = await HttpHelper.Get($"https://{domain}/email/{email}", opts);
+			bool found = false;
+			bool first = true;
+			string result = "";
+			while (!found)
+			try
+			{
+				result = await HttpHelper.Get($"https://{domain}/email/{email}", opts);
+				Misc.LogLine($"Email found {email}");
+				found = true;
+			}
+			catch (Exception ex)
+			{ 
+				if (first)
+				{
+					try
+					{
+						result = await HttpHelper.Post($"https://{domain}/verify/{email}?intro=true", "", opts);
+					}
+					catch 
+					{ 
+					}
+
+					Misc.LogLine($"Email {email} does not exist yet, checking every minute <ctrl-c> to cancel...");
+					first = false;
+				}
+				await Task.Delay(60000); // 1 minute
+			}
 
 			var c = JsonSerializer.Deserialize<CertResult>(result);
 
@@ -24,7 +50,7 @@ public class EmailHelper
 		catch (Exception ex)
 		{
 			Misc.LogError(opts, "Unable to verify email", ex.Message);
-			return new CertResult() { Alias = ""};
+			throw new Exception("Unable to verify email");
 		}
 	}
 }

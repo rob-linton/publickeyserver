@@ -77,20 +77,29 @@ class Pack
 
 			// first replace any email alias with their alias versions
 			List<string> aliases = new List<string>();
+			List<Task<CertResult>> tasks = new List<Task<CertResult>>();
 			foreach (string aliasOrEmail in opts.InputAliases)
 			{
 				string alias = aliasOrEmail;
 				if (aliasOrEmail.Contains("@"))
 				{
-					CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
-					alias = cert?.Alias ?? string.Empty;
+					//CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
+					tasks.Add(EmailHelper.GetAliasFromEmail(aliasOrEmail, opts));
+					//alias = cert?.Alias ?? string.Empty;
 					Misc.LogLine($"Recipient Alias: {alias} ({aliasOrEmail})");
 				}
 				else
 				{
 					Misc.LogLine($"Recipient Alias: {aliasOrEmail}");
 				}
-				aliases.Add(alias);
+			}
+			
+			// when all of the tasks have completed
+			await Task.WhenAll(tasks);
+			foreach (var task in tasks)
+			{
+				CertResult cert = task.Result;
+				aliases.Add(cert?.Alias ?? string.Empty);
 			}
 			opts.InputAliases = aliases;
 

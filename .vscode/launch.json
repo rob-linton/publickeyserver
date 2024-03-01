@@ -102,7 +102,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadpack",
 			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
-			"args": ["pack","-v","0","-d", "localhost:5001", "-p","password", "-o", "Rob Linton", "-a","rob.linton@mac.com","-i","*.jpg","-f","nba-henry-ronald.deadrop.org"],
+			"args": ["pack","-v","0","-d", "localhost:5001", "-p","password", "-o", "Rob Linton", "-a","rob.linton@mac.com","conviction-kruger-yn.deadrop.org","-i","*.jpg","-f","nba-henry-ronald.deadrop.org"],
 			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",

@@ -33,6 +33,37 @@ class Receive
 {
 	public static async Task<int> Execute(ReceiveOptions opts)
 	{
+		Misc.LogHeader();
+		Misc.LogLine($"Receiving packages...");
+		Misc.LogLine($"Alias: {opts.Alias}");
+		Misc.LogLine($"");
+
+		if (String.IsNullOrEmpty(opts.Password))
+		opts.Password = Misc.GetPassword();
+		
+			
+		//Misc.LogLine($"Recipient Alias: {alias}");
+
+		if (!String.IsNullOrEmpty(opts.Alias))
+		{
+			return await ExecuteInternal(opts, opts.Alias);
+		}
+		else
+		{
+			// loop through all of the aliases
+			foreach (var alias in Storage.GetAliases())
+			{
+				Misc.LogLine($"\nChecking alias {alias}...");
+				int result = await ExecuteInternal(opts, alias);
+				if (result == 0)
+					return result;
+			}
+			Misc.LogError(opts, "Error recieving package, no valid alias found");
+			return 1;
+		}
+	}
+	public static async Task<int> ExecuteInternal(ReceiveOptions opts, string alias)
+	{
 		// get a tmp output directory
 		string tmpOutputDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 		Directory.CreateDirectory(tmpOutputDirectory);
@@ -40,21 +71,15 @@ class Receive
 
 		try
 		{
-			Misc.LogHeader();
-			Misc.LogLine($"Receiving packages...");
-			Misc.LogLine($"Alias: {opts.Alias}");
-			Misc.LogLine($"");
-
-			if (String.IsNullOrEmpty(opts.Password))
-			opts.Password = Misc.GetPassword();
+			
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.Alias}.root", opts.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", opts.Password);
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// verify the alias
-			string toDomain = Misc.GetDomain(opts, opts.Alias);
-			(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, opts.Alias, "", opts);
+			string toDomain = Misc.GetDomain(opts, alias);
+			(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, alias, "", opts);
 			
 			// verify the fingerprint
 			if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
@@ -64,7 +89,7 @@ class Receive
 
 			if (!fromValid)
 			{
-				Misc.LogError(opts, "Invalid alias", opts.Alias);
+				Misc.LogError(opts, "Invalid alias", alias);
 				return 1;
 			}
 
@@ -75,12 +100,12 @@ class Receive
 			AsymmetricCipherKeyPair privateKey;
 			try
 			{
-				string privateKeyPem = Storage.GetPrivateKey($"{opts.Alias}.rsa", opts.Password);
+				string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa", opts.Password);
 				privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 			}
 			catch (Exception ex)
 			{
-				Misc.LogError(opts, $"Error: could not read private key for {opts.Alias}", ex.Message);
+				Misc.LogError(opts, $"Error: could not read private key for {alias}", ex.Message);
 
 				// application exit
 				return 1;
@@ -90,13 +115,13 @@ class Receive
 			AsymmetricKeyParameter kyberPrivateKey;
 			try
 			{
-				string privateKeyKyber = Storage.GetPrivateKey($"{opts.Alias}.kyber", opts.Password);
+				string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", opts.Password);
 				byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
 				kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
 			}
 			catch (Exception ex)
 			{
-				Misc.LogError(opts, $"Error: could not read kyber private key for {opts.Alias}", ex.Message);
+				Misc.LogError(opts, $"Error: could not read kyber private key for {alias}", ex.Message);
 
 				// application exit
 				return 1;
@@ -112,14 +137,14 @@ class Receive
 			while (true)
 			{
 				// sign it with the sender
-				string domain = Misc.GetDomainFromAlias(opts.Alias);
-				byte[] data = $"{opts.Alias}{unixTimestamp.ToString()}{domain}".ToBytes();
+				string domain = Misc.GetDomainFromAlias(alias);
+				byte[] data = $"{alias}{unixTimestamp.ToString()}{domain}".ToBytes();
 				byte[] signature = BouncyCastleHelper.SignData(data, privateKey.Private);
 				string base64Signature = Convert.ToBase64String(signature);
 
 
 				// get a list of deadpacks from the server
-				string result = await HttpHelper.Get($"https://{toDomain}/list/{opts.Alias}?timestamp={unixTimestamp}&signature={base64Signature}", opts);
+				string result = await HttpHelper.Get($"https://{toDomain}/list/{alias}?timestamp={unixTimestamp}&signature={base64Signature}", opts);
 
 				// parse the json
 				ListResult files = JsonSerializer.Deserialize<ListResult>(result) ?? throw new Exception($"Could not parse json: {result}");
@@ -249,22 +274,22 @@ class Receive
 					string tmpOutputName = Path.Combine(tmpOutputDirectory, key);
 
 					Misc.LogLine($"\nGetting deadpack {key}...");
-					await HttpHelper.GetFile($"https://{toDomain}/package/{opts.Alias}/{key}?timestamp={unixTimestamp}&signature={base64Signature}", opts, tmpOutputName);
+					await HttpHelper.GetFile($"https://{toDomain}/package/{alias}/{key}?timestamp={unixTimestamp}&signature={base64Signature}", opts, tmpOutputName);
 
 
 					// get the envelope from the file
 					Envelope envelope = Envelope.LoadFromFile(tmpOutputName);
-					Recipient recipient = envelope.To.FirstOrDefault(r => r.Alias == opts.Alias) ?? throw new Exception($"Could not find recipient {opts.Alias} in package");
+					Recipient recipient = envelope.To.FirstOrDefault(r => r.Alias == alias) ?? throw new Exception($"Could not find recipient {alias} in package");
 					if (recipient == null)
 					{
-						Misc.LogError(opts, $"Could not find recipient {opts.Alias} in package");
+						Misc.LogError(opts, $"Could not find recipient {alias} in package");
 						return 1;
 					}
 					string kyberKeyString = recipient.KyberKey;
 					byte[] kyberKey = Convert.FromBase64String(kyberKeyString);
 
 					// get the manifest from the file
-// TODO					// *** TO DO Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, opts.Alias, kyberKey);
+// TODO					// *** TO DO Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, alias, kyberKey);
 					
 					// get a compact string showing the date and time
 					long timestamp = envelope.Created;

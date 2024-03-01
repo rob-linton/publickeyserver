@@ -47,7 +47,7 @@ namespace publickeyserver
 		// ------------------------------------------------------------------------------------------------------------
 		[Produces("application/json")]
 		[HttpPost("{email}")]
-		public async Task<IActionResult> Verify(string email)
+		public async Task<IActionResult> Verify(string email, bool intro = false)
 		{
 			try
 			{
@@ -112,7 +112,7 @@ namespace publickeyserver
 
 				// now send the email
 				string emailBody = $"Your token is {tokenFileContentsNew}";
-				string emailSubject = $"Your token for Dead Drop at {GLOBALS.origin}";
+				string emailSubject = $"Your email verification token for {GLOBALS.origin}";
 				string emailFrom = GLOBALS.emailFrom;
 				string emailTo = email;
 
