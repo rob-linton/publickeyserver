@@ -51,8 +51,9 @@ class Receive
 		else
 		{
 			// loop through all of the aliases
-			foreach (var alias in Storage.GetAliases())
+			foreach (var a in Storage.GetAliases())
 			{
+				string alias = a.Name;
 				Misc.LogLine($"\nChecking alias {alias}...");
 				int result = await ExecuteInternal(opts, alias);
 				if (result == 0)

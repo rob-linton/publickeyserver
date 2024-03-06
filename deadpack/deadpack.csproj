@@ -12,7 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include = "../../bc-csharp/crypto/src/BouncyCastle.Crypto.csproj" /> 
+    <PackageReference Include="Terminal.Gui" Version="1.15.1" />
+    <ProjectReference Include="../../bc-csharp/crypto/src/BouncyCastle.Crypto.csproj" /> 
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
   </ItemGroup>
 

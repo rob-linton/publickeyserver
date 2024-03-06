@@ -167,6 +167,20 @@
 			},
 		},
 		{
+			"name": "deadpack (Gui)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_deadpack",
+			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
+			"args": ["-v","0","-d", "localhost:5001"],
+			"cwd": "${workspaceFolder}/deadpack/test",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
 			"name": ".NET Core Attach",
 			"type": "coreclr",
 			"request": "attach"

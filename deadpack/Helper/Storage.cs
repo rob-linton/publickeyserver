@@ -34,9 +34,9 @@ public class Storage
 	/// Retrieves a list of aliases from the current directory.
 	/// </summary>
 	/// <returns>A list of aliases.</returns>
-	public static List<string> GetAliases()
+	public static List<Alias> GetAliases()
 	{
-		List<string> aliases = new List<string>();
+		List<Alias> aliases = new List<Alias>();
 
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -44,7 +44,18 @@ public class Storage
 
 		foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.rsa"))
 		{
-			string alias = Path.GetFileNameWithoutExtension(file).Replace(".rsa", "");
+			string sAlias = Path.GetFileNameWithoutExtension(file).Replace(".rsa", "");
+			
+			// get the unix timestamp of the file in seconds
+			long timestamp = (long)(File.GetCreationTime(file) - new DateTime(1970, 1, 1)).TotalSeconds;
+			
+			Alias alias = new Alias 
+			{ 
+				Name = sAlias, 
+				Timestamp = timestamp,
+				Filename = file 
+			};
+
 			aliases.Add(alias);
 		}
 

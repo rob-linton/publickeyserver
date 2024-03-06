@@ -23,13 +23,13 @@ class List
 		Misc.LogLine($"Listing...");
 		Misc.LogLine($"");
 	
-		List<string> aliases = Storage.GetAliases();
+		List<Alias> aliases = Storage.GetAliases();
 
-		foreach (string alias in aliases)
+		foreach (Alias a in aliases)
 		{
 			try
 			{
-
+				string alias = a.Name;
 				string domain = Misc.GetDomain(opts, alias);
 
 				(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "", opts);
