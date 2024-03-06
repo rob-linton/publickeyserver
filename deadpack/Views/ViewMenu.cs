@@ -22,12 +22,12 @@ class ViewMenu
                 }),
 				new MenuItem ("_Quit", "", () => { 
                     Application.RequestStop (); 
-                }),
+                },null,null,Key.CtrlMask | Key.Q),
             }),
 			new MenuBarItem ("_File", new MenuItem [] {
-                new MenuItem ("_New DeadPack", "", () => { 
+                new MenuItem ("New _DeadPack", "", () => { 
                     Application.RequestStop (); 
-                }),
+                },null,null,Key.CtrlMask | Key.D),
 				new MenuItem ("_Open DeadPack", "", () => { 
                     Application.RequestStop (); 
                 }),
@@ -36,9 +36,9 @@ class ViewMenu
                 }),
             }),
 			new MenuBarItem ("_Alias", new MenuItem [] {
-                new MenuItem ("_New Alias", "", () => { 
+                new MenuItem ("New _Alias", "", () => { 
                     Application.RequestStop (); 
-                }),
+                },null,null,Key.CtrlMask | Key.A),
 				new MenuItem ("_Delete Alias", "", () => { 
                     Application.RequestStop (); 
                 }),
@@ -47,12 +47,12 @@ class ViewMenu
                 }),
             }),
 			new MenuBarItem ("_Send/Receive", new MenuItem [] {
-                new MenuItem ("_Send DeadPack", "", () => { 
+                new MenuItem ("_Send Pending DeadPacks", "", () => { 
                     Application.RequestStop (); 
-                }),
-				new MenuItem ("_Check for New DeadPacks", "", () => { 
+                },null,null,Key.CtrlMask | Key.S),
+				new MenuItem ("_Refresh New DeadPacks", "", () => { 
                     Application.RequestStop (); 
-                }),
+                },null,null,Key.CtrlMask | Key.R),
             }),
 			new MenuBarItem ("_Help", new MenuItem [] {
                 new MenuItem ("_Overview", "", () => { 

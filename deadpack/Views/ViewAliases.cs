@@ -1,6 +1,7 @@
 
 using System;
 using Terminal.Gui;
+using Terminal.Gui.Trees;
 
 namespace deadrop.Verbs;
 
@@ -23,24 +24,27 @@ public class ViewAliases : Window
 		List<Alias> aliases = Storage.GetAliases();
 
 		List<string> source = new List<string>();
+		source.Add("[all]");
 		foreach (var a in aliases)
 		{
-			source.Add("  " + a.Name);
+			source.Add(a.Name);
 		}
 
 		// create the list view
 		var add = new Button("+ Add Alias") { X = Pos.Right(this) - 18, Y = 0, Width = 11, Height = 1 };
 		var received = new Label("Inbox") { X = 0, Y = Pos.Bottom(add), Width = Dim.Fill(), Height = 1 };
-		var listView = new ListView(source) { X = 1, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Fill() - 4 };
-		listView.OpenSelectedItem += listView_OpenSelectedItem;
+		var listViewReceived = new ListView(source) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
+		listViewReceived.OpenSelectedItem += listView_OpenSelectedItem;
 
-		var sent = new ListView(new List<string>() { "Sent" }) { X = 0, Y = Pos.Bottom(listView) + 1, Width = Dim.Fill(), Height = 1 };
-		sent.OpenSelectedItem += listView_OpenSent;
+		var sent = new Label("Sent") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
+		var listViewSent = new ListView(source) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
+		listViewSent.OpenSelectedItem += listView_OpenSelectedItem;
 
-		var outbox = new ListView(new List<string>() { "Outbox" }) { X = 0, Y = Pos.Bottom(sent) + 1, Width = Dim.Fill(), Height = 1 };
+		var outbox = new ListView(new List<string>() { "Outbox" }) { X = 0, Y = Pos.Bottom(listViewSent) + 1, Width = Dim.Fill(), Height = 1 };
 		outbox.OpenSelectedItem += listView_OpenOutbox;
 
-		Add(add, received, listView, sent, outbox);
+		Add(add, received, listViewReceived, sent, listViewSent, outbox);
+		
 	}
 
 	private void listView_OpenSelectedItem(ListViewItemEventArgs e)
