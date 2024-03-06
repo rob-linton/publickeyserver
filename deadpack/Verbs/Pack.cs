@@ -73,8 +73,10 @@ class Pack
 			Misc.LogLine($"Search Subdirectories: {opts.subdirectories}");
 			Misc.LogLine($"Sender Alias: {opts.From}");
 
+			// get a unix timestamp in seconds
+			string date = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds().ToString();
+			opts.Output = date + " " + opts.Output;
 			
-
 			// first replace any email alias with their alias versions
 			List<string> aliases = new List<string>();
 			List<Task<CertResult>> tasks = new List<Task<CertResult>>();
@@ -169,7 +171,7 @@ class Pack
 			//Misc.LogLine(opts, "  Packing files...");
 			
 			// create an empty zip stream 
-			using (FileStream zipFileStream = new FileStream(opts.Output, FileMode.Create))
+			using (FileStream zipFileStream = new FileStream(Storage.GetDeadPackDirectoryOutbox(opts.Output), FileMode.Create))
 			using (ZipArchive zip = new ZipArchive(zipFileStream, ZipArchiveMode.Create))
 			{
 				foreach (string filePath in relativePaths)

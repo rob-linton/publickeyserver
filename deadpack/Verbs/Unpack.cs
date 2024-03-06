@@ -30,6 +30,8 @@ class Unpack
 		Misc.LogLine($"Input: {opts.File}");
 		Misc.LogLine($"Output directory: {opts.Output}");
 			
+		opts.File = Storage.GetDeadPackDirectoryInbox(opts.Alias, opts.File);
+
 		//Misc.LogLine($"Recipient Alias: {alias}");
 
 		if (!String.IsNullOrEmpty(opts.Alias))

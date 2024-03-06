@@ -13,8 +13,8 @@ namespace deadrop.Verbs;
 [Verb("send", HelpText = "Send your package to another alias")]
 public class SendOptions : Options
 {
-	[Option('i', "input", Required = true, HelpText = "Package file to send")]
-    public required string File { get; set; }
+	[Option('i', "input", HelpText = "Package file to send")]
+    public string? File { get; set; }
 }
 
 class Send 
@@ -23,14 +23,34 @@ class Send
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Sending...");
-		Misc.LogLine($"Input: {opts.File}");
+		if (!String.IsNullOrEmpty(opts.File))
+			Misc.LogLine($"Input: {opts.File}");
 		Misc.LogLine($"");
-		
+
+		if (!String.IsNullOrEmpty(opts.File))
+		{
+			return await ExecuteInternal(opts, opts.File);
+		}
+		else
+		{
+			var deadpacks = Storage.ListDeadPacks("","outbox");
+			foreach (var file in deadpacks)
+			{
+				await ExecuteInternal(opts, file.Filename);
+			}
+			return 0;
+		}
+
+	}
+
+	public static async Task<int> ExecuteInternal(SendOptions opts, string file)
+	{
+
 		if (String.IsNullOrEmpty(opts.Password))
 			opts.Password = Misc.GetPassword();
 
 		// get the envelop from the package file
-		Envelope envelope = Envelope.LoadFromFile(opts.File);
+		Envelope envelope = Envelope.LoadFromFile(file);
 
 		// now get the "from" alias
 		string fromAlias = envelope.From;
@@ -122,10 +142,17 @@ class Send
 
 				Misc.LogLine($"\nSending deadpack to {toAlias}...\n");
 				// UploadPackage(string sender, string recipient, string timestamp, string signature)
-				var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", opts, opts.File);
+				var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", opts, file);
 
 				// show result ok
-				Misc.LogLine($"\n{result}\n");		
+				Misc.LogLine($"\n{result}\n");	
+
+				// now move it to the sent folder
+				string sentFolder = Storage.GetDeadPackDirectorySent(fromAlias, "");
+				// get the filename from opt.file
+				string filename = Path.GetFileName(file);
+
+				File.Move(file, Path.Combine(sentFolder, filename));	
 			}
 			catch (Exception ex)
 			{

@@ -15,13 +15,13 @@ public class Manifest
 	[JsonPropertyName("files")]
 	public required List<FileItem> Files { get; set; }
 
-	public static Manifest LoadFromFile(string file, AsymmetricCipherKeyPair keyPair, string alias, KyberPrivateKeyParameters kyberPrivateKey, byte[] kyberKey)
+	public static Manifest LoadFromFile(string file, AsymmetricCipherKeyPair keyPairtt, string alias, string password)
 	{
 		// open the zip file
 		using (ZipArchive archive = ZipFile.OpenRead(file))
 		{
 			// get the envelope
-			var entry = archive.GetEntry("manifest") ?? throw new Exception("Could not find envelope.json in package");
+			var entry = archive.GetEntry("manifest") ?? throw new Exception("Could not find manifest in package");
 			byte[] encryptedManifest = new byte[entry.Length];
 			using (var stream = entry.Open())
 			{
@@ -37,16 +37,45 @@ public class Manifest
 						string encryptedKeyBase64 = recipient.Key;
 						byte[] encryptedKey = Convert.FromBase64String(encryptedKeyBase64);
 
-						// decrypt with the kyber key
+						string encryptedKyberKeyBase64 = recipient.KyberKey;
+						byte[] encryptedKyberKey = Convert.FromBase64String(encryptedKyberKeyBase64);
 
-						byte[] key = BouncyCastleHelper.DecryptWithPrivateKey(encryptedKey, keyPair.Private);
+						string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa", password);
 
+						AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
+
+
+						//
+						// post quantum cryptography
+						//
+						// get the kyber private key
+						KyberKeyParameters kyberPrivateKey;
+						
+						string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", password);
+						byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
+						kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
+						
+
+						// now decrypt the key using kyber
+						//Misc.LogLine(opts, "- Decrypting kyber key...");
+						var myKemExtractor = new KyberKemExtractor(kyberPrivateKey);
+						var kyberSecret = myKemExtractor.ExtractSecret(encryptedKyberKey);
+
+						// now decrypt the key
+						byte[] decryptedEncryptedKey = BouncyCastleHelper.DecryptWithKey(encryptedKey, kyberSecret, envelope.From.ToLower().ToBytes());
+
+						byte[] key = BouncyCastleHelper.DecryptWithPrivateKey(decryptedEncryptedKey, keyPair.Private);
+
+						//
+						// now we should have the key used to encrypt all of the files
+						//
+
+						// now decrypt the manifest
 						byte[] nonce = envelope.From.ToLower().ToBytes();
+						byte[] manifestJsonBytes = BouncyCastleHelper.DecryptWithKey(encryptedManifest, key, nonce);
 
-						byte[] manifestBytes = BouncyCastleHelper.DecryptWithKey(encryptedManifest, key, nonce);
-
-						string manifestJson = manifestBytes.FromBytes();
-						Manifest manifest = JsonSerializer.Deserialize<Manifest>(manifestJson) ?? throw new Exception("Could not deserialize manifest");
+						string manifestJson = manifestJsonBytes.FromBytes();
+						var manifest = JsonSerializer.Deserialize<Manifest>(manifestJson) ?? throw new Exception("Could not deserialize manifest");
 
 						// return it
 						return manifest;

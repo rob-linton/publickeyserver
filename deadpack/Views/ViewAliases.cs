@@ -4,9 +4,9 @@ using Terminal.Gui;
 
 namespace deadrop.Verbs;
 
-public class AliasList : Window
+public class ViewAliases : Window
 {
-	public AliasList()
+	public ViewAliases()
 	{	
 		// set the border style
 		Border.BorderStyle = BorderStyle.None;
@@ -30,7 +30,7 @@ public class AliasList : Window
 
 		// create the list view
 		var add = new Button("+ Add Alias") { X = Pos.Right(this) - 18, Y = 0, Width = 11, Height = 1 };
-		var received = new Label("Received") { X = 0, Y = Pos.Bottom(add), Width = Dim.Fill(), Height = 1 };
+		var received = new Label("Inbox") { X = 0, Y = Pos.Bottom(add), Width = Dim.Fill(), Height = 1 };
 		var listView = new ListView(source) { X = 1, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Fill() - 4 };
 		listView.OpenSelectedItem += listView_OpenSelectedItem;
 

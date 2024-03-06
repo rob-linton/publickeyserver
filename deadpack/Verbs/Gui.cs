@@ -22,73 +22,10 @@ class Gui
 	public static async Task<int> Execute(GuiOptions opts)
 	{
 		Application.Init ();
-        
-		// menubar
-		var menu = new MenuBar (new MenuBarItem [] {
-            new MenuBarItem ("_DeadPack", new MenuItem [] {
-                new MenuItem ("_About", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Update", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				 new MenuItem ("_Settings", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Quit", "", () => { 
-                    Application.RequestStop (); 
-                }),
-            }),
-			new MenuBarItem ("_File", new MenuItem [] {
-                new MenuItem ("_New DeadPack", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Open DeadPack", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Certify DeadPack", "", () => { 
-                    Application.RequestStop (); 
-                }),
-            }),
-			new MenuBarItem ("_Alias", new MenuItem [] {
-                new MenuItem ("_New Alias", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Delete Alias", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Certify Alias", "", () => { 
-                    Application.RequestStop (); 
-                }),
-            }),
-			new MenuBarItem ("_Send/Receive", new MenuItem [] {
-                new MenuItem ("_Send DeadPack", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Check for New DeadPacks", "", () => { 
-                    Application.RequestStop (); 
-                }),
-            }),
-			new MenuBarItem ("_Help", new MenuItem [] {
-                new MenuItem ("_Overview", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Aliases", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_DeadPacks", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Encryption", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Key Servers", "", () => { 
-                    Application.RequestStop (); 
-                }),
-            }),
-        });
 
-        var winLeft = new Window ("Alias") {
+		ViewMenu menu = new ViewMenu();
+
+        var winLeft = new Window ("Aliases") {
             X = 0,
             Y = 1,
             Width = 60,
@@ -103,10 +40,10 @@ class Gui
         };
 
 		// add the list of aliases
-		winLeft.Add(new AliasList());
+		winLeft.Add(new ViewAliases());
 
         // Add both menu and win in a single call
-        Application.Top.Add (menu, winLeft, winRight);
+        Application.Top.Add (menu.Menu, winLeft, winRight);
         Application.Run ();
         Application.Shutdown ();
 

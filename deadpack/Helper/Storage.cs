@@ -23,7 +23,8 @@ public class Storage
 
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-		string  deadDropFolder = Path.Join(localAppData, "deadrop");
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "aliases"));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", "aliases");
 
 		Directory.CreateDirectory(deadDropFolder);
 
@@ -40,7 +41,8 @@ public class Storage
 
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-		string  deadDropFolder = Path.Join(localAppData, "deadrop");
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "aliases"));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", "aliases");
 
 		foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.rsa"))
 		{
@@ -74,7 +76,8 @@ public class Storage
 
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-		string  deadDropFolder = Path.Join(localAppData, "deadrop");
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "aliases"));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", "aliases");
 
 		Directory.CreateDirectory(deadDropFolder);
 
@@ -94,6 +97,75 @@ public class Storage
 			throw new Exception($"Unable to decrypt private key for {alias}", ex);
 		}
 		return plainText.FromBytes();
+	}
+
+	public static string GetDeadPackDirectoryInbox(string alias, string dir)
+	{
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "inbox", alias));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", "inbox", alias);
+		if (string.IsNullOrEmpty(dir))
+			return deadDropFolder;
+		else
+			return Path.Join(deadDropFolder, dir);
+	}
+
+	public static string GetDeadPackDirectorySent(string alias, string dir)
+	{
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "sent", alias));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", "sent", alias);
+		if (string.IsNullOrEmpty(dir))
+			return deadDropFolder;
+		else
+			return Path.Join(deadDropFolder, dir);
+	}
+
+	public static string GetDeadPackDirectoryOutbox(string dir)
+	{
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "outbox"));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", "outbox");
+		if (string.IsNullOrEmpty(dir))
+			return deadDropFolder;
+		else
+			return Path.Join(deadDropFolder, dir);
+	}
+
+	public static List<DeadPack> ListDeadPacks(string alias, string location)
+	{
+		List<DeadPack> deadpacks = new List<DeadPack>();
+
+		// get the users home userdata directory
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", location);
+
+		foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
+		{
+			string name = Path.GetFileNameWithoutExtension(file).Replace(".deadpack", "");
+
+			string[] bits = name.Split(' ');
+			string date = bits[0];
+			long timestamp = long.Parse(date);
+
+			// concatanate all of the bits back together again
+			string shortName = string.Join(" ", bits.Skip(1));
+
+			DeadPack deadpack = new DeadPack 
+			{ 
+				Name = shortName, 
+				Timestamp = timestamp,
+				Filename = file 
+			};
+
+			deadpacks.Add(deadpack);
+		}
+
+		return deadpacks;
 	}
 	
 }

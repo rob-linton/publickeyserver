@@ -290,28 +290,29 @@ class Receive
 					byte[] kyberKey = Convert.FromBase64String(kyberKeyString);
 
 					// get the manifest from the file
-// TODO					// *** TO DO Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, alias, kyberKey);
+					Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, alias, opts.Password);
 					
 					// get a compact string showing the date and time
 					long timestamp = envelope.Created;
 
 					// convert the unix timestamp to a readable datetime
-					DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-					dt = dt.AddSeconds(Convert.ToDouble(timestamp));
+					//DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+					//dt = dt.AddSeconds(Convert.ToDouble(timestamp));
 
 					// convert utc date to localtime date
-					dt = dt.ToLocalTime();
+					//dt = dt.ToLocalTime();
 
-					string date = dt.ToString("yyyy-MM-dd HH-mm-ss");
-// TODO					string destFilename = $"{date} {manifest.Name}";
-					string destFilename = $"{date} {key}";  // <<-- TDO REMOVE
+					//string date = dt.ToString("yyyy-MM-dd.HH-mm-ss");
+					//string destFilename = $"{date} {manifest.Name}";
+					//string destFilename = $"{date} {key}";  // <<-- TDO REMOVE
+					string destFilename = Storage.GetDeadPackDirectoryInbox(alias, manifest.Name);
 
 					// check if the file already exists, and if it does then add a (1) to the end, loop until the file does not exist
 					int ii = 1;
 					while (File.Exists(destFilename))
 					{
 						//destFilename = $"{date} {manifest.Name} ({ii})";
-						destFilename = $"{date} {key} ({ii})";  // <<-- TDO REMOVE
+						destFilename = $"{manifest.Name} ({ii})";  // <<-- TDO REMOVE
 
 						ii++;
 					}
