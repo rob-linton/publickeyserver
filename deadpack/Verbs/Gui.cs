@@ -30,14 +30,14 @@ class Gui
 
 		ViewMenu menu = new ViewMenu();
 
-        var winLeft = new Window ("Aliases") {
+        Globals.ViewLeft = new Window ("Aliases") {
             X = 0,
             Y = 1,
             Width = 60,
             Height = Dim.Fill () - 1
         };
 
-		var winRight = new Window ("DeadPacks") {
+		Globals.ViewRight = new Window ("DeadPacks") {
             X = 60,
             Y = 1,
             Width = Dim.Fill (),
@@ -45,15 +45,17 @@ class Gui
         };
 
 		// add the list of aliases
-		winLeft.Add(new ViewAliases());
+		Globals.ViewAliases = new ViewAliases();
+		Globals.ViewLeft.Add(Globals.ViewAliases);
 
 		// add the list of deadpacks
-		if (!String.IsNullOrEmpty(Globals.Location))
-			winRight.Add(new ViewDeadPacks(Globals.Alias, Globals.Location));
+		Globals.ViewDeadPacks = new ViewDeadPacks(Globals.Alias, Globals.Location);
+		Globals.ViewRight.Add(Globals.ViewDeadPacks);
+		
 
 		// Add both menu and win in a single call
 		Application.Top.RemoveAll();
-        Application.Top.Add (menu.Menu, winLeft, winRight);
+        Application.Top.Add (menu.Menu, Globals.ViewLeft, Globals.ViewRight);
         Application.Run ();
         Application.Shutdown ();
 

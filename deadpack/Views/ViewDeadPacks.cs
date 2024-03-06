@@ -36,4 +36,4 @@ public class ViewDeadPacks : Window
 		//listView.OpenSelectedItem += listView_OpenSelectedItem;
 		Add(listView);
 	}
-}
+}	
