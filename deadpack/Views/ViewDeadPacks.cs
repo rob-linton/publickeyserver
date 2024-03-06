@@ -32,8 +32,17 @@ public class ViewDeadPacks : Window
 			source.Add(row);
 		}
 
-		ListView listView = new ListView(source) { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
+		Button add = new Button("+ Add DeadPack") { X = Pos.Right(this) - 21, Y = 0, Width = 15, Height = 1 };
+		
+		Button back = new Button("<-") { X = 0, Y = 0, Width = 5, Height = 1 };
+		back.Clicked += () => 
+		{
+			Globals.ViewLeft.Remove(Globals.ViewAliases);
+			Globals.ViewLeft.Add(Globals.ViewAliases);
+		};
+
+		ListView listView = new ListView(source) { X = 0, Y = 2, Width = Dim.Fill(), Height = Dim.Fill() - 2};
 		//listView.OpenSelectedItem += listView_OpenSelectedItem;
-		Add(listView);
+		Add(back, add, listView);
 	}
 }	

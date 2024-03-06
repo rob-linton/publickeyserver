@@ -51,6 +51,8 @@ public class ViewAliases : Window
 	{
 		Globals.Alias = e.Value.ToString();
 		Globals.Location = "inbox";
+
+		// removing the view and re-adding it causes it to get the focus
 		Globals.ViewRight.Remove(Globals.ViewDeadPacks);
 		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
 		Globals.ViewRight.Add(Globals.ViewDeadPacks);
@@ -60,6 +62,7 @@ public class ViewAliases : Window
 	{
 		Globals.Alias = e.Value.ToString();
 		Globals.Location = "sent";
+		// removing the view and re-adding it causes it to get the focus
 		Globals.ViewRight.Remove(Globals.ViewDeadPacks);
 		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
 		Globals.ViewRight.Add(Globals.ViewDeadPacks);
@@ -69,6 +72,7 @@ public class ViewAliases : Window
 	{
 		Globals.Alias = e.Value.ToString();
 		Globals.Location = "outbox";
+		// removing the view and re-adding it causes it to get the focus
 		Globals.ViewRight.Remove(Globals.ViewDeadPacks);
 		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
 		Globals.ViewRight.Add(Globals.ViewDeadPacks);
