@@ -130,7 +130,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadpack",
 			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
-			"args": ["receive","-v","0","-d", "localhost:5001", "-p","password","-a","changed-mercury-insight.deadrop.org", "-s","10"],
+			"args": ["receive","-v","0","-d", "localhost:5001", "-p","password","-a","changed-mercury-insight.deadrop.org", "-f"],
 			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
