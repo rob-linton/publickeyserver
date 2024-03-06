@@ -425,4 +425,10 @@ public class Misc
 		Console.WriteLine();
 		return password;
 	}
+
+	public static string Pad(string input, int length)
+	{
+		string s = input + "                                                                                                                  ";
+		return s.Substring(0, length);
+	}
 }

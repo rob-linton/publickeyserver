@@ -21,6 +21,11 @@ class Gui
 {
 	public static async Task<int> Execute(GuiOptions opts)
 	{
+		Build();
+		return 0;
+	}
+	public static async void Build()
+	{
 		Application.Init ();
 
 		ViewMenu menu = new ViewMenu();
@@ -32,7 +37,7 @@ class Gui
             Height = Dim.Fill () - 1
         };
 
-		var winRight = new Window () {
+		var winRight = new Window ("DeadPacks") {
             X = 60,
             Y = 1,
             Width = Dim.Fill (),
@@ -42,11 +47,16 @@ class Gui
 		// add the list of aliases
 		winLeft.Add(new ViewAliases());
 
-        // Add both menu and win in a single call
+		// add the list of deadpacks
+		if (!String.IsNullOrEmpty(Globals.Location))
+			winRight.Add(new ViewDeadPacks(Globals.Alias, Globals.Location));
+
+		// Add both menu and win in a single call
+		Application.Top.RemoveAll();
         Application.Top.Add (menu.Menu, winLeft, winRight);
         Application.Run ();
         Application.Shutdown ();
 
-		return 0;
+		return;
 	}
 }

@@ -141,8 +141,8 @@ public class Storage
 
 		// get the users home userdata directory
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location));
-		string  deadDropFolder = Path.Join(localAppData, "deadpack", location);
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location, alias));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", location, alias);
 
 		foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
 		{
