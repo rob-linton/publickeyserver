@@ -37,7 +37,7 @@ public class Storage
 	/// <returns>A list of aliases.</returns>
 	public static List<Alias> GetAliases()
 	{
-		List<Alias> aliases = new List<Alias>();
+		SortedList<string, Alias> aliases = new SortedList<string, Alias>();
 
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -58,11 +58,12 @@ public class Storage
 				Filename = file 
 			};
 
-			aliases.Add(alias);
+			aliases.Add(sAlias, alias);
 		}
 
-		return aliases;
+		return aliases.Values.ToList();
 	}
+
 	/// <summary>
 	/// Retrieves the private key associated with the specified alias and password.
 	/// </summary>
@@ -137,7 +138,7 @@ public class Storage
 
 	public static List<DeadPack> ListDeadPacks(string alias, string location)
 	{
-		List<DeadPack> deadpacks = new List<DeadPack>();
+		SortedList<long, DeadPack> sorted = new SortedList<long, DeadPack>();
 
 		// get the users home userdata directory
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -162,10 +163,10 @@ public class Storage
 				Filename = file 
 			};
 
-			deadpacks.Add(deadpack);
+			sorted.Add(timestamp,deadpack);
 		}
 
-		return deadpacks;
+		return sorted.Values.ToList().Reverse<DeadPack>().ToList();
 	}
 	
 }
