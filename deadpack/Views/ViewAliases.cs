@@ -32,11 +32,11 @@ public class ViewAliases : Window
 
 		// create the list view
 		var add = new Button("+ Add Alias") { X = Pos.Right(this) - 18, Y = 0, Width = 11, Height = 1 };
-		var received = new Label("Inbox") { X = 0, Y = Pos.Bottom(add), Width = Dim.Fill(), Height = 1 };
+		var received = new Label("Inbox To") { X = 0, Y = Pos.Bottom(add), Width = Dim.Fill(), Height = 1 };
 		var listViewReceived = new ListView(source) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
 
-		var sent = new Label("Sent") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
+		var sent = new Label("Sent From") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
 		var listViewSent = new ListView(source) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
 		listViewSent.OpenSelectedItem += listView_OpenSent;
 

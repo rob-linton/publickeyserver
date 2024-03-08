@@ -40,9 +40,13 @@ public class ViewDeadPacks : Window
 			Globals.ViewLeft.Add(Globals.ViewAliases);
 		};
 
-		ListView listView = new ListView(deadPacks) { X = 0, Y = 2, Width = Dim.Fill(), Height = Dim.Fill() - 2};
+		// add the heding
+		var heading = new Label("DeadPacks") { X = 0, Y = 2, Width = Dim.Fill(), Height = 1 };
+		heading.Text = $"Created              From                                      Subject";
+
+		ListView listView = new ListView(deadPacks) { X = 0, Y = 3, Width = Dim.Fill(), Height = Dim.Fill() - 2};
 		listView.OpenSelectedItem += listView_OpenSelectedItem;
-		Add(back, add, listView);
+		Add(back, add, heading, listView);
 	}
 
 	private void listView_OpenSelectedItem(ListViewItemEventArgs e)

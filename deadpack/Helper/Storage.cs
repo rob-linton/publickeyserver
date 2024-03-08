@@ -188,6 +188,10 @@ public class Storage
 				// get the from alias
 				string fromAlias = envelope.From;
 				List<Recipient> recipients = envelope.To;
+				
+				// remove the from alias from the recipients
+				recipients.RemoveAll(r => r.Alias == fromAlias);
+
 
 				DeadPack deadpack = new DeadPack
 				{

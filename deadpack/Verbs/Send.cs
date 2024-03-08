@@ -83,6 +83,11 @@ class Send
 		// loop through each toAlias
 		foreach (string toAlias in toAliases)
 		{
+			if (toAlias == fromAlias)
+			{
+				//Misc.LogLine($"Skipping self {toAlias}");
+				continue;
+			}
 			try
 			{
 				Misc.LogLine($"\nProcessing {toAlias}...\n");
