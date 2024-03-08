@@ -32,7 +32,7 @@ class Create
 			Misc.LogLine($"Creating...");
 
 			// get the domain for requests
-			string domain = Misc.GetDomain(opts, "");
+			string domain = Misc.GetDomain("");
 
 			Misc.LogLine($"Domain: {domain}");
 			Misc.LogLine($"");
@@ -40,25 +40,25 @@ class Create
 			if (String.IsNullOrEmpty(opts.Password))
 			opts.Password = Misc.GetPassword();
 			
-			Misc.LogLine(opts, $"- Requesting alias from: {domain}\n");
+			Misc.LogLine($"- Requesting alias from: {domain}\n");
 
 			//
 			// create the public/private key pair using bouncy castle
 			//
-			Misc.LogCheckMark("Generated RSA key pair", opts);
+			Misc.LogCheckMark("Generated RSA key pair");
 			AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.GenerateKeyPair(2048);
 
 			//
 			// generate a Kyber keypair using bouncy castle
 			//
-			Misc.LogCheckMark("Generated Quantum Kyber key pair", opts);
+			Misc.LogCheckMark("Generated Quantum Kyber key pair");
 			AsymmetricCipherKeyPair KyberKeyPair = BouncyCastleQuantumHelper.GenerateKyberKeyPair();
 			(byte[] KyberPublicKey, byte[] KyberPrivatyeKey) = BouncyCastleQuantumHelper.ReadKyberKeyPair(KyberKeyPair);
 
 			//
 			// generate a Dilithium keypair using bouncy castle
 			//
-			Misc.LogCheckMark("Generated Quantum Dilithium key pair", opts);
+			Misc.LogCheckMark("Generated Quantum Dilithium key pair");
 			AsymmetricCipherKeyPair DilithiumKeyPair = BouncyCastleQuantumHelper.GenerateDilithiumKeyPair();
 			(byte[] DilithiumPublicKey, byte[] DilithiumPrivateKey) = BouncyCastleQuantumHelper.ReadDilithiumKeyPair(DilithiumKeyPair);
 
@@ -85,7 +85,7 @@ class Create
 
 			if (publicKeyPem == null)
 			{
-				Misc.LogError(opts, "Could not read public key from new key pair");
+				Misc.LogError("Could not read public key from new key pair");
 				return 1;
 			}
 
@@ -94,15 +94,15 @@ class Create
 			payload["data"] = jsondataBase64;
 			string json = JsonSerializer.Serialize(payload);
 
-			Misc.LogLine(opts, "- Sending public key...");
+			Misc.LogLine("- Sending public key...");
 
-			var result = await HttpHelper.Post($"https://{domain}/simpleenroll", json, opts);
+			var result = await HttpHelper.Post($"https://{domain}/simpleenroll", json);
 
 			var j = JsonSerializer.Deserialize<SimpleEnrollResult>(result);
 			alias = j?.Alias ?? string.Empty;
 			if (String.IsNullOrEmpty(j?.Certificate))
 			{
-				Misc.LogError(opts, "No certificate returned from simpleenroll");
+				Misc.LogError("No certificate returned from simpleenroll");
 				return 1;
 			}
 		
@@ -111,7 +111,7 @@ class Create
 			string privateKeyPem = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Private);
 			if (privateKeyPem == null)
 			{
-				Misc.LogError(opts, "Could not read private key");
+				Misc.LogError("Could not read private key");
 				return 1;
 			}
 			Storage.StorePrivateKey($"{alias}.rsa", privateKeyPem, opts.Password);
@@ -124,11 +124,11 @@ class Create
 			string dilithiumPrivateKeyPem = Convert.ToBase64String(DilithiumPrivateKey);
 			Storage.StorePrivateKey($"{alias}.dilithium", dilithiumPrivateKeyPem, opts.Password);
 
-			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "", opts);
+			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "");
 
 			if (!valid)
 			{
-				Misc.LogError(opts, "Unable to verify alias");
+				Misc.LogError("Unable to verify alias");
 				return 1;
 			}
 
@@ -136,13 +136,13 @@ class Create
 			string rootFingerprintHex = Convert.ToBase64String(rootFingerprint);
 			Storage.StorePrivateKey($"{alias}.root", rootFingerprintHex, opts.Password);
 
-			Misc.LogCheckMark("Root certificate fingerprint saved", opts);
+			Misc.LogCheckMark("Root certificate fingerprint saved");
 
 			Misc.LogLine($"\nAlias {alias} created\n");
 		}
 		catch (Exception ex)
 		{
-			Misc.LogError(opts, "Unable to create alias", ex.Message);
+			Misc.LogError("Unable to create alias", ex.Message);
 			return 1;
 		}
 

@@ -59,7 +59,7 @@ class Receive
 				if (result == 0)
 					return result;
 			}
-			Misc.LogError(opts, "Error recieving package, no valid alias found");
+			Misc.LogError("Error recieving package, no valid alias found");
 			return 1;
 		}
 	}
@@ -72,25 +72,29 @@ class Receive
 
 		try
 		{
-			
+
+			// replace emails with actual aliases
+			CertResult cert = await EmailHelper.GetAliasOrEmailFromServer(alias, false);
+
+			alias = cert.Alias;
 
 			// now load the root fingerprint from a file
 			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", opts.Password);
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// verify the alias
-			string toDomain = Misc.GetDomain(opts, alias);
-			(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, alias, "", opts);
+			string toDomain = Misc.GetDomain(alias);
+			(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, alias, "");
 			
 			// verify the fingerprint
 			if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
-				Misc.LogCheckMark($"Root fingerprint matches", opts);
+				Misc.LogCheckMark($"Root fingerprint matches");
 			else
 				Misc.LogLine($"Invalid: Root fingerprint does not match");
 
 			if (!fromValid)
 			{
-				Misc.LogError(opts, "Invalid alias", alias);
+				Misc.LogError("Invalid alias", alias);
 				return 1;
 			}
 
@@ -106,7 +110,7 @@ class Receive
 			}
 			catch (Exception ex)
 			{
-				Misc.LogError(opts, $"Error: could not read private key for {alias}", ex.Message);
+				Misc.LogError($"Error: could not read private key for {alias}", ex.Message);
 
 				// application exit
 				return 1;
@@ -122,7 +126,7 @@ class Receive
 			}
 			catch (Exception ex)
 			{
-				Misc.LogError(opts, $"Error: could not read kyber private key for {alias}", ex.Message);
+				Misc.LogError($"Error: could not read kyber private key for {alias}", ex.Message);
 
 				// application exit
 				return 1;
@@ -145,7 +149,7 @@ class Receive
 
 
 				// get a list of deadpacks from the server
-				string result = await HttpHelper.Get($"https://{toDomain}/list/{alias}?timestamp={unixTimestamp}&signature={base64Signature}", opts);
+				string result = await HttpHelper.Get($"https://{toDomain}/list/{alias}?timestamp={unixTimestamp}&signature={base64Signature}");
 
 				// parse the json
 				ListResult files = JsonSerializer.Deserialize<ListResult>(result) ?? throw new Exception($"Could not parse json: {result}");
@@ -244,7 +248,7 @@ class Receive
 						// check the number is valid
 						if (number < 1 || number > receiveCount)
 						{
-							Misc.LogError(opts, "Invalid number", input);
+							Misc.LogError("Invalid number", input);
 							return 1;
 						}
 
@@ -283,39 +287,21 @@ class Receive
 					Recipient recipient = envelope.To.FirstOrDefault(r => r.Alias == alias) ?? throw new Exception($"Could not find recipient {alias} in package");
 					if (recipient == null)
 					{
-						Misc.LogError(opts, $"Could not find recipient {alias} in package");
+						Misc.LogError($"Could not find recipient {alias} in package");
 						return 1;
 					}
 					string kyberKeyString = recipient.KyberKey;
 					byte[] kyberKey = Convert.FromBase64String(kyberKeyString);
 
 					// get the manifest from the file
-					Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, alias, opts.Password);
+					//Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, alias, opts.Password);
 					
 					// get a compact string showing the date and time
 					long timestamp = envelope.Created;
 
-					// convert the unix timestamp to a readable datetime
-					//DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-					//dt = dt.AddSeconds(Convert.ToDouble(timestamp));
-
-					// convert utc date to localtime date
-					//dt = dt.ToLocalTime();
-
-					//string date = dt.ToString("yyyy-MM-dd.HH-mm-ss");
-					//string destFilename = $"{date} {manifest.Name}";
-					//string destFilename = $"{date} {key}";  // <<-- TDO REMOVE
-					string destFilename = Storage.GetDeadPackDirectoryInbox(alias, manifest.Name);
-
-					// check if the file already exists, and if it does then add a (1) to the end, loop until the file does not exist
-					int ii = 1;
-					while (File.Exists(destFilename))
-					{
-						//destFilename = $"{date} {manifest.Name} ({ii})";
-						destFilename = $"{manifest.Name} ({ii})";  // <<-- TDO REMOVE
-
-						ii++;
-					}
+					string filename = $"{timestamp}-{Guid.NewGuid()}.deadpack";
+					
+					string destFilename = Storage.GetDeadPackDirectoryInbox(alias, filename);
 
 					// now move the deadpack to the destination filename
 					File.Move(tmpOutputName, destFilename);
@@ -342,7 +328,7 @@ class Receive
 		}
 		catch (Exception ex)
 		{
-			Misc.LogError(opts, "Error receiving package", ex.Message);
+			Misc.LogError("Error receiving package", ex.Message);
 			return 1;
 		}
 		finally

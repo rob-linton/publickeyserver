@@ -26,20 +26,20 @@ class Verify
 			Misc.LogLine($"Verifying...");
 
 			// get the domain for requests
-			string domain = Misc.GetDomain(opts, "");
+			string domain = Misc.GetDomain("");
 
 			Misc.LogLine($"Domain: {domain}");
 			Misc.LogLine($"");
 
-			Misc.LogLine(opts, "- verifying email...");
+			Misc.LogLine("- verifying email...");
 
-			var result = await HttpHelper.Post($"https://{domain}/verify/{opts.Email}", "", opts);
+			var result = await HttpHelper.Post($"https://{domain}/verify/{opts.Email}", "");
 
 			Misc.LogLine($"\n{result}\n");
 		}
 		catch (Exception ex)
 		{
-			Misc.LogError(opts, "Unable to verify email", ex.Message);
+			Misc.LogError("Unable to verify email", ex.Message);
 			return 1;
 		}
 		

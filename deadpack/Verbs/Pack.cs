@@ -18,14 +18,20 @@ public class PackOptions : Options
 	[Option('i', "input", Required = true, HelpText = "Input file to be processed, (use wildcards for multiple)")]
     public required string File { get; set; }
 
-	[Option('s', "subdirectories", HelpText = "Traverse sub directories")]
+	[Option('r', "Recurse subdirectories", HelpText = "Recurse sub directories")]
 	public bool subdirectories { get; set; } = false;
 
 	[Option('a', "aliases", Required = true, HelpText = "Destination aliases/emails (comma delimited)")]
     public required IEnumerable<string>? InputAliases { get; set; }
 
-	[Option('o', "output", Default = "package", HelpText = "Output package file")]
+	[Option('o', "output", Default = "package.deadpack", HelpText = "Output package file")]
     public string Output { get; set; } = "package.deadpack";	
+
+	[Option('m', "message", HelpText = "Optional message")]
+    public string? Message { get; set; }
+
+	[Option('s', "subject", HelpText = "Deadpack subject")]
+    public string? Subject { get; set; }
 
 	[Option('f', "from", Required = true, HelpText = "From alias")]
     public required string From { get; set; }
@@ -72,28 +78,14 @@ class Pack
 			Misc.LogLine($"Input: {opts.File}");
 			Misc.LogLine($"Search Subdirectories: {opts.subdirectories}");
 			Misc.LogLine($"Sender Alias: {opts.From}");
-
-			// get a unix timestamp in seconds
-			string date = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds().ToString();
-			opts.Output = date + " " + opts.Output;
 			
 			// first replace any email alias with their alias versions
 			List<string> aliases = new List<string>();
 			List<Task<CertResult>> tasks = new List<Task<CertResult>>();
 			foreach (string aliasOrEmail in opts.InputAliases)
 			{
-				string alias = aliasOrEmail;
-				if (aliasOrEmail.Contains("@"))
-				{
-					//CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
-					tasks.Add(EmailHelper.GetAliasFromEmail(aliasOrEmail, opts));
-					//alias = cert?.Alias ?? string.Empty;
-					Misc.LogLine($"Recipient Alias: {alias} ({aliasOrEmail})");
-				}
-				else
-				{
-					Misc.LogLine($"Recipient Alias: {aliasOrEmail}");
-				}
+				//CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
+				tasks.Add(EmailHelper.GetAliasOrEmailFromServer(aliasOrEmail, true));	
 			}
 			
 			// when all of the tasks have completed
@@ -144,22 +136,22 @@ class Pack
 			// validate the sender
 			//
 
-			Misc.LogLine(opts, $"\n- Validating sender alias  ->  {opts.From}");
+			Misc.LogLine($"\n- Validating sender alias  ->  {opts.From}");
 			
-			string fromDomain = Misc.GetDomain(opts, opts.From);
-			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, "", opts);
+			string fromDomain = Misc.GetDomain(opts.From);
+			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, "");
 
 			// validate the rootfingerprint
 			if (rootFingerprintFromFile.SequenceEqual(fromFingerprint))
-				Misc.LogCheckMark($"Root fingerprint matches", opts);
+				Misc.LogCheckMark($"Root fingerprint matches");
 			else
 				Misc.LogLine($"Invalid: Root fingerprint does not match");
 
 			if (valid)
-				Misc.LogCheckMark($"Alias {opts.From} is valid", opts);
+				Misc.LogCheckMark($"Alias {opts.From} is valid");
 			else
 			{
-				Misc.LogError(opts, $"Alias {opts.From} is *NOT* valid");
+				Misc.LogError($"Alias {opts.From} is *NOT* valid");
 				return 1;
 			}
 
@@ -168,10 +160,19 @@ class Pack
 			// create the zip file
 			//
 
-			//Misc.LogLine(opts, "  Packing files...");
+			// set the output directory depending if it has been passed in in opts.output
+			string outputFile = opts.Output;
+			if (String.IsNullOrEmpty(opts.Output))
+			{
+				// get a unix timestamp in seconds
+				string date = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds().ToString();
+				//opts.Output = date + " " + opts.Output;
+				outputFile = Storage.GetDeadPackDirectoryOutbox($"{date}-{Guid.NewGuid()}.deadpack");
+			}
 			
+
 			// create an empty zip stream 
-			using (FileStream zipFileStream = new FileStream(Storage.GetDeadPackDirectoryOutbox(opts.Output), FileMode.Create))
+			using (FileStream zipFileStream = new FileStream(outputFile, FileMode.Create))
 			using (ZipArchive zip = new ZipArchive(zipFileStream, ZipArchiveMode.Create))
 			{
 				foreach (string filePath in relativePaths)
@@ -222,7 +223,7 @@ class Pack
 					}
 					else
 					{
-						Misc.LogError(opts, $"File not found: {filePath}");
+						Misc.LogError($"File not found: {filePath}");
 					}
 				}
 
@@ -241,7 +242,7 @@ class Pack
 				}
 				catch (Exception ex)
 				{
-					Misc.LogError(opts, $"Error: could not read private key for {opts.From}", ex.Message);
+					Misc.LogError($"Error: could not read private key for {opts.From}", ex.Message);
 
 					// application exit
 					return 1;
@@ -250,7 +251,7 @@ class Pack
 				//
 				// make sure the public key from the cert matches the private key
 				//
-				var fromX509 = await Misc.GetCertificate(opts, opts.From);
+				var fromX509 = await Misc.GetCertificate(opts.From);
 				if (fromX509 != null)
 				{
 					var fromPublicKey = fromX509.GetPublicKey();
@@ -258,17 +259,17 @@ class Pack
 					// compare the two public keys and make sure that the private key is for the public key
 					if (!privateKey.Public.Equals(fromPublicKey))
 					{
-						Misc.LogError(opts, $"Public key does not match private key for alias {opts.From}");
+						Misc.LogError($"Public key does not match private key for alias {opts.From}");
 						return 1;
 					}
 					else
 					{
-						Misc.LogCheckMark($"Private key matches public certificate for alias {opts.From}", opts);
+						Misc.LogCheckMark($"Private key matches public certificate for alias {opts.From}");
 					}
 				}
 				else
 				{
-					Misc.LogError(opts, $"Could not find certificate for {opts.From}");
+					Misc.LogError($"Could not find certificate for {opts.From}");
 					return 1;
 				}
 
@@ -276,16 +277,21 @@ class Pack
 				// create the manifest
 				//
 
+				// base64 encode opts.Message
+				string message = Convert.ToBase64String(Encoding.UTF8.GetBytes(opts.Message ?? ""));
+				string subject = Convert.ToBase64String(Encoding.UTF8.GetBytes(opts.Subject ?? ""));
+
 				// add the files to the manifest
 				Manifest manifest = new Manifest 
 				{
 					Files = fileList,
-					Name = opts.Output,
+					Subject = subject,
+					Message = message
 				};
 
 				string manifestJson = JsonSerializer.Serialize(manifest);
 
-				Misc.LogLine(opts, "- Encrypting the manifest...");
+				Misc.LogLine("- Encrypting the manifest...");
 
 				// encrypt the manifest
 				byte[] encryptedManifest = BouncyCastleHelper.EncryptWithKey(manifestJson.ToBytes(), key, nonce);
@@ -295,7 +301,7 @@ class Pack
 				//
 
 				// now loop through each of the aliases and add them to the envelope
-				Misc.LogLine(opts, "- Addressing envelope...");
+				Misc.LogLine("- Addressing envelope...");
 				if (opts.InputAliases != null)
 				{
 					foreach (string alias in opts.InputAliases)
@@ -306,13 +312,13 @@ class Pack
 							
 
 							// validate the alias
-							Misc.LogLine(opts, $"- Validating recipient alias  ->  {alias}");
-							string domain = Misc.GetDomain(opts, alias);
-							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "", opts);
+							Misc.LogLine($"- Validating recipient alias  ->  {alias}");
+							string domain = Misc.GetDomain(alias);
+							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "");
 
 							// validate the fingerprint
 							if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
-								Misc.LogCheckMark($"Root fingerprint matches", opts);
+								Misc.LogCheckMark($"Root fingerprint matches");
 							else
 								Misc.LogLine($"Invalid: Root fingerprint does not match");
 
@@ -324,20 +330,20 @@ class Pack
 
 								if (!fromFingerprint.SequenceEqual(toFingerprint))
 								{
-									Misc.LogLine(opts, $"Aliases do not share the same root certificate {opts.From} -> {alias}");
+									Misc.LogLine($"Aliases do not share the same root certificate {opts.From} -> {alias}");
 									return 1;
 								}
 
-								Misc.LogCheckMark($"Recipient Alias {alias} is valid", opts);
-								Misc.LogCheckMark($"Shared root certificate {opts.From} -> {alias}", opts);
+								Misc.LogCheckMark($"Recipient Alias {alias} is valid");
+								Misc.LogCheckMark($"Shared root certificate {opts.From} -> {alias}");
 							}
 							else
 							{
-								Misc.LogError(opts, $"Recipient Alias {alias} is *NOT* valid");
+								Misc.LogError($"Recipient Alias {alias} is *NOT* valid");
 								return 1;
 							}
 
-							var toX509 = await Misc.GetCertificate(opts, alias);
+							var toX509 = await Misc.GetCertificate(alias);
 							if (toX509 != null)
 							{
 								var publicKey = toX509.GetPublicKey();
@@ -363,7 +369,7 @@ class Pack
 								var quantumSecret = encapsulatedSecret.GetSecret();	// <-- this is the secret
 								
 								
-								Misc.LogCheckMark($"Encrypted alias {alias} key with RSA", opts);
+								Misc.LogCheckMark($"Encrypted alias {alias} key with RSA");
 
 								// encrypt the key with the public key
 								byte[] encryptedKey = BouncyCastleHelper.EncryptWithPublicKey(key, publicKey); // <-- this is the encrypted key
@@ -373,16 +379,16 @@ class Pack
 								byte[] encryptedEncryptedKey = BouncyCastleHelper.EncryptWithKey(encryptedKey, quantumSecret, nonce); // <-- this is the encrypted key double encrypted with kyber
 								string sEncryptedEncryptedKey = Convert.ToBase64String(encryptedEncryptedKey); // <-- this is the encrypted key double encrypted with kyber as a string
 
-								Misc.LogCheckMark($"Re-encrypted alias {alias} key with Post Quantum Kyber", opts);
+								Misc.LogCheckMark($"Re-encrypted alias {alias} key with Post Quantum Kyber");
 
 								// add the encrypted key to the envelope
 								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedEncryptedKey, KyberKey = sCipherText });
-								Misc.LogLine(opts, $"- Added alias {alias}");
+								Misc.LogLine($"- Added alias {alias}");
 							}
 						}
 						catch (Exception ex)
 						{
-							Misc.LogError(opts, $"Error: could not find alias {alias}", ex.Message);
+							Misc.LogError($"Error: could not find alias {alias}", ex.Message);
 						}
 					}
 				}
@@ -402,13 +408,13 @@ class Pack
 				string envelopeJson = JsonSerializer.Serialize(envelope);
 				
 
-				Misc.LogLine(opts, "- Signing the envelope...");
+				Misc.LogLine("- Signing the envelope...");
 				
 				// sign the manifest
 				byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);
 				byte[] envelopeSignature = BouncyCastleHelper.SignData(envelopeHash, privateKey.Private);
 
-				Misc.LogLine(opts, "- Signing the manifest...");
+				Misc.LogLine("- Signing the manifest...");
 				
 				// sign the manifest
 				byte[] manifestHash = BouncyCastleHelper.GetHashOfBytes(encryptedManifest);
@@ -449,7 +455,7 @@ class Pack
 		}
 		catch (Exception ex)
 		{
-			Misc.LogError(opts, "Unable to pack files", ex.Message);
+			Misc.LogError("Unable to pack files", ex.Message);
 			return 1;
 		}
 

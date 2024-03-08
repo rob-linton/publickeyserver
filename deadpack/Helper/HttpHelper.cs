@@ -13,17 +13,17 @@ public class HttpHelper
 	/// <param name="url">The URL to send the GET request to.</param>
 	/// <param name="opts">The options for the request.</param>
 	/// <returns>A task that represents the asynchronous operation. The task result contains the response as a string.</returns>
-	public static async Task<string> Get(string url, Options opts)
+	public static async Task<string> Get(string url)
 	{
 #if DEBUG
 		url = url.Replace("https://", "http://");	
 #endif
 
-		Misc.LogLine(opts, $"- GET: {url}");
+		Misc.LogLine2($"- GET: {url}");
 
 		using var client = new HttpClient();
 		string ret = await client.GetStringAsync(url);
-		Misc.LogLine1(opts, $"RESPONSE: {ret}");
+		Misc.LogLine2($"RESPONSE: {ret}");
 		return ret;
 	}
 
@@ -34,14 +34,14 @@ public class HttpHelper
 	/// <param name="json">The JSON data to send in the request body.</param>
 	/// <param name="opts">The options for the request.</param>
 	/// <returns>A task representing the asynchronous operation. The task result contains the response from the server.</returns>
-	public static async Task<string> Post(string url, string json, Options opts)
+	public static async Task<string> Post(string url, string json)
 	{
 #if DEBUG
 		url = url.Replace("https://", "http://");	
 #endif
 
-		Misc.LogLine(opts, $"- POST: {url}");
-		Misc.LogLine1(opts, $"REQUEST: {json}");
+		Misc.LogLine2($"- POST: {url}");
+		Misc.LogLine2($"REQUEST: {json}");
 
 		using var client = new HttpClient();
 		var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -51,7 +51,7 @@ public class HttpHelper
 			throw new Exception($"{response.Content.ReadAsStringAsync().Result}}}");
 		}
 		string ret = await response.Content.ReadAsStringAsync();
-		Misc.LogLine1(opts, $"RESPONSE: {ret}");
+		Misc.LogLine2($"RESPONSE: {ret}");
 		return ret;
 	}
 
@@ -68,8 +68,8 @@ public class HttpHelper
 		url = url.Replace("https://", "http://");	
 #endif
 
-		Misc.LogLine(opts, $"- PUT: {url}");
-		Misc.LogLine1(opts, $"REQUEST: {json}");
+		Misc.LogLine2($"- PUT: {url}");
+		Misc.LogLine2($"REQUEST: {json}");
 
 		using var client = new HttpClient();
 		var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -79,7 +79,7 @@ public class HttpHelper
 			throw new Exception($"{response.Content.ReadAsStringAsync().Result}}}");
 		}
 		string ret = await response.Content.ReadAsStringAsync();
-		Misc.LogLine1(opts, $"RESPONSE: {ret}");
+		Misc.LogLine2($"RESPONSE: {ret}");
 		return ret;
 	}
 
@@ -96,7 +96,7 @@ public class HttpHelper
 		url = url.Replace("https://", "http://");	
 #endif
 		
-		Misc.LogLine(opts, $"- DELETE: {url}");
+		Misc.LogLine2($"- DELETE: {url}");
 
 		using var client = new HttpClient();
 		var response = await client.DeleteAsync(url);
@@ -117,14 +117,14 @@ public class HttpHelper
 	/// <param name="opts">The options for the request.</param>
 	/// <param name="filePath">The path of the file to be posted.</param>
 	/// <returns>A task that represents the asynchronous operation. The task result contains the response data as a string.</returns>
-	public static async Task<string> PostFile(string url, Options opts, string filePath)
+	public static async Task<string> PostFile(string url, string filePath)
     {
 		
 
 #if DEBUG
 		url = url.Replace("https://", "http://");	
 #endif
-		Misc.LogLine(opts, $"- POSTFILE: {url}");
+		Misc.LogLine2($"- POSTFILE: {url}");
 
 		using (var client = new HttpClient())
 		using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
@@ -148,7 +148,7 @@ public class HttpHelper
 			}
 			catch (Exception ex)
 			{
-				Misc.LogLine(opts, $"POSTFILE failed: {ex.Message}");
+				Misc.LogLine($"POSTFILE failed: {ex.Message}");
 				throw;
 			}
 
@@ -172,7 +172,7 @@ public class HttpHelper
 	#if DEBUG
 		url = url.Replace("https://", "http://");
 	#endif
-		Misc.LogLine(opts, $"- GETFILE: {url}");
+		Misc.LogLine($"- GETFILE: {url}");
 
 		using (var client = new HttpClient())
 		using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))

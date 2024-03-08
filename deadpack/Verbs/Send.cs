@@ -33,7 +33,7 @@ class Send
 		}
 		else
 		{
-			var deadpacks = Storage.ListDeadPacks("","outbox");
+			var deadpacks = Storage.ListDeadPacks("","outbox", Globals.Password);
 			foreach (var file in deadpacks)
 			{
 				await ExecuteInternal(opts, file.Filename);
@@ -61,18 +61,18 @@ class Send
 		byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 		// validate the from alias
-		string fromDomain = Misc.GetDomain(opts, fromAlias);
-		(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, fromAlias, "", opts);
+		string fromDomain = Misc.GetDomain(fromAlias);
+		(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, fromAlias, "");
 		
 		// verify the fingerprint
 		if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
-			Misc.LogCheckMark($"Root fingerprint matches", opts);
+			Misc.LogCheckMark($"Root fingerprint matches");
 		else
 			Misc.LogLine($"Invalid: Root fingerprint does not match");
 		
 		if (!fromValid)
 		{
-			Misc.LogError(opts, "Invalid from alias", fromAlias);
+			Misc.LogError("Invalid from alias", fromAlias);
 			return 1;
 		}
 		
@@ -88,27 +88,27 @@ class Send
 				Misc.LogLine($"\nProcessing {toAlias}...\n");
 
 				// valiadate the to alias
-				string toDomain = Misc.GetDomain(opts, toAlias);
-				(bool toValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, toAlias, "", opts);
+				string toDomain = Misc.GetDomain(toAlias);
+				(bool toValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, toAlias, "");
 				
 				// verify the fingerprint
 				if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
-					Misc.LogCheckMark($"Root fingerprint matches", opts);
+					Misc.LogCheckMark($"Root fingerprint matches");
 				else
 					Misc.LogLine($"Invalid: Root fingerprint does not match");
 
 				if (!toValid)
 				{
-					Misc.LogError(opts, "Invalid to alias", toAlias);
+					Misc.LogError("Invalid to alias", toAlias);
 					return 1;
 				}
 
 				if (!fromFingerprint.SequenceEqual(toFingerprint))
 				{
-					Misc.LogLine(opts, $"Aliases do not share the same root certificate {fromAlias} -> {toAlias}");
+					Misc.LogLine($"Aliases do not share the same root certificate {fromAlias} -> {toAlias}");
 					return 1;
 				}
-				Misc.LogCheckMark($"Shared root certificate {fromAlias} -> {toAlias}", opts);
+				Misc.LogCheckMark($"Shared root certificate {fromAlias} -> {toAlias}");
 
 				// send the file to the server
 				// UploadPackage(string sender, string timestamp, string signature)
@@ -125,7 +125,7 @@ class Send
 				}
 				catch (Exception ex)
 				{
-					Misc.LogError(opts, $"Error: could not read private key for {fromAlias}", ex.Message);
+					Misc.LogError($"Error: could not read private key for {fromAlias}", ex.Message);
 
 					// application exit
 					return 1;
@@ -142,7 +142,7 @@ class Send
 
 				Misc.LogLine($"\nSending deadpack to {toAlias}...\n");
 				// UploadPackage(string sender, string recipient, string timestamp, string signature)
-				var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", opts, file);
+				var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", file);
 
 				// show result ok
 				Misc.LogLine($"\n{result}\n");	
@@ -156,7 +156,7 @@ class Send
 			}
 			catch (Exception ex)
 			{
-				Misc.LogError(opts, "Unable to send package", ex.Message);
+				Misc.LogError("Unable to send package", ex.Message);
 			}
 		}
 

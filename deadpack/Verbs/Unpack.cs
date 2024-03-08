@@ -29,8 +29,9 @@ class Unpack
 		Misc.LogLine($"Unpacking deadpack...");
 		Misc.LogLine($"Input: {opts.File}");
 		Misc.LogLine($"Output directory: {opts.Output}");
-			
-		opts.File = Storage.GetDeadPackDirectoryInbox(opts.Alias, opts.File);
+		
+		if (!File.Exists(opts.File))
+			opts.File = Storage.GetDeadPackDirectoryInbox(opts.Alias, opts.File);
 
 		//Misc.LogLine($"Recipient Alias: {alias}");
 
@@ -49,7 +50,7 @@ class Unpack
 				if (result == 0)
 					return result;
 			}
-			Misc.LogError(opts, "Error unpacking package, no valid alias found");
+			Misc.LogError("Error unpacking package, no valid alias found");
 			return 1;
 		}
 	}
@@ -58,8 +59,9 @@ class Unpack
 	{
 		try
 		{
-
-			string toDomain = Misc.GetDomain(opts, alias);
+			CertResult cert = await EmailHelper.GetAliasOrEmailFromServer(alias, false);
+			alias = cert.Alias;
+			string toDomain = Misc.GetDomain(alias);
 
 			// get the input zip file
 			opts.File = opts.File.Replace(".deadpack", "") + ".deadpack";
@@ -90,7 +92,7 @@ class Unpack
 
 			try
 			{
-				Misc.LogLine(opts, "");
+				Misc.LogLine("");
 
 				// now read the envelope
 				string envelopeJson = Misc.GetTextFromZip("envelope", zipFile);
@@ -105,24 +107,24 @@ class Unpack
 				// now read the manifest
 				byte[] manifestBytes = Misc.GetBytesFromZip("manifest", zipFile);
 
-				string fromDomain = Misc.GetDomain(opts, envelope.From);
+				string fromDomain = Misc.GetDomain(envelope.From);
 
 				// now get the "from" alias
-				var fromX509 = await Misc.GetCertificate(opts, envelope.From);
+				var fromX509 = await Misc.GetCertificate(envelope.From);
 
 				// now verify the alias
-				Misc.LogLine(opts, $"\n- Verifying sender alias: {envelope.From}");
-				(bool validAlias, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, envelope.From, "", opts);
+				Misc.LogLine($"\n- Verifying sender alias: {envelope.From}");
+				(bool validAlias, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, envelope.From, "");
 
 				// verify fingerprint
 				if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
-					Misc.LogCheckMark($"Root fingerprint matches", opts);
+					Misc.LogCheckMark($"Root fingerprint matches");
 				else
 					Misc.LogLine($"Invalid: Root fingerprint does not match");
 
 				if (!validAlias)
 				{
-					Misc.LogError(opts, $"Could not verify alias {envelope.From}");
+					Misc.LogError($"Could not verify alias {envelope.From}");
 					return 1;
 				}
 
@@ -137,13 +139,12 @@ class Unpack
 				try
 				{
 					BouncyCastleHelper.VerifySignature(envelopeHash, envelopeSignature, fromPublicKey);
-					Misc.LogCheckMark("Envelope signature is valid", opts);
+					Misc.LogCheckMark("Envelope signature is valid");
 				}
 				catch (Exception ex)
 				{
-					Misc.LogError(opts, "Envelope signature is *NOT* valid");
-					if (opts.Verbose > 0)
-						Misc.LogLine(opts, ex.Message);
+					Misc.LogError("Envelope signature is *NOT* valid");
+					Misc.LogLine(ex.Message);
 					return 1;
 				}
 
@@ -155,11 +156,11 @@ class Unpack
 				try
 				{
 					BouncyCastleHelper.VerifySignature(manifestHash, manifestSignature, fromPublicKey);
-					Misc.LogCheckMark("Manifest signature is valid", opts);
+					Misc.LogCheckMark("Manifest signature is valid");
 				}
 				catch (Exception ex)
 				{
-					Misc.LogError(opts, "Manifest signature is *NOT* valid", ex.Message);
+					Misc.LogError("Manifest signature is *NOT* valid", ex.Message);
 					return 1;
 				}
 
@@ -173,18 +174,18 @@ class Unpack
 						//Misc.LogLine(opts, $"\nUsing alias: {recipient.Alias}");
 
 						// now verify the alias
-						Misc.LogLine(opts, $"- Verifying recipient alias: {alias}");
-						(bool validToAlias, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, alias, "", opts);
+						Misc.LogLine($"- Verifying recipient alias: {alias}");
+						(bool validToAlias, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, alias, "");
 
 						// verify alias
 						if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
-							Misc.LogCheckMark($"Root fingerprint matches", opts);
+							Misc.LogCheckMark($"Root fingerprint matches");
 						else
 							Misc.LogLine($"Invalid: Root fingerprint does not match");
 
 						if (!validToAlias)
 						{
-							Misc.LogError(opts, $"Could not verify alias {alias}");
+							Misc.LogError($"Could not verify alias {alias}");
 							return 1;
 						}
 
@@ -193,16 +194,16 @@ class Unpack
 						//
 						if (!fromFingerprint.SequenceEqual(toFingerprint))
 						{
-							Misc.LogError(opts, $"Aliases do not share the same root certificate {envelope.From} -> {alias}");
+							Misc.LogError($"Aliases do not share the same root certificate {envelope.From} -> {alias}");
 							return 1;
 						}
 						else
 						{
-							Misc.LogCheckMark($"Aliases share the same root certificate: {envelope.From} -> {alias}", opts);
+							Misc.LogCheckMark($"Aliases share the same root certificate: {envelope.From} -> {alias}");
 						}
 
 						// get the public key from the alias
-						var toX509 = await Misc.GetCertificate(opts, alias);
+						var toX509 = await Misc.GetCertificate(alias);
 						var toPublicKey = toX509.GetPublicKey();
 
 						// we found our alias, so decrypt the private key
@@ -219,12 +220,12 @@ class Unpack
 						// compare the two public keys and make sure that the private key is for the public key
 						if (!keyPair.Public.Equals(toPublicKey))
 						{
-							Misc.LogError(opts, $"Error: public key does not match for alias {alias}");
+							Misc.LogError($"Error: public key does not match for alias {alias}");
 							return 1;
 						}
 						else
 						{
-							Misc.LogCheckMark($"Private key matches public certificate for alias: {alias}", opts);
+							Misc.LogCheckMark($"Private key matches public certificate for alias: {alias}");
 						}
 
 						//
@@ -240,7 +241,7 @@ class Unpack
 						}
 						catch (Exception ex)
 						{
-							Misc.LogError(opts, $"Error: could not read kyber private key for {alias}", ex.Message);
+							Misc.LogError($"Error: could not read kyber private key for {alias}", ex.Message);
 
 							// application exit
 							return 1;
@@ -255,7 +256,7 @@ class Unpack
 						byte[] decryptedEncryptedKey = BouncyCastleHelper.DecryptWithKey(encryptedKey, kyberSecret, envelope.From.ToLower().ToBytes());
 
 
-						Misc.LogLine(opts, "- Decrypting key...");
+						Misc.LogLine("- Decrypting key...");
 						byte[] key = BouncyCastleHelper.DecryptWithPrivateKey(decryptedEncryptedKey, keyPair.Private);
 
 						//
@@ -263,7 +264,7 @@ class Unpack
 						//
 
 						// now decrypt the manifest
-						Misc.LogLine(opts, "- Decrypting manifest...");
+						Misc.LogLine("- Decrypting manifest...");
 
 						byte[] nonce = envelope.From.ToLower().ToBytes();
 						byte[] manifestJsonBytes = BouncyCastleHelper.DecryptWithKey(manifestBytes, key, nonce);
@@ -313,13 +314,13 @@ class Unpack
 
 				if (!found_alias)
 				{
-					Misc.LogLine(opts, $"Error: could not find alias {alias} in deadpack");
+					Misc.LogLine($"Error: could not find alias {alias} in deadpack");
 					return 1;
 				}
 			}
 			catch (Exception ex)
 			{
-				Misc.LogError(opts, "Unable to unpack package", ex.Message);
+				Misc.LogError("Unable to unpack package", ex.Message);
 				return 1;
 			}
 
@@ -327,7 +328,7 @@ class Unpack
 		}
 		catch (Exception ex)
 		{
-			Misc.LogError(opts, "Error unpacking package", ex.Message);
+			Misc.LogError("Error unpacking package", ex.Message);
 			return 1;
 		}
 	}

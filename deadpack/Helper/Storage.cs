@@ -1,4 +1,5 @@
 using System.Net.NetworkInformation;
+using System.Text;
 
 namespace deadrop;
 
@@ -136,37 +137,98 @@ public class Storage
 			return Path.Join(deadDropFolder, dir);
 	}
 
-	public static List<DeadPack> ListDeadPacks(string alias, string location)
+	public static List<DeadPack> ListDeadPacks(string alias, string location, string password)
 	{
 		SortedList<long, DeadPack> sorted = new SortedList<long, DeadPack>();
 
 		// get the users home userdata directory
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location, alias));
-		string  deadDropFolder = Path.Join(localAppData, "deadpack", location, alias);
-
-		foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
+		string deadDropFolder = "";
+		if (string.IsNullOrEmpty(alias))
 		{
-			string name = Path.GetFileNameWithoutExtension(file).Replace(".deadpack", "");
-
-			string[] bits = name.Split(' ');
-			string date = bits[0];
-			long timestamp = long.Parse(date);
-
-			// concatanate all of the bits back together again
-			string shortName = string.Join(" ", bits.Skip(1));
-
-			DeadPack deadpack = new DeadPack 
-			{ 
-				Name = shortName, 
-				Timestamp = timestamp,
-				Filename = file 
-			};
-
-			sorted.Add(timestamp,deadpack);
+			Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location));
+			deadDropFolder = Path.Join(localAppData, "deadpack", location);
+		}
+		else
+		{
+			Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location, alias));
+			deadDropFolder = Path.Join(localAppData, "deadpack", location, alias);
 		}
 
-		return sorted.Values.ToList().Reverse<DeadPack>().ToList();
+		// for the outbox we can't open the manifest, so only list the basic information
+		if (location == "outbox")
+		{
+			foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
+			{
+				Envelope envelope = Envelope.LoadFromFile(file);
+				long timestamp = envelope.Created;
+			
+				// get the recipients from the envelope
+				List<Recipient> recipients = envelope.To;
+
+				DeadPack deadpack = new DeadPack
+				{
+					Subject = file.Replace(".deadpack",""),
+					Message = "",
+					Timestamp = timestamp,
+					Files = new List<FileItem>(),
+					From = envelope.From,
+					Alias = "",
+					Filename = file,
+					Recipients = recipients
+				};
+				sorted.Add(timestamp, deadpack);
+			}
+			return sorted.Values.ToList().Reverse<DeadPack>().ToList();
+		}
+		else
+		{
+
+			// get the private key for this alias
+			string privateKey = Storage.GetPrivateKey($"{alias}.rsa", "");
+
+			foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
+			{
+
+				Manifest manifest = Manifest.LoadFromFile(file, alias, password);
+
+				// convert the manifest base64
+				byte[] base64Subject = Convert.FromBase64String(manifest.Subject);
+				string subject = Encoding.UTF8.GetString(base64Subject);
+
+				// do the same for the message
+				byte[] base64Message = Convert.FromBase64String(manifest.Message);
+				string message = Encoding.UTF8.GetString(base64Message);
+
+				// get the timestamp from the envelope
+				Envelope envelope = Envelope.LoadFromFile(file);
+				long timestamp = envelope.Created;
+
+				// get the list of files in the deadpack
+				List<FileItem> files = manifest.Files;
+
+				// get the from alias
+				string fromAlias = envelope.From;
+				List<Recipient> recipients = envelope.To;
+
+				DeadPack deadpack = new DeadPack
+				{
+					Subject = subject,
+					Message = message,
+					Timestamp = timestamp,
+					Files = files,
+					From = fromAlias,
+					Alias = alias,
+					Filename = file,
+					Recipients = recipients
+				};
+
+				sorted.Add(timestamp, deadpack);
+
+			}
+
+			return sorted.Values.ToList().Reverse<DeadPack>().ToList();
+		}
 	}
 	
 }

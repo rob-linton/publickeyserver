@@ -30,9 +30,9 @@ class List
 			try
 			{
 				string alias = a.Name;
-				string domain = Misc.GetDomain(opts, alias);
+				string domain = Misc.GetDomain(alias);
 
-				(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "", opts);
+				(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "");
 
 				if (valid)
 				{
@@ -46,7 +46,7 @@ class List
 			}
 			catch (Exception ex)
 			{
-				Misc.LogError(opts, "Unable to validate alias", ex.Message);
+				Misc.LogError("Unable to validate alias", ex.Message);
 			}
 		}
 

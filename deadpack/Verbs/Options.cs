@@ -5,12 +5,37 @@ namespace deadrop.Verbs;
 public class Options
 {
 	[Option('v', "verbose", Default = 0, HelpText = "Set output to verbose messages.")]
-	public int Verbose { get; set; } = 0;	
+	public string Verbose
+	{
+		get 
+		{
+			return Globals.Verbose.ToString(); 
+		}
+		set 
+		{ 
+			try
+			{
+				Globals.Verbose = Int32.Parse(value);
+			}
+			catch
+			{
+				Globals.Verbose = 0;
+			}
+		}
+	}
 
 	[Option('p', "passphrase", Default = "", HelpText = "Enter password")]
-	public string Password { get; set; } = "";	
+	public string Password
+	{
+		get { return Globals.Password; }
+		set { Globals.Password = value; }
+	}
 
 	[Option('d', "domain", HelpText = "Domain name")]
-	public string Domain { get; set; } = "";
+	public string Domain
+	{
+		get { return Globals.Domain; }
+		set { Globals.Domain = value; }
+	}
 
 }

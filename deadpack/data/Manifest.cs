@@ -9,13 +9,16 @@ namespace deadrop;
 
 public class Manifest
 {
-	[JsonPropertyName("name")]
-    public required string Name { get; set; }
+	[JsonPropertyName("subject")]
+    public required string Subject { get; set; }
+
+	[JsonPropertyName("message")]
+    public required string Message { get; set; }
 
 	[JsonPropertyName("files")]
 	public required List<FileItem> Files { get; set; }
 
-	public static Manifest LoadFromFile(string file, AsymmetricCipherKeyPair keyPairtt, string alias, string password)
+	public static Manifest LoadFromFile(string file, string alias, string password)
 	{
 		// open the zip file
 		using (ZipArchive archive = ZipFile.OpenRead(file))

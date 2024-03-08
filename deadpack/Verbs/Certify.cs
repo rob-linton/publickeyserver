@@ -40,18 +40,18 @@ class Certify
 			// if it is an email then swap it out for an alias
 			if (alias.Contains("@"))
 			{
-				CertResult cert = await EmailHelper.GetAliasFromEmail(alias, opts);
+				CertResult cert = await EmailHelper.GetAliasOrEmailFromServer(alias, false);
 				alias = cert?.Alias ?? string.Empty;
 			}
 
-			string domain = Misc.GetDomain(opts, alias);
+			string domain = Misc.GetDomain(alias);
 			string email = opts.Email;
 			if (String.IsNullOrEmpty(opts.Email) && opts.Alias.Contains("@"))
 			{
 				email = opts.Alias;
 			}
 
-			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, email, opts);
+			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, email);
 
 			// now load the root fingerprint from a file
 			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", opts.Password);
@@ -59,7 +59,7 @@ class Certify
 
 			// and compare it to the rootfingerprint
 			if (rootFingerprint.SequenceEqual(rootFingerprintFromFile))
-				Misc.LogCheckMark($"Root fingerprint matches", opts);
+				Misc.LogCheckMark($"Root fingerprint matches");
 			else
 				Misc.LogLine($"Invalid: Root fingerprint does not match");
 
@@ -71,7 +71,7 @@ class Certify
 		}
 		catch (Exception ex)
 		{
-			Misc.LogError(opts, "Unable to validate alias", ex.Message);
+			Misc.LogError("Unable to validate alias", ex.Message);
 			return 1;
 		}
 		

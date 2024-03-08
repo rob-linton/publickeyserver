@@ -8,39 +8,50 @@ namespace deadrop;
 
 public class EmailHelper
 {
-	public static async Task<CertResult> GetAliasFromEmail(string email, Options opts)
+	public static async Task<CertResult> GetAliasOrEmailFromServer(string emailOrAlias, bool create)
 	{
+		// get the domain for requests
+			string domain = Misc.GetDomain("");
+
+		// if there is no @ then just return the email as it will be an alias
+		if (!emailOrAlias.Contains("@"))
+		{
+			var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(emailOrAlias)}");
+			var c = JsonSerializer.Deserialize<CertResult>(result);
+			return c;
+		}
+
 		try
 		{
-			// get the domain for requests
-			string domain = Misc.GetDomain(opts, "");
+			
 
-			bool found = false;
-			bool first = true;
 			string result = "";
-			while (!found)
+			
 			try
 			{
-				result = await HttpHelper.Get($"https://{domain}/email/{email}", opts);
-				Misc.LogLine($"Email found {email}");
-				found = true;
+				result = await HttpHelper.Get($"https://{domain}/email/{emailOrAlias}");
+				Misc.LogCheckMark($"Email found {emailOrAlias}");
 			}
 			catch (Exception ex)
 			{ 
-				if (first)
+
+				if (create)
 				{
 					try
 					{
-						result = await HttpHelper.Post($"https://{domain}/verify/{email}?intro=true", "", opts);
+						result = await HttpHelper.Post($"https://{domain}/verify/{emailOrAlias}?intro=true", "");
 					}
 					catch 
 					{ 
 					}
 
-					Misc.LogLine($"Email {email} does not exist yet, checking every minute <ctrl-c> to cancel...");
-					first = false;
+					Misc.LogCross($"Email found {emailOrAlias}");
+					Misc.LogCheckMark($"Email sent {emailOrAlias}");
 				}
-				await Task.Delay(60000); // 1 minute
+				else		
+				{
+					Misc.LogCross($"Email found {emailOrAlias}");
+				}
 			}
 
 			var c = JsonSerializer.Deserialize<CertResult>(result);
@@ -49,7 +60,7 @@ public class EmailHelper
 		}
 		catch (Exception ex)
 		{
-			Misc.LogError(opts, "Unable to verify email", ex.Message);
+			Misc.LogError("Unable to verify email", ex.Message);
 			throw new Exception("Unable to verify email");
 		}
 	}

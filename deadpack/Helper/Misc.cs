@@ -90,11 +90,11 @@ public class Misc
 	/// <param name="opts">The options object containing the domain.</param>
 	/// <param name="alias">The alias used to retrieve the domain.</param>
 	/// <returns>The domain to be used.</returns>
-	public static string GetDomain(Options opts, string alias)
+	public static string GetDomain(string alias)
 	{
-		if (opts.Domain != null && opts.Domain.Length > 0)
+		if (Globals.Domain != null && Globals.Domain.Length > 0)
 		{
-			return opts.Domain;
+			return Globals.Domain;
 		}
 		else
 		{	if (String.IsNullOrEmpty(alias))
@@ -115,14 +115,14 @@ public class Misc
 	/// <param name="opts">The options for retrieving the certificate.</param>
 	/// <param name="alias">The alias of the certificate.</param>
 	/// <returns>The X509 certificate.</returns>
-	public static async Task<X509Certificate> GetCertificate(Options opts, string alias)
+	public static async Task<X509Certificate> GetCertificate(string alias)
 	{
 
 		// is the alias an email address
 		string url = "";
 		if (alias.Contains("@"))
 		{
-			string domain = Misc.GetDomain(opts, "");
+			string domain = Misc.GetDomain("");
 			url = $"https://{domain}/email/{alias}";
 
 			// get a list of files from the s3 bucket in this folder
@@ -132,14 +132,14 @@ public class Misc
 		}
 		else
 		{
-			string domain = Misc.GetDomain(opts, alias);
+			string domain = Misc.GetDomain(alias);
 			url = $"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}";
 		}
 
 		
 
 		// now get the "from" alias	
-		var result = await HttpHelper.Get(url, opts);
+		var result = await HttpHelper.Get(url);
 
 		var c = JsonSerializer.Deserialize<CertResult>(result) ?? throw new Exception("Could not deserialize cert result");
 		var certificate = c.Certificate ?? throw new Exception("Could not get certificate from cert result");
@@ -152,9 +152,14 @@ public class Misc
 	/// </summary>
 	/// <param name="opts">The options object.</param>
 	/// <param name="message">The message to be logged.</param>
-	public static void LogLine(Options opts, string message)
+	public static void LogLine(string message)
 	{
-		if (opts.Verbose > 1)
+		if (Globals.Verbose > 0)
+			Console.WriteLine(message);
+	}
+	public static void LogLine1(string message)
+	{
+		if (Globals.Verbose > 1)
 			Console.WriteLine(message);
 	}
 	// --------------------------------------------------------------------------------------------------------
@@ -163,28 +168,16 @@ public class Misc
 	/// </summary>
 	/// <param name="opts">The options object.</param>
 	/// <param name="message">The message to be logged.</param>
-	public static void LogLine1(Options opts, string message)
+	public static void LogLine2(string message)
 	{
-		if (opts.Verbose > 1)
+		if (Globals.Verbose > 2)
 		{
 			Console.WriteLine("--------------------------------------------------------------------------------");
 			Console.WriteLine(message);
 			Console.WriteLine("--------------------------------------------------------------------------------");
 		}
 	}
-	// --------------------------------------------------------------------------------------------------------
-	/// <summary>
-	/// Logs a message to the console.
-	/// </summary>
-	/// <param name="message">The message to be logged.</param>
-	public static void LogLine(string message)
-	{
-		if (message.Length > 120)
-			Console.WriteLine(message.Substring(0, 120));
-		else
-			Console.WriteLine(message);
-
-	}
+	
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
 	/// Logs an error message with optional details.
@@ -192,14 +185,17 @@ public class Misc
 	/// <param name="opts">The options object.</param>
 	/// <param name="message">The error message.</param>
 	/// <param name="details">Optional details about the error.</param>
-	public static void LogError(Options opts, string message, string details = "")
+	public static void LogError(string message, string details = "")
 	{
-		Console.ForegroundColor = ConsoleColor.Red;
-		Console.WriteLine($"\n{message}\n");
+		if (Globals.Verbose > 0)
+		{
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine($"\n{message}\n");
 
-		if (!String.IsNullOrEmpty(details))
-			Console.Write($"{details}\n");
-		Console.ResetColor();
+			if (!String.IsNullOrEmpty(details))
+				Console.Write($"{details}\n");
+			Console.ResetColor();
+		}
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
@@ -207,24 +203,15 @@ public class Misc
 	/// </summary>
 	/// <param name="opts">The options object.</param>
 	/// <param name="message">The message to be logged.</param>
-	public static void LogChar(Options opts, string message)
+	public static void LogChar(string message)
 	{
-		if (opts.Verbose > 1)
+		if (Globals.Verbose > 0)
 			Console.Write(message);
 	}
 	// --------------------------------------------------------------------------------------------------------
-	/// <summary>
-	/// Logs a character to the console.
-	/// </summary>
-	/// <param name="message">The character to be logged.</param>
-	public static void LogChar(string message)
+	public static void LogCheckMark(string message)
 	{
-		Console.Write(message);
-	}
-	// --------------------------------------------------------------------------------------------------------
-	public static void LogCheckMark(string message, Options opts)
-	{
-		if (opts.Verbose > 0)
+		if (Globals.Verbose > 0)
 		{
 			message = message + "  ................................................................................................................";
 			Console.WriteLine(message.Substring(0, 110) + "  [ \u2713 ]");
@@ -234,21 +221,27 @@ public class Misc
 	// log a cross check mark
 	public static void LogCross(string message)
 	{
-		message = message + "  ................................................................................................................";
-		// print it in red
-		Console.ForegroundColor = ConsoleColor.Red;
-		Console.WriteLine(message.Substring(0, 110) + "  [ \u2717 ]");
-		Console.ResetColor();
+		if (Globals.Verbose > 0)
+		{
+			message = message + "  ................................................................................................................";
+			// print it in red
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine(message.Substring(0, 110) + "  [ \u2717 ]");
+			Console.ResetColor();
+		}
 	}
 	// --------------------------------------------------------------------------------------------------------
 	public static void LogList(string col1, string col2, string col3, string col4)
 	{
-		string col1padded = col1 + ".                                                       ";
-		string col2padded = col2 + "                                                        ";
-		string col3padded = col3 + "                                                        ";
-		string col4padded = col4 + "                                                        ";
+		if (Globals.Verbose > 0)
+		{
+			string col1padded = col1 + ".                                                       ";
+			string col2padded = col2 + "                                                        ";
+			string col3padded = col3 + "                                                        ";
+			string col4padded = col4 + "                                                        ";
 
-		Console.WriteLine(col1padded.Substring(0, 3) + " " + col2padded.Substring(0, 80) + "  " + col3padded.Substring(0, 10) + "  " + col4padded.Substring(0, 20));
+			Console.WriteLine(col1padded.Substring(0, 3) + " " + col2padded.Substring(0, 80) + "  " + col3padded.Substring(0, 10) + "  " + col4padded.Substring(0, 20));
+		}
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
@@ -275,15 +268,18 @@ public class Misc
 	/// </summary>
 	public static void LogHeader()
 	{
-		LogArt();
+		if (Globals.Verbose > 0)
+		{
+			LogArt();
 
-		LogLine("=========================================================================================================================================================");
-		LogLine("DEADPACK v1.0 (deadrop.org)");
-		LogLine("[D]eadrop's [E]ncrypted [A]rchive and [D]istribution [PACK]age (DEADPACK)");
-		LogLine("Copyright Rob Linton, 2023");
-		LogLine("Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms");
-		LogLine("Acknowledgement to the BouncyCastle C# Crypto library");
-		LogLine("========================================================================================================================================================\n");
+			LogLine("=========================================================================================================================================================");
+			LogLine("DEADPACK v1.0 (deadrop.org)");
+			LogLine("[D]eadrop's [E]ncrypted [A]rchive and [D]istribution [PACK]age (DEADPACK)");
+			LogLine("Copyright Rob Linton, 2023");
+			LogLine("Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms");
+			LogLine("Acknowledgement to the BouncyCastle C# Crypto library");
+			LogLine("========================================================================================================================================================\n");
+		}
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>

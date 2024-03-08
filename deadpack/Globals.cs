@@ -13,5 +13,11 @@ public static class Globals
 	public static Window ViewLeft;
 	public static Window ViewRight;
 
+	// global options
+	public static string Password;
+	public static string Domain;
+	public static int Verbose;
+
+
     public const string Test = "test123";
 }

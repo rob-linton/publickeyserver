@@ -52,7 +52,7 @@ public class BouncyCastleHelper
 
 		return keyPair;
     }
-	public static bool CheckIfCertificateAltNamesMatch(string alias, string email, string targetCertificatePem, Options opts)
+	public static bool CheckIfCertificateAltNamesMatch(string alias, string email, string targetCertificatePem)
 	{
 		// get the certificate
 		Org.BouncyCastle.X509.X509Certificate cert = ReadCertificateFromPemString(targetCertificatePem);
@@ -69,12 +69,12 @@ public class BouncyCastleHelper
 			{
 				if (altName[1].ToString() == alias)
 				{
-					Misc.LogCheckMark($"Alias {alias} is in the SubjectAlternativeNames", opts);
+					Misc.LogCheckMark($"Alias {alias} is in the SubjectAlternativeNames");
 					aliasFound = true;
 				}
 				if (altName[1].ToString() == email)
 				{
-					Misc.LogCheckMark($"Email {email} is in the SubjectAlternativeNames", opts);
+					Misc.LogCheckMark($"Email {email} is in the SubjectAlternativeNames");
 					emailFound = true;
 				}
 			}
@@ -112,13 +112,11 @@ public class BouncyCastleHelper
 	/// <param name="targetCertificatePem">The PEM string of the target certificate.</param>
 	/// <param name="intermediateAndRootCertificatePems">The list of PEM strings of intermediate and root certificates.</param>
 	/// <param name="commonName">The common name to check against the certificate.</param>
-	/// <param name="opts">The options for certificate validation.</param>
 	/// <returns>A tuple containing a boolean indicating if the certificate chain is valid and the fingerprint of the root certificate.</returns>
-	public static (bool, byte[]) ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName, Options opts)
+	public static (bool, byte[]) ValidateCertificateChain(string targetCertificatePem, List<string> intermediateAndRootCertificatePems, string commonName)
     {
         try
         {
-			Misc.LogLine(opts, "  Validating certificate chain...");
 
             X509CertificateParser parser = new X509CertificateParser();
 
@@ -142,13 +140,13 @@ public class BouncyCastleHelper
                 
                     throw new CertificateException("*** ERROR: Issuer/Subject DN mismatch ***");
                 }
-				Misc.LogCheckMark("Subject name matches the parent certificate's Issuer name", opts);
+				Misc.LogCheckMark("Subject name matches the parent certificate's Issuer name");
 
 				// throws an exception if not valid
                 child.Verify(parent.GetPublicKey());
 
 				// check if the commonname is a member
-				if (!CheckIfCommonNameIsAMember(child.SubjectDN.ToString(), commonName, opts))
+				if (!CheckIfCommonNameIsAMember(child.SubjectDN.ToString(), commonName))
 				{
 					throw new CertificateException("*** Error: CommonName is not a member ***");
 				}
@@ -158,7 +156,7 @@ public class BouncyCastleHelper
 				{
 					throw new CertificateException("*** Error: Certificate not valid now ***");
 				}
-				Misc.LogCheckMark("Certificate dates are valid", opts);
+				Misc.LogCheckMark("Certificate dates are valid");
 
 				// does the parent have authority to sign the child?
 				Asn1Object? asn1Object = GetAsn1Object(parent, X509Extensions.KeyUsage);
@@ -175,9 +173,9 @@ public class BouncyCastleHelper
 				{
 					throw new CertificateException("*** Error: KeyUsage extension does not allow signing. ***");
 				}
-				Misc.LogCheckMark($"Parent has authority to sign the child {i + 1} of {chain.Length}", opts);
+				Misc.LogCheckMark($"Parent has authority to sign the child {i + 1} of {chain.Length}");
 
-				Misc.LogLine(opts, $"  Certificate {i + 1} of {chain.Length} is valid: {parent.SubjectDN.ToString()}");
+				Misc.LogLine($"  Certificate {i + 1} of {chain.Length} is valid: {parent.SubjectDN}");
             }
 
             // get the fingerprint of the root certificate
@@ -185,13 +183,13 @@ public class BouncyCastleHelper
 
 			//DisplayVisualFingerprint(fingerprint);
 			//CertificateFingerprint.DisplayCertificateFingerprintFromString(fingerprint);
-			Misc.LogCheckMark($"Certificate is valid", opts);
+			Misc.LogCheckMark($"Certificate is valid");
 
             return (true, fingerprint);
         }
         catch (Exception ex)
         {
-            Misc.LogLine(opts, $"*** Error: Certificate chain validation failed: {ex.Message} ***");
+            Misc.LogLine($"*** Error: Certificate chain validation failed: {ex.Message} ***");
             return (false, new byte[0]);
         }
     }
@@ -218,16 +216,15 @@ public class BouncyCastleHelper
 	/// </summary>
 	/// <param name="fullName">The full name to check.</param>
 	/// <param name="shortName">The common name to check.</param>
-	/// <param name="opts">The options.</param>
 	/// <returns>True if the common name is a member of the full name; otherwise, false.</returns>
-	public static bool CheckIfCommonNameIsAMember(string fullName, string shortName, Options opts)
+	public static bool CheckIfCommonNameIsAMember(string fullName, string shortName)
 	{
 		fullName = fullName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
 		shortName = shortName.Replace("CN=", "").Replace("OU=", "").Replace("O=", "").Replace("C=", "").Replace("ST=", "").Replace("L=", "").Replace(" ", "").ToLower();
 
 		if (fullName.EndsWith(shortName))
 		{
-			Misc.LogCheckMark($"CommonName {shortName} is a member of {fullName}", opts);
+			Misc.LogCheckMark($"CommonName {shortName} is a member of {fullName}");
 			return true;
 		}		
 
@@ -608,19 +605,18 @@ public class BouncyCastleHelper
 		/// </summary>
 		/// <param name="domain">The domain to retrieve the certificates from.</param>
 		/// <param name="alias">The alias to verify.</param>
-		/// <param name="opts">The options for the HTTP request.</param>
 		/// <returns>A tuple containing a boolean indicating the validity of the alias and the fingerprint of the certificate.</returns>
-		public static async Task<(bool, byte[])> VerifyAliasAsync(string domain, string alias, string email, Options opts)
+		public static async Task<(bool, byte[])> VerifyAliasAsync(string domain, string alias, string email)
 		{
 			
 
 			// first get the CA
-			var result = await HttpHelper.Get($"https://{domain}/cacerts", opts);
+			var result = await HttpHelper.Get($"https://{domain}/cacerts");
 			var ca = JsonSerializer.Deserialize<CaCertsResult>(result);
 			var cacerts = ca?.CaCerts;
 
 			// now get the alias	
-			result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}", opts);
+			result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(alias)}");
 
 			var c = JsonSerializer.Deserialize<CertResult>(result);
 			var certificate = c?.Certificate;
@@ -630,10 +626,10 @@ public class BouncyCastleHelper
 			byte[] fingerprint = new byte[0];
 			if (certificate != null && cacerts != null) // Add null check for cacerts
 			{
-				(valid, fingerprint) = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain, opts);
+				(valid, fingerprint) = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain);
 			}
 
-			bool validAltName = CheckIfCertificateAltNamesMatch(alias, email, certificate, opts);
+			bool validAltName = CheckIfCertificateAltNamesMatch(alias, email, certificate);
 
 			if (valid)
 				return (true, fingerprint);
