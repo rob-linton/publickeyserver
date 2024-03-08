@@ -99,7 +99,7 @@ public class Misc
 		else
 		{	if (String.IsNullOrEmpty(alias))
 			{
-				return "publickeyserver.org";
+				return "deadpack.org";
 			}
 			else
 			{

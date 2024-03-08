@@ -28,6 +28,14 @@ class Gui
 	{
 		Application.Init ();
 
+		Globals.StandardColors = new ColorScheme()
+		{
+			Normal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+			Focus = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+			HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+		};
+
 		ViewMenu menu = new ViewMenu();
 
         Globals.ViewLeft = new Window ("Aliases") {

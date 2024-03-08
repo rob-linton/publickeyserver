@@ -70,7 +70,7 @@ public class ViewAliases : Window
 
 	private void listView_OpenOutbox(ListViewItemEventArgs e)
 	{
-		Globals.Alias = e.Value.ToString();
+		Globals.Alias = "";
 		Globals.Location = "outbox";
 		// removing the view and re-adding it causes it to get the focus
 		Globals.ViewRight.Remove(Globals.ViewDeadPacks);

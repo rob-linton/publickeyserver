@@ -31,17 +31,6 @@ public class ViewDeadPacks : Window
 		// get a list of deadpacks
 		List<DeadPack> deadPacks = Storage.ListDeadPacks(alias, location, Globals.Password);
 
-		List<string> source = new List<string>();
-		foreach (var deadPack in deadPacks)
-		{
-			// convert deadpack.timestamp to a human readable date time
-			DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			dateTime = dateTime.AddSeconds(deadPack.Timestamp).ToLocalTime();
-			string row = dateTime.ToString("d-MMM-yyyy h:mmtt") + "   " + deadPack.Subject;
-
-			source.Add(row);
-		}
-
 		Button add = new Button("+ Add DeadPack") { X = Pos.Right(this) - 21, Y = 0, Width = 15, Height = 1 };
 		
 		Button back = new Button("<-") { X = 0, Y = 0, Width = 5, Height = 1 };
@@ -51,7 +40,7 @@ public class ViewDeadPacks : Window
 			Globals.ViewLeft.Add(Globals.ViewAliases);
 		};
 
-		ListView listView = new ListView(source) { X = 0, Y = 2, Width = Dim.Fill(), Height = Dim.Fill() - 2};
+		ListView listView = new ListView(deadPacks) { X = 0, Y = 2, Width = Dim.Fill(), Height = Dim.Fill() - 2};
 		listView.OpenSelectedItem += listView_OpenSelectedItem;
 		Add(back, add, listView);
 	}
@@ -65,7 +54,7 @@ public class ViewDeadPacks : Window
 		string deadpack = string.Join(" ", bits.Skip(4));
 		string deadpackFilename = deadpack + ".deadpack";
 		
-		var result = DialogOpenDeadPack.Build(alias, deadpack, deadpackFilename, location);
+		var result = DialogOpenDeadPack.Build(e, location);
 
 	}
 }	

@@ -78,9 +78,10 @@ class Pack
 			Misc.LogLine($"Input: {opts.File}");
 			Misc.LogLine($"Search Subdirectories: {opts.subdirectories}");
 			Misc.LogLine($"Sender Alias: {opts.From}");
-			
+				
 			// first replace any email alias with their alias versions
-			List<string> aliases = new List<string>();
+			List<string> aliases = [opts.From];
+			
 			List<Task<CertResult>> tasks = new List<Task<CertResult>>();
 			foreach (string aliasOrEmail in opts.InputAliases)
 			{

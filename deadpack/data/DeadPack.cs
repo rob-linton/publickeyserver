@@ -29,4 +29,14 @@ public class DeadPack
 	[JsonPropertyName("recipients")]
 	public required List<Recipient> Recipients { get; set; }
 
+	// create a ToString() method
+	public override string ToString()
+	{
+		DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+		dateTime = dateTime.AddSeconds(Timestamp).ToLocalTime();
+		string row = dateTime.ToString("dd-MMM-yyyy hh:mmtt") + "   " + Subject;
+
+		return $"{row}";
+	}
+
 }

@@ -156,37 +156,18 @@ public class Storage
 		}
 
 		// for the outbox we can't open the manifest, so only list the basic information
-		if (location == "outbox" || location == "sent")
-		{
-			foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
-			{
-				Envelope envelope = Envelope.LoadFromFile(file);
-				long timestamp = envelope.Created;
-			
-				// get the recipients from the envelope
-				List<Recipient> recipients = envelope.To;
-
-				DeadPack deadpack = new DeadPack
-				{
-					Subject = file.Replace(".deadpack",""),
-					Message = "",
-					Timestamp = timestamp,
-					Files = new List<FileItem>(),
-					From = envelope.From,
-					Alias = "",
-					Filename = file,
-					Recipients = recipients
-				};
-				sorted.Add(timestamp, deadpack);
-			}
-			return sorted.Values.ToList().Reverse<DeadPack>().ToList();
-		}
-		else
 		{
 
 			// get the private key for this alias
 			foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
 			{
+				Envelope envelope = Envelope.LoadFromFile(file);
+
+				// if the alias is blank, then get it from the envelope
+				if (String.IsNullOrEmpty(alias))
+				{
+					alias = envelope.From;
+				}
 
 				Manifest manifest = Manifest.LoadFromFile(file, alias, password);
 
@@ -199,7 +180,6 @@ public class Storage
 				string message = Encoding.UTF8.GetString(base64Message);
 
 				// get the timestamp from the envelope
-				Envelope envelope = Envelope.LoadFromFile(file);
 				long timestamp = envelope.Created;
 
 				// get the list of files in the deadpack

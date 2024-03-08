@@ -18,6 +18,6 @@ public static class Globals
 	public static string Domain;
 	public static int Verbose;
 
-
+	public static ColorScheme StandardColors; 
     public const string Test = "test123";
 }
