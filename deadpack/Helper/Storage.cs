@@ -185,8 +185,6 @@ public class Storage
 		{
 
 			// get the private key for this alias
-			string privateKey = Storage.GetPrivateKey($"{alias}.rsa", "");
-
 			foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
 			{
 

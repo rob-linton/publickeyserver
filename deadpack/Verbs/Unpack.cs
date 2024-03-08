@@ -69,11 +69,11 @@ class Unpack
 
 			
 
-			if (String.IsNullOrEmpty(opts.Password))
-			opts.Password = Misc.GetPassword();
+			if (String.IsNullOrEmpty(Globals.Password))
+			Globals.Password = Misc.GetPassword();
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", opts.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", Globals.Password);
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// get the output directory
@@ -86,8 +86,8 @@ class Unpack
 			string outputDirectory = opts.Output;
 			
 
-			if (String.IsNullOrEmpty(opts.Password))
-				opts.Password = Misc.GetPassword();
+			if (String.IsNullOrEmpty(Globals.Password))
+				Globals.Password = Misc.GetPassword();
 
 
 			try
@@ -213,7 +213,7 @@ class Unpack
 						string encryptedKyberKeyBase64 = recipient.KyberKey;
 						byte[] encryptedKyberKey = Convert.FromBase64String(encryptedKyberKeyBase64);
 
-						string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa", opts.Password);
+						string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa", Globals.Password);
 
 						AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 
@@ -235,7 +235,7 @@ class Unpack
 						KyberKeyParameters kyberPrivateKey;
 						try
 						{
-							string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", opts.Password);
+							string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", Globals.Password);
 							byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
 							kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
 						}

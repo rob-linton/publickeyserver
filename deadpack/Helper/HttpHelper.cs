@@ -172,7 +172,6 @@ public class HttpHelper
 	#if DEBUG
 		url = url.Replace("https://", "http://");
 	#endif
-		Misc.LogLine($"- GETFILE: {url}");
 
 		using (var client = new HttpClient())
 		using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))

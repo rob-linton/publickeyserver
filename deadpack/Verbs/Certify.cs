@@ -33,8 +33,8 @@ class Certify
 			Misc.LogLine($"Certifying  {opts.Alias}");
 			Misc.LogLine($"");
 
-			if (String.IsNullOrEmpty(opts.Password))
-			opts.Password = Misc.GetPassword();
+			if (String.IsNullOrEmpty(Globals.Password))
+			Globals.Password = Misc.GetPassword();
 
 			string alias = opts.Alias;
 			// if it is an email then swap it out for an alias
@@ -54,7 +54,7 @@ class Certify
 			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, email);
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", opts.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", Globals.Password);
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// and compare it to the rootfingerprint

@@ -37,8 +37,8 @@ class Create
 			Misc.LogLine($"Domain: {domain}");
 			Misc.LogLine($"");
 
-			if (String.IsNullOrEmpty(opts.Password))
-			opts.Password = Misc.GetPassword();
+			if (String.IsNullOrEmpty(Globals.Password))
+			Globals.Password = Misc.GetPassword();
 			
 			Misc.LogLine($"- Requesting alias from: {domain}\n");
 
@@ -114,15 +114,15 @@ class Create
 				Misc.LogError("Could not read private key");
 				return 1;
 			}
-			Storage.StorePrivateKey($"{alias}.rsa", privateKeyPem, opts.Password);
+			Storage.StorePrivateKey($"{alias}.rsa", privateKeyPem, Globals.Password);
 
 			// store kyber private key
 			string kyberPrivateKeyPem = Convert.ToBase64String(KyberPrivatyeKey);
-			Storage.StorePrivateKey($"{alias}.kyber", kyberPrivateKeyPem, opts.Password);
+			Storage.StorePrivateKey($"{alias}.kyber", kyberPrivateKeyPem, Globals.Password);
 
 			// store dilithium private key
 			string dilithiumPrivateKeyPem = Convert.ToBase64String(DilithiumPrivateKey);
-			Storage.StorePrivateKey($"{alias}.dilithium", dilithiumPrivateKeyPem, opts.Password);
+			Storage.StorePrivateKey($"{alias}.dilithium", dilithiumPrivateKeyPem, Globals.Password);
 
 			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "");
 
@@ -134,7 +134,7 @@ class Create
 
 			// now save the root fingerprint to a file
 			string rootFingerprintHex = Convert.ToBase64String(rootFingerprint);
-			Storage.StorePrivateKey($"{alias}.root", rootFingerprintHex, opts.Password);
+			Storage.StorePrivateKey($"{alias}.root", rootFingerprintHex, Globals.Password);
 
 			Misc.LogCheckMark("Root certificate fingerprint saved");
 

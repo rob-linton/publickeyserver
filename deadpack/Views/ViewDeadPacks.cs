@@ -12,8 +12,14 @@ public class ViewDeadPacks : Window
 	{	
 		// set the border style
 		Border.BorderStyle = BorderStyle.None;
-
-		Build(alias, location);
+		if (string.IsNullOrEmpty(alias) && string.IsNullOrEmpty(location))
+		{
+			return;
+		}
+		else
+		{
+			Build(alias, location);
+		}
 	}
 
 

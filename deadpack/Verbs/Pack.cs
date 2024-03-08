@@ -24,8 +24,8 @@ public class PackOptions : Options
 	[Option('a', "aliases", Required = true, HelpText = "Destination aliases/emails (comma delimited)")]
     public required IEnumerable<string>? InputAliases { get; set; }
 
-	[Option('o', "output", Default = "package.deadpack", HelpText = "Output package file")]
-    public string Output { get; set; } = "package.deadpack";	
+	[Option('o', "output", HelpText = "Output package file")]
+    public string? Output { get; set; }	
 
 	[Option('m', "message", HelpText = "Optional message")]
     public string? Message { get; set; }
@@ -43,8 +43,8 @@ class Pack
 	{
 		try
 		{
-			
-			opts.Output = opts.Output.Replace(".deadpack","") + ".deadpack";
+			if (!String.IsNullOrEmpty(opts.Output) && !opts.Output.EndsWith(".deadpack"))
+				opts.Output = opts.Output + ".deadpack";
 
 			long createDate = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
 			byte[] nonce = opts.From.ToLower().ToBytes();
@@ -100,8 +100,8 @@ class Pack
 			Misc.LogLine($"Output: {opts.Output}");
 			Misc.LogLine($"");
 
-			if (String.IsNullOrEmpty(opts.Password))
-			opts.Password = Misc.GetPassword();
+			if (String.IsNullOrEmpty(Globals.Password))
+			Globals.Password = Misc.GetPassword();
 
 			Misc.LogLine("Files to be deadpacked:");
 			foreach (string filePath in relativePaths)
@@ -129,7 +129,7 @@ class Pack
 			}
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.From}.root", opts.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.From}.root", Globals.Password);
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// 
@@ -237,7 +237,7 @@ class Pack
 				AsymmetricCipherKeyPair privateKey;
 				try
 				{
-					string privateKeyPem = Storage.GetPrivateKey($"{opts.From}.rsa", opts.Password);
+					string privateKeyPem = Storage.GetPrivateKey($"{opts.From}.rsa", Globals.Password);
 					privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 				}
 				catch (Exception ex)

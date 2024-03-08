@@ -18,8 +18,8 @@ public class ReceiveOptions : Options
 	//[Option('i', "input", Required = true, HelpText = "Package key to Receive")]
     //public required string Key { get; set; }
 
-	[Option('a', "alias", Required = true, HelpText = "Alias to use")]
-    public required string Alias { get; set; }
+	[Option('a', "alias", HelpText = "Alias to use")]
+    public string? Alias { get; set; }
 
 	[Option('f', "force", Default = false, HelpText = "Download all deadpacks without prompting")]
 	public required bool Force { get; set; } = false;
@@ -38,8 +38,8 @@ class Receive
 		Misc.LogLine($"Alias: {opts.Alias}");
 		Misc.LogLine($"");
 
-		if (String.IsNullOrEmpty(opts.Password))
-		opts.Password = Misc.GetPassword();
+		if (String.IsNullOrEmpty(Globals.Password))
+		Globals.Password = Misc.GetPassword();
 		
 			
 		//Misc.LogLine($"Recipient Alias: {alias}");
@@ -56,11 +56,8 @@ class Receive
 				string alias = a.Name;
 				Misc.LogLine($"\nChecking alias {alias}...");
 				int result = await ExecuteInternal(opts, alias);
-				if (result == 0)
-					return result;
 			}
-			Misc.LogError("Error recieving package, no valid alias found");
-			return 1;
+			return 0;
 		}
 	}
 	public static async Task<int> ExecuteInternal(ReceiveOptions opts, string alias)
@@ -79,7 +76,7 @@ class Receive
 			alias = cert.Alias;
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", opts.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", Globals.Password);
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// verify the alias
@@ -105,7 +102,7 @@ class Receive
 			AsymmetricCipherKeyPair privateKey;
 			try
 			{
-				string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa", opts.Password);
+				string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa", Globals.Password);
 				privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 			}
 			catch (Exception ex)
@@ -120,7 +117,7 @@ class Receive
 			AsymmetricKeyParameter kyberPrivateKey;
 			try
 			{
-				string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", opts.Password);
+				string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", Globals.Password);
 				byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
 				kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
 			}
@@ -294,7 +291,7 @@ class Receive
 					byte[] kyberKey = Convert.FromBase64String(kyberKeyString);
 
 					// get the manifest from the file
-					//Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, alias, opts.Password);
+					//Manifest manifest = Manifest.LoadFromFile(tmpOutputName, privateKey, alias, Globals.Password);
 					
 					// get a compact string showing the date and time
 					long timestamp = envelope.Created;
@@ -305,9 +302,6 @@ class Receive
 
 					// now move the deadpack to the destination filename
 					File.Move(tmpOutputName, destFilename);
-
-					// show result ok
-					Misc.LogLine($"\n{destFilename} retrieved OK\n");
 
 				}
 

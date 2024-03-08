@@ -29,25 +29,25 @@ class Send
 
 		if (!String.IsNullOrEmpty(opts.File))
 		{
-			return await ExecuteInternal(opts, opts.File);
+			return await ExecuteInternal(opts, opts.File, false);
 		}
 		else
 		{
 			var deadpacks = Storage.ListDeadPacks("","outbox", Globals.Password);
 			foreach (var file in deadpacks)
 			{
-				await ExecuteInternal(opts, file.Filename);
+				await ExecuteInternal(opts, file.Filename, true);
 			}
 			return 0;
 		}
 
 	}
 
-	public static async Task<int> ExecuteInternal(SendOptions opts, string file)
+	public static async Task<int> ExecuteInternal(SendOptions opts, string file, bool move)
 	{
 
-		if (String.IsNullOrEmpty(opts.Password))
-			opts.Password = Misc.GetPassword();
+		if (String.IsNullOrEmpty(Globals.Password))
+			Globals.Password = Misc.GetPassword();
 
 		// get the envelop from the package file
 		Envelope envelope = Envelope.LoadFromFile(file);
@@ -57,7 +57,7 @@ class Send
 		Misc.LogLine($"Sending from {fromAlias}...\n");
 
 		// now load the root fingerprint from a file
-		string rootFingerprintFromFileString = Storage.GetPrivateKey($"{fromAlias}.root", opts.Password);
+		string rootFingerprintFromFileString = Storage.GetPrivateKey($"{fromAlias}.root", Globals.Password);
 		byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 		// validate the from alias
@@ -120,7 +120,7 @@ class Send
 				AsymmetricCipherKeyPair privateKey;
 				try
 				{
-					string privateKeyPem = Storage.GetPrivateKey($"{fromAlias}.rsa", opts.Password);
+					string privateKeyPem = Storage.GetPrivateKey($"{fromAlias}.rsa", Globals.Password);
 					privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 				}
 				catch (Exception ex)
@@ -145,19 +145,24 @@ class Send
 				var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", file);
 
 				// show result ok
-				Misc.LogLine($"\n{result}\n");	
+				Misc.LogLine($"\n{result}\n");
 
-				// now move it to the sent folder
-				string sentFolder = Storage.GetDeadPackDirectorySent(fromAlias, "");
-				// get the filename from opt.file
-				string filename = Path.GetFileName(file);
-
-				File.Move(file, Path.Combine(sentFolder, filename));	
 			}
 			catch (Exception ex)
 			{
 				Misc.LogError("Unable to send package", ex.Message);
 			}
+
+		}
+
+		if (move)
+		{
+			// now move it to the sent folder
+			string sentFolder = Storage.GetDeadPackDirectorySent(fromAlias, "");
+			// get the filename from opt.file
+			string filename = Path.GetFileName(file);
+
+			File.Move(file, Path.Combine(sentFolder, filename));
 		}
 
 		return 0;
