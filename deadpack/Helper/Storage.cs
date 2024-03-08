@@ -144,7 +144,7 @@ public class Storage
 		// get the users home userdata directory
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 		string deadDropFolder = "";
-		if (string.IsNullOrEmpty(alias))
+		if (location == "outbox")
 		{
 			Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location));
 			deadDropFolder = Path.Join(localAppData, "deadpack", location);
@@ -156,7 +156,7 @@ public class Storage
 		}
 
 		// for the outbox we can't open the manifest, so only list the basic information
-		if (location == "outbox")
+		if (location == "outbox" || location == "sent")
 		{
 			foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
 			{

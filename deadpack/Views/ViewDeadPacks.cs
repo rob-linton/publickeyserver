@@ -37,7 +37,7 @@ public class ViewDeadPacks : Window
 			// convert deadpack.timestamp to a human readable date time
 			DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 			dateTime = dateTime.AddSeconds(deadPack.Timestamp).ToLocalTime();
-			string row = dateTime.ToString() + "   " + deadPack.Subject;
+			string row = dateTime.ToString("d-MMM-yyyy h:mmtt") + "   " + deadPack.Subject;
 
 			source.Add(row);
 		}
