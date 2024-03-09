@@ -19,5 +19,10 @@ public static class Globals
 	public static int Verbose;
 
 	public static ColorScheme StandardColors; 
+
+	public static ColorScheme YellowColors;
+
+	public static List<string> Progress;
+	public static ListView ProgressListView;
     public const string Test = "test123";
 }

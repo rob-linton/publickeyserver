@@ -8,6 +8,8 @@ namespace deadrop.Verbs;
 
 public class ViewDeadPacks : Window
 {
+	string _location;
+
 	public ViewDeadPacks(string alias, string location)
 	{	
 		// set the border style
@@ -25,6 +27,8 @@ public class ViewDeadPacks : Window
 
 	public void Build(string alias, string location)
 	{
+		_location = location;
+
 		// remove all of the existing widgets from this view
 		RemoveAll();
 
@@ -46,19 +50,25 @@ public class ViewDeadPacks : Window
 
 		ListView listView = new ListView(deadPacks) { X = 0, Y = 3, Width = Dim.Fill(), Height = Dim.Fill() - 2};
 		listView.OpenSelectedItem += listView_OpenSelectedItem;
+		listView.ColorScheme = Globals.YellowColors;
 		Add(back, add, heading, listView);
 	}
 
 	private void listView_OpenSelectedItem(ListViewItemEventArgs e)
 	{
+		DeadPack deadPack = (DeadPack)e.Value;
+
 		string alias = Globals.Alias;
 		string location = Globals.Location;
 
-		string[] bits = e.Value.ToString().Split(' ');
-		string deadpack = string.Join(" ", bits.Skip(4));
-		string deadpackFilename = deadpack + ".deadpack";
 		
-		var result = DialogOpenDeadPack.Build(e, location);
-
+		
+		var result = new DialogOpenDeadPack().Build(e, location);
+		if (result == Enums.DialogReturn.Extract)
+		{
+			string input = deadPack.Filename;
+			
+			new DialogUnpack().Build(input, alias);
+		}
 	}
 }	

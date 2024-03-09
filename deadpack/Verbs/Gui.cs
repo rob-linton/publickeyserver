@@ -36,6 +36,17 @@ class Gui
 			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Blue),
 		};
 
+		Globals.YellowColors = new ColorScheme()
+		{
+			Normal = Application.Driver.MakeAttribute(Color.BrightYellow, Color.Blue),
+			Focus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
+			HotNormal = Application.Driver.MakeAttribute(Color.BrightYellow, Color.Blue),
+			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
+		};
+
+		Globals.Progress = new List<string>();
+		Globals.Verbose = 0;
+
 		ViewMenu menu = new ViewMenu();
 
         Globals.ViewLeft = new Window ("Aliases") {
@@ -63,7 +74,8 @@ class Gui
 
 		// Add both menu and win in a single call
 		Application.Top.RemoveAll();
-        Application.Top.Add (menu.Menu, Globals.ViewLeft, Globals.ViewRight);
+        Application.Top.Add (menu.Menu, Globals.ViewRight);
+		Application.Top.Add(Globals.ViewLeft);
         Application.Run ();
         Application.Shutdown ();
 

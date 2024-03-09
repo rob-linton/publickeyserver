@@ -10,7 +10,7 @@ namespace deadrop.Verbs;
 public class DialogOpenDeadPack 
 {
 	// build
-	public static Enums.DialogReturn Build(dynamic e, string location)
+	public Enums.DialogReturn Build(dynamic e, string location)
 	{
 		DeadPack deadPack = (DeadPack)e.Value;
 
@@ -35,7 +35,7 @@ public class DialogOpenDeadPack
 		//
 		// add the from
 		//
-		var from = new TextView() { X = 1, Y = 1, Width = Dim.Fill()-2, Height = 1 };
+		var from = new TextView() { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() };
 		from.Text = deadPack.From;
 		from.ReadOnly = true;
 		from.ColorScheme = Globals.StandardColors;
@@ -58,7 +58,7 @@ public class DialogOpenDeadPack
 		string dt = dateTime.ToString("dd-MMM-yyyy hh:mmtt");
 
 
-		var created = new TextView() { X = 1, Y = 1, Width = Dim.Fill()-1, Height = 1 };
+		var created = new TextView() { X = 1, Y = 1, Width = Dim.Fill()-1, Height = Dim.Fill() };
 		created.Text = dt;
 		created.ReadOnly = true;
 		created.ColorScheme = Globals.StandardColors;
@@ -67,7 +67,7 @@ public class DialogOpenDeadPack
 		Window viewCreated = new Window ("Created") {
         	X = Pos.Percent(50),
             Y = 1,
-            Width = Dim.Percent(50) - 1,
+            Width = Dim.Percent(50),
             Height = 4,
         };
 		viewCreated.Border.BorderStyle = BorderStyle.Single;
@@ -77,7 +77,7 @@ public class DialogOpenDeadPack
 		//
 		// add the subject
 		//
-		var subject = new TextView() { X = 1, Y = 1, Width = Dim.Fill()-1, Height = 1 };
+		var subject = new TextView() { X = 1, Y = 1, Width = Dim.Fill()-1, Height = Dim.Fill() };
 		subject.Text = deadPack.Subject;
 		subject.ReadOnly = true;
 		subject.ColorScheme = Globals.StandardColors;
@@ -94,7 +94,7 @@ public class DialogOpenDeadPack
 		//
 		// add the message body
 		//
-		var message = new TextView() { X = 1, Y = 1, Width = Dim.Fill()-2, Height = 7 };
+		var message = new TextView() { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() };
 		message.Text = deadPack.Message;
 		message.ReadOnly = true;
 		message.ColorScheme = Globals.StandardColors;
@@ -103,7 +103,7 @@ public class DialogOpenDeadPack
         	X = 1,
             Y = 9,
             Width = Dim.Fill () - 1,
-            Height = 8,
+            Height = 7,
         };
 		viewMessage.Border.BorderStyle = BorderStyle.Single;
 		viewMessage.Add(message);
@@ -113,12 +113,14 @@ public class DialogOpenDeadPack
 		//
 		// create 2 views left and right
 		Window viewLeft = new Window ("Files") {
-        	X = 1,
-            Y = 17,
-            Width = Dim.Fill () - 61,
-            Height = Dim.Fill () - 2
-        };
+			X = 1,
+			Y = 16,
+			Width = Dim.Fill () - 61,
+			Height = Dim.Fill () - 2
+		};
 		var files = new ListView(deadPack.Files) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
+		files.ColorScheme = Globals.StandardColors;
+
 		viewLeft.Add(files);
 
 		//
@@ -126,7 +128,7 @@ public class DialogOpenDeadPack
 		//
 		Window viewRight = new Window ("Recipients") {
         	X = dialog.Frame.Width - 63,
-            Y = 17,
+            Y = 16,
             Width = 60,
             Height = Dim.Fill () - 2
         };
@@ -134,7 +136,8 @@ public class DialogOpenDeadPack
 		viewRight.Add(recipients);
 
 	
-		dialog.Add (viewFrom, viewCreated, viewSubject, viewMessage, viewLeft, viewRight);
+		dialog.Add (viewFrom, viewCreated, viewSubject, viewMessage, viewRight);
+		dialog.Add (viewLeft);
 		Application.Run (dialog);
 
 		return result;
