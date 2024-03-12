@@ -308,15 +308,7 @@ class Unpack
 							File.SetLastWriteTime(file.Name, modifiedDate);
 
 							// update the progress bar if it is not null
-							try
-							{
-								Globals.Progressbar.Fraction = ((float)manifest.Files.IndexOf(file) + 1) / (float)manifest.Files.Count;
-								Globals.ProgressLabel.Text = $"Unpacking {manifest.Files.IndexOf(file) + 1 } of {manifest.Files.Count}...";
-								Globals.Progressbar.SetNeedsDisplay();
-								Globals.ProgressLabel.SetNeedsDisplay();
-							}
-							catch { }
-
+							Globals.UpdateProgressBar((float)manifest.Files.IndexOf(file) + 1, (float)manifest.Files.Count);
 						}
 						Misc.LogLine($"\n\nYour files are located in {opts.Output}");
 						Misc.LogLine("\nDone\n");

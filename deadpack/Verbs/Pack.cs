@@ -19,7 +19,7 @@ public class PackOptions : Options
     public required string File { get; set; }
 
 	[Option('r', "Recurse subdirectories", HelpText = "Recurse sub directories")]
-	public bool subdirectories { get; set; } = false;
+	public bool Recurse { get; set; } = false;
 
 	[Option('a', "aliases", Required = true, HelpText = "Destination aliases/emails (comma delimited)")]
     public required IEnumerable<string>? InputAliases { get; set; }
@@ -62,21 +62,21 @@ class Pack
 			string currentDirectory = Directory.GetCurrentDirectory();
 
 			SearchOption s = SearchOption.TopDirectoryOnly;
-			if (opts.subdirectories)
+			if (opts.Recurse)
 				s = SearchOption.TopDirectoryOnly;
 
 			// get a list of files from the wildcard returning relative paths only
 			string[] fullPaths = Directory.GetFiles(currentDirectory, opts.File, s);
 
 			// Convert full paths to relative paths
-        	string[] relativePaths = fullPaths.Select(fullPath =>
-            fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();
+        	string[] relativePaths = fullPaths.Select(fullPath => fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();
 
 			Misc.LogHeader();
 
 			Misc.LogLine($"Deadpacking...");
 			Misc.LogLine($"Input: {opts.File}");
-			Misc.LogLine($"Search Subdirectories: {opts.subdirectories}");
+			string r = opts.Recurse ? "Yes" : "No";
+			Misc.LogLine($"Search Subdirectories: {r}");
 			Misc.LogLine($"Sender Alias: {opts.From}");
 				
 			// first replace any email alias with their alias versions

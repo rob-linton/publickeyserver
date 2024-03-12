@@ -212,8 +212,8 @@ public class Misc
 	public static void LogCheckMark(string message)
 	{
 		message = "[ \u2713 ]  " + message;
-		Globals.ProgressSource.Add(message);
-		Globals.ProgressListView.SetNeedsDisplay();
+
+		Globals.UpdateProgressMessage(message);
 		
 		if (Globals.Verbose > 0)
 		{
@@ -225,8 +225,7 @@ public class Misc
 	public static void LogCross(string message)
 	{
 		message = "[ X ]  " + message;
-		Globals.ProgressSource.Add(message);
-		Globals.ProgressListView.SetNeedsDisplay();
+		Globals.UpdateProgressMessage(message);
 	
 		if (Globals.Verbose > 0)
 		{
