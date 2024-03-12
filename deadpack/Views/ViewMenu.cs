@@ -22,12 +22,12 @@ class ViewMenu
                 }),
 				new MenuItem ("_Quit", "", () => { 
                     Application.RequestStop (); 
-                },null,null,Key.CtrlMask | Key.Q),
+                },null,null,Key.CtrlMask | Key.D | Key.Q),
             }),
 			new MenuBarItem ("_File", new MenuItem [] {
                 new MenuItem ("New _DeadPack", "", () => { 
                     Application.RequestStop (); 
-                },null,null,Key.CtrlMask | Key.D),
+                },null,null,Key.CtrlMask | Key.F | Key.D),
 				new MenuItem ("_Open DeadPack", "", () => { 
                     Application.RequestStop (); 
                 }),

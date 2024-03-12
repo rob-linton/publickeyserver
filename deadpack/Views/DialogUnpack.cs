@@ -15,7 +15,7 @@ public class DialogUnpack
 		// get the current directory
 		string currentDirectory = Environment.CurrentDirectory;
 
-		Globals.Progress.Clear();
+		Globals.ProgressSource.Clear();
 
 		Enums.DialogReturn result = Enums.DialogReturn.Cancel;
 
@@ -33,7 +33,7 @@ public class DialogUnpack
 		var cancel = new Button("Close");
 		cancel.Clicked += () => Application.RequestStop ();
 
-		var dialog = new Dialog ("", 0, 0, ok, cancel);
+		var dialog = new Dialog ("", 0, 0, cancel, ok);
 		
 		dialog.Border.BorderStyle = BorderStyle.Double;
 		dialog.ColorScheme = Colors.Base;
@@ -55,20 +55,43 @@ public class DialogUnpack
 		viewOutput.Add(output);
 
 		//
+		// add the progress bar
+		//
+		ProgressBar extractProgress = new ProgressBar () {
+			X = 2,
+			Y = 4,
+			Width = Dim.Fill () - 1,
+			Height = 1,
+			Fraction = 0.0F,
+		};
+		Globals.Progressbar = extractProgress;
+
+		Label progressLabel = new Label("Unpacking...") 
+		{ 
+			X = 2, 
+			Y = Pos.Bottom(extractProgress) + 1, 
+			Width = Dim.Fill() - 1, 
+			Height = 1 
+		};
+		Globals.ProgressLabel = progressLabel;
+
+		//
 		// add the progress view list
 		//
 		Window viewProgress = new Window ("Extract Verification") {
 			X = 1,
-			Y = 4,
+			Y = Pos.Bottom(progressLabel) + 1, 
 			Width = Dim.Fill () - 1,
 			Height = Dim.Fill () - 2
 		};
-		var listViewProgress = new ListView(Globals.Progress) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
+		var listViewProgress = new ListView(Globals.ProgressSource) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
 		Globals.ProgressListView = listViewProgress;
+
+		
 
 		viewProgress.Add(listViewProgress);
 	
-		dialog.Add (viewOutput, viewProgress);
+		dialog.Add (viewOutput, extractProgress, progressLabel, viewProgress);
 		Application.Run (dialog);
 
 		return result;

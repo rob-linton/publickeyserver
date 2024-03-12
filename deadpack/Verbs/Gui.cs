@@ -26,6 +26,7 @@ class Gui
 	}
 	public static async void Build()
 	{
+		// start the Gui
 		Application.Init ();
 
 		Globals.StandardColors = new ColorScheme()
@@ -44,28 +45,33 @@ class Gui
 			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
 		};
 
-		Globals.Progress = new List<string>();
+		Globals.ProgressSource = new List<string>();
 		Globals.Verbose = 0;
 
 		ViewMenu menu = new ViewMenu();
 
-        Globals.ViewLeft = new Window ("Aliases") {
+        Globals.ViewLeft = new FrameView ("Aliases") {
             X = 0,
             Y = 1,
             Width = 60,
-            Height = Dim.Fill () - 1
+            Height = Dim.Fill () - 1,
+			ColorScheme = Globals.StandardColors
         };
+	 	
 
-		Globals.ViewRight = new Window ("DeadPacks") {
-            X = 60,
-            Y = 1,
-            Width = Dim.Fill (),
-            Height = Dim.Fill () - 1
-        };
 
-		// add the list of aliases
+
+		Globals.ViewRight = new FrameView ("DeadPacks") {
+			X = 60,
+			Y = 1,
+			Width = Dim.Fill (),
+			Height = Dim.Fill () - 1,
+			ColorScheme = Globals.StandardColors
+		};
+
 		Globals.ViewAliases = new ViewAliases();
 		Globals.ViewLeft.Add(Globals.ViewAliases);
+
 
 		// add the list of deadpacks
 		Globals.ViewDeadPacks = new ViewDeadPacks(Globals.Alias, Globals.Location);
@@ -81,4 +87,6 @@ class Gui
 
 		return;
 	}
+
+	
 }

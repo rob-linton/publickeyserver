@@ -1,5 +1,6 @@
 
 using System;
+using Microsoft.VisualBasic;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
 
@@ -31,13 +32,16 @@ public class ViewAliases : Window
 		}
 
 		// create the list view
-		var add = new Button("+ Add Alias") { X = Pos.Right(this) - 18, Y = 0, Width = 11, Height = 1 };
-		var received = new Label("Inbox To") { X = 0, Y = Pos.Bottom(add), Width = Dim.Fill(), Height = 1 };
+		Button addDeadPack = new Button("+ DeadPack") { X = Pos.Right(this) - 17, Y = 0, Width = 15, Height = 1 };
+		var addAlias = new Button("+ Alias") { X = Pos.Left(addDeadPack) - 13, Y = 0, Width = 11, Height = 1 };
+		
+
+		var received = new Label("Inbox") { X = 0, Y = Pos.Bottom(addAlias), Width = Dim.Fill(), Height = 1 };
 		var listViewReceived = new ListView(source) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
 		listViewReceived.ColorScheme = Globals.YellowColors;
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
 
-		var sent = new Label("Sent From") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
+		var sent = new Label("Sent") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
 		var listViewSent = new ListView(source) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
 		listViewSent.ColorScheme = Globals.YellowColors;
 		listViewSent.OpenSelectedItem += listView_OpenSent;
@@ -46,7 +50,8 @@ public class ViewAliases : Window
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
 		outbox.OpenSelectedItem += listView_OpenOutbox;
 		outbox.ColorScheme = Globals.YellowColors;
-		Add(add, received, listViewReceived, sent, listViewSent, outbox);
+		Add(received, listViewReceived, sent, listViewSent, outbox, addAlias, addDeadPack);		
+		
 		
 	}
 
@@ -54,31 +59,34 @@ public class ViewAliases : Window
 	{
 		Globals.Alias = e.Value.ToString();
 		Globals.Location = "inbox";
-
-		// removing the view and re-adding it causes it to get the focus
-		Globals.ViewRight.Remove(Globals.ViewDeadPacks);
 		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
-		Globals.ViewRight.Add(Globals.ViewDeadPacks);
+		Globals.ViewRight.FocusFirst();
 	}
 
 	private void listView_OpenSent(ListViewItemEventArgs e)
 	{
 		Globals.Alias = e.Value.ToString();
 		Globals.Location = "sent";
-		// removing the view and re-adding it causes it to get the focus
-		Globals.ViewRight.Remove(Globals.ViewDeadPacks);
 		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
-		Globals.ViewRight.Add(Globals.ViewDeadPacks);
+		Globals.ViewRight.FocusFirst();
 	}
 
 	private void listView_OpenOutbox(ListViewItemEventArgs e)
 	{
 		Globals.Alias = "";
 		Globals.Location = "outbox";
-		// removing the view and re-adding it causes it to get the focus
-		Globals.ViewRight.Remove(Globals.ViewDeadPacks);
 		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
-		Globals.ViewRight.Add(Globals.ViewDeadPacks);
+		Globals.ViewRight.FocusFirst();
+	}
+
+	public override bool ProcessKey (KeyEvent keyEvent)
+	{
+		if (keyEvent.Key == Key.CursorRight)
+		{
+			Globals.ViewDeadPacks.FocusFirst();
+			return true;
+		}
+		return base.ProcessKey (keyEvent);
 	}
 
 	

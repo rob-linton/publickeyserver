@@ -212,24 +212,22 @@ public class Misc
 	public static void LogCheckMark(string message)
 	{
 		message = "[ \u2713 ]  " + message;
-		Globals.Progress.Add(message);
-		Globals.ProgressListView.Redraw(Globals.ProgressListView.Bounds);
+		Globals.ProgressSource.Add(message);
+		Globals.ProgressListView.SetNeedsDisplay();
 		
 		if (Globals.Verbose > 0)
 		{
 			Console.WriteLine(message);
 		}
-
-		
 	}
 	// --------------------------------------------------------------------------------------------------------
 	// log a cross check mark
 	public static void LogCross(string message)
 	{
 		message = "[ X ]  " + message;
-		Globals.Progress.Add(message);
-		Globals.ProgressListView.Redraw(Globals.ProgressListView.Bounds);
-		
+		Globals.ProgressSource.Add(message);
+		Globals.ProgressListView.SetNeedsDisplay();
+	
 		if (Globals.Verbose > 0)
 		{
 			// print it in red

@@ -35,14 +35,8 @@ public class ViewDeadPacks : Window
 		// get a list of deadpacks
 		List<DeadPack> deadPacks = Storage.ListDeadPacks(alias, location, Globals.Password);
 
-		Button add = new Button("+ Add DeadPack") { X = Pos.Right(this) - 21, Y = 0, Width = 15, Height = 1 };
 		
-		Button back = new Button("<-") { X = 0, Y = 0, Width = 5, Height = 1 };
-		back.Clicked += () => 
-		{
-			Globals.ViewLeft.Remove(Globals.ViewAliases);
-			Globals.ViewLeft.Add(Globals.ViewAliases);
-		};
+		
 
 		// add the heding
 		var heading = new Label("DeadPacks") { X = 0, Y = 2, Width = Dim.Fill(), Height = 1 };
@@ -51,7 +45,7 @@ public class ViewDeadPacks : Window
 		ListView listView = new ListView(deadPacks) { X = 0, Y = 3, Width = Dim.Fill(), Height = Dim.Fill() - 2};
 		listView.OpenSelectedItem += listView_OpenSelectedItem;
 		listView.ColorScheme = Globals.YellowColors;
-		Add(back, add, heading, listView);
+		Add(listView, heading);
 	}
 
 	private void listView_OpenSelectedItem(ListViewItemEventArgs e)
@@ -67,8 +61,24 @@ public class ViewDeadPacks : Window
 		if (result == Enums.DialogReturn.Extract)
 		{
 			string input = deadPack.Filename;
-			
+
 			new DialogUnpack().Build(input, alias);
 		}
+	}
+
+	private void listView_LeftArrow(ListViewItemEventArgs e)
+	{
+		Globals.ViewLeft.Remove(Globals.ViewAliases);
+		Globals.ViewLeft.Add(Globals.ViewAliases);
+	}
+
+	public override bool ProcessKey (KeyEvent keyEvent)
+	{
+		if (keyEvent.Key == Key.CursorLeft)
+		{
+			Globals.ViewAliases.FocusFirst();
+			return true;
+		}
+		return base.ProcessKey (keyEvent);
 	}
 }	
