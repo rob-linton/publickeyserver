@@ -49,6 +49,7 @@ class Gui
 		Globals.Verbose = 0;
 
 		ViewMenu menu = new ViewMenu();
+		ViewStatusBar statusBar = new ViewStatusBar();
 
         Globals.ViewLeft = new FrameView ("Aliases") {
             X = 0,
@@ -80,7 +81,7 @@ class Gui
 
 		// Add both menu and win in a single call
 		Application.Top.RemoveAll();
-        Application.Top.Add (menu.Menu, Globals.ViewRight);
+        Application.Top.Add (menu.Menu, statusBar.StatusBar, Globals.ViewRight);
 		Application.Top.Add(Globals.ViewLeft);
         Application.Run ();
         Application.Shutdown ();
