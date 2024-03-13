@@ -65,6 +65,10 @@ public static class Globals
 			{
 				ProgressLabel.Text = "Unpacking complete";
 			}
+			else if (index == 0)
+			{
+				ProgressLabel.Text = "Unpacking...";
+			}
 			else
 			{
 				ProgressLabel.Text = "Unpacking " + index.ToString() + " of " + count.ToString() + "...";

@@ -24,7 +24,7 @@ public class DialogUnpack
 		var ok = new Button("Go");
 		ok.Clicked += async () => { 
 			
-
+			Globals.UpdateProgressBar(0, 0);
 			
 			UnpackOptions opts = new UnpackOptions()
 			{
@@ -84,7 +84,7 @@ public class DialogUnpack
 			Fraction = 0.0F,
 		};
 		
-		Label progressLabel = new Label("Unpacking...") 
+		Label progressLabel = new Label("") 
 		{ 
 			X = 2, 
 			Y = Pos.Bottom(extractProgress) + 1, 
