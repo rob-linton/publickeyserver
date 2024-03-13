@@ -85,7 +85,7 @@ public class DialogSelectFiles
 		};
 		checkBox.Toggled += (e) => 
 		{
-			recursive = e; 
+			recursive = checkBox.Checked; 
 		};
 
 		//

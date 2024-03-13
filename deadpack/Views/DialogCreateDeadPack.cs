@@ -17,7 +17,7 @@ public class DialogCreateDeadPack
 		string deadPackFrom = alias;
 		string deadPackSubject = "";
 		string deadPackMessage = "";
-		List<Recipient> deadPackRecipients = new List<Recipient>();
+		List<string> deadPackRecipients = new List<string>();
 		string[] deadPackFiles = new string[0];
 		bool recursive = false;
 
@@ -209,7 +209,7 @@ public class DialogCreateDeadPack
 		//
 		// add the files add button
 		//
-		var add = new Button("+ Add")
+		var addFiles = new Button("+ Add")
 		{
 			X = 9,
 			Y = Pos.Top(viewLeft),
@@ -217,7 +217,7 @@ public class DialogCreateDeadPack
 			Height = 1
 		
 		};
-		add.Clicked += () => 
+		addFiles.Clicked += () => 
 		{
 			(string filename, recursive, deadPackFiles) = new DialogSelectFiles().Build("Select Files");
 			files.SetSource(deadPackFiles);
@@ -241,11 +241,29 @@ public class DialogCreateDeadPack
 			Height = Dim.Fill() - 2,
 			TabStop = false,
 		};
-		
 		viewRight.Add(recipients);
 
+		//
+		// add the files add button
+		//
+		var addRecipient = new Button("+ Add")
+		{
+			X = dialog.Frame.Width - 50,
+            Y = 16,
+			Width = 10,
+			Height = 1
+		
+		};
+		addRecipient.Clicked += async () => 
+		{
+			string lookupAlias = await new DialogSelectAliases().Build("Select Alias", deadPackFrom);
+			deadPackRecipients.Add(lookupAlias);
+			recipients.SetSource(deadPackRecipients);
+		};
+
+
 	
-		dialog.Add (viewFrom, addAlias, viewCreated, viewSubject, viewMessage, viewRight, viewLeft, add);
+		dialog.Add (viewFrom, addAlias, viewCreated, viewSubject, viewMessage, viewRight, viewLeft, addFiles, addRecipient);
 		Application.Run (dialog);
 
 		return result;
