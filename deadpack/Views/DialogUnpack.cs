@@ -9,6 +9,8 @@ namespace deadrop.Verbs;
 
 public class DialogUnpack
 {
+	
+
 	// build
 	public Enums.DialogReturn Build(string input, String alias)
 	{
@@ -21,17 +23,34 @@ public class DialogUnpack
 
 		var ok = new Button("Go");
 		ok.Clicked += async () => { 
+			
+
+			
 			UnpackOptions opts = new UnpackOptions()
 			{
 				Alias = alias,
 				Output = currentDirectory,
 				File = input
 			};
-			await Unpack.Execute(opts);
+			
+			// report on progress
+			var progress = new Progress<StatusUpdate>(StatusUpdate =>
+			{
+				Globals.UpdateProgressBar(StatusUpdate.Index, StatusUpdate.Count);
+			});
+
+			if (String.IsNullOrEmpty(alias))
+				await Unpack.Execute(opts, progress);
+			else
+				await Unpack.ExecuteInternal(opts, alias, progress);
+			
 		};
 
 		var cancel = new Button("Close");
-		cancel.Clicked += () => Application.RequestStop ();
+		cancel.Clicked += () =>
+		{	
+			Application.RequestStop();
+		};
 
 		var dialog = new Dialog ("", 0, 0, cancel, ok);
 		
@@ -64,8 +83,7 @@ public class DialogUnpack
 			Height = 1,
 			Fraction = 0.0F,
 		};
-		Globals.Progressbar = extractProgress;
-
+		
 		Label progressLabel = new Label("Unpacking...") 
 		{ 
 			X = 2, 
@@ -73,7 +91,6 @@ public class DialogUnpack
 			Width = Dim.Fill() - 1, 
 			Height = 1 
 		};
-		Globals.ProgressLabel = progressLabel;
 
 		//
 		// add the progress view list
@@ -85,9 +102,9 @@ public class DialogUnpack
 			Height = Dim.Fill () - 2
 		};
 		var listViewProgress = new ListView(Globals.ProgressSource) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
-		Globals.ProgressListView = listViewProgress;
-
 		
+		// setup the progress
+		Globals.SetupProgress(listViewProgress, extractProgress, progressLabel);
 
 		viewProgress.Add(listViewProgress);
 	
@@ -96,4 +113,7 @@ public class DialogUnpack
 
 		return result;
 	}
+
+	
+	
 }

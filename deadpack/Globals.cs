@@ -44,40 +44,51 @@ public static class Globals
 		try
 		{
 			ProgressSource.Add(message);
-			ProgressListView.SetNeedsDisplay();
-			ProgressListView.Redraw(ProgressListView.Bounds);
 		}
 		catch { }
 	}
 
 	public static void UpdateProgressBar(float index, float count)
 	{
-		ProgressIndex = index;
-		ProgressCount = count;
-	}
-	public static void UpdateProgressBar()
-	{
+		if (index > count)
+		{
+			index = count;
+		}
+		if (count == 0)
+		{
+			count = 1;
+		}
 		try
 		{
-			Progressbar.Fraction = ProgressIndex / ProgressCount;
-			ProgressLabel.Text = "Unpacking " + ProgressIndex.ToString() + " of " + ProgressCount.ToString() + "...";
-			Progressbar.SetNeedsDisplay();
-			ProgressLabel.SetNeedsDisplay();
-			ProgressLabel.Redraw(ProgressLabel.Bounds);
-			Progressbar.Redraw(Progressbar.Bounds);
-			Application.MainLoop.Driver.Wakeup ();
+			Progressbar.Fraction = index / count;
+			if (index == count)
+			{
+				ProgressLabel.Text = "Unpacking complete";
+			}
+			else
+			{
+				ProgressLabel.Text = "Unpacking " + index.ToString() + " of " + count.ToString() + "...";
+			}
+
 		}
 		catch (Exception e)
-		{ 
+		{
 			//Console.WriteLine(e.Message);
 		}
 	}
-	public static float ProgressIndex;
-	public static float ProgressCount;
+	
+	public static void SetupProgress(ListView progressListView, ProgressBar progressBar, Label progressLabel)
+	{
+		ProgressListView = progressListView;
+		Progressbar = progressBar;
+		ProgressLabel = progressLabel;
+	}
+
+
 	public static List<string> ProgressSource;
-	public static ListView ProgressListView;
-	public static ProgressBar Progressbar;
-	public static Label ProgressLabel;
+	private static ListView ProgressListView;
+	private static ProgressBar Progressbar;
+	private static Label ProgressLabel;
 
 
 

@@ -4,7 +4,7 @@ namespace deadrop.Verbs;
 
 public class Options
 {
-	[Option('v', "verbose", Default = 0, HelpText = "Set output to verbose messages.")]
+	[Option('v', "verbose", Default = "0", HelpText = "Set output to verbose messages.")]
 	public string Verbose
 	{
 		get 

@@ -23,7 +23,7 @@ public class UnpackOptions : Options
 
 class Unpack 
 {
-	public static async Task<int> Execute(UnpackOptions opts)
+	public static async Task<int> Execute(UnpackOptions opts, IProgress<StatusUpdate> progress = null)
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Unpacking deadpack...");
@@ -46,7 +46,7 @@ class Unpack
 			{
 				string alias = a.Name;
 				Misc.LogLine($"\nChecking alias {alias}...");
-				int result = await ExecuteInternal(opts, alias);
+				int result = await ExecuteInternal(opts, alias, progress);
 				if (result == 0)
 					return result;
 			}
@@ -55,7 +55,7 @@ class Unpack
 		}
 	}
 
-	public static async Task<int> ExecuteInternal(UnpackOptions opts, string alias)
+	public static async Task<int> ExecuteInternal(UnpackOptions opts, string alias, IProgress<StatusUpdate> progress = null)
 	{
 		try
 		{
@@ -308,7 +308,15 @@ class Unpack
 							File.SetLastWriteTime(file.Name, modifiedDate);
 
 							// update the progress bar if it is not null
-							Globals.UpdateProgressBar((float)manifest.Files.IndexOf(file) + 1, (float)manifest.Files.Count);
+							//Globals.UpdateProgressBar((float)manifest.Files.IndexOf(file) + 1, (float)manifest.Files.Count);
+							StatusUpdate statusUpdate = new StatusUpdate
+							{
+								Index = (float)manifest.Files.IndexOf(file) + 1,
+								Count = (float)manifest.Files.Count
+							};
+
+							progress?.Report(statusUpdate);
+							await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
 						}
 						Misc.LogLine($"\n\nYour files are located in {opts.Output}");
 						Misc.LogLine("\nDone\n");
