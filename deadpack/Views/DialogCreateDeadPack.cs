@@ -7,19 +7,27 @@ using Terminal.Gui.Trees;
 
 namespace deadrop.Verbs;
 
-public class DialogOpenDeadPack 
+public class DialogCreateDeadPack
 {
 	// build
-	public Enums.DialogReturn Build(dynamic e, string location)
+	public Enums.DialogReturn Build(string alias = "")
 	{
-		DeadPack deadPack = (DeadPack)e.Value;
+		
+
+		string deadPackFrom = alias;
+		string deadPackSubject = "";
+		string deadPackMessage = "";
+		List<Recipient> deadPackRecipients = new List<Recipient>();
+		string[] deadPackFiles = new string[0];
+		bool recursive = false;
+
 
 		Enums.DialogReturn result = Enums.DialogReturn.Cancel;
 
-		var cancel = new Button("Close");
+		var cancel = new Button("Cancel");
 		cancel.Clicked += () => Application.RequestStop ();
 
-		var extract = new Button("Extract");
+		var extract = new Button("Create");
 		extract.Clicked += () => { Application.RequestStop (); result = Enums.DialogReturn.Extract; };
 
 		int width = Application.Top.Frame.Width;
@@ -29,6 +37,21 @@ public class DialogOpenDeadPack
 		dialog.Border.BorderStyle = BorderStyle.None;
 		dialog.ColorScheme = Colors.Base;
 
+		if (string.IsNullOrEmpty(alias))
+		{
+			// get a list of aliases
+			List<Alias> aliases = Storage.GetAliases();
+			List<string> source = new List<string>();
+			foreach (var a in aliases)
+			{
+				source.Add(a.Name);
+			}
+
+			// create the select from list dialog
+			DialogSelectFromList dialogSelectFromList = new DialogSelectFromList();
+			deadPackFrom = dialogSelectFromList.Build(source, "Select Alias");
+		}
+		
 		//
 		// add the from
 		//
@@ -39,11 +62,11 @@ public class DialogOpenDeadPack
 			Width = Dim.Fill() - 2,
 			Height = Dim.Fill(),
 			TabStop = false,
-			Text = deadPack.From,
+			Text = deadPackFrom,
 			ReadOnly = true,
 			ColorScheme = Globals.StandardColors
 		};
-
+		
 
 		FrameView viewFrom = new FrameView ("From") {
         	X = 1,
@@ -58,8 +81,7 @@ public class DialogOpenDeadPack
 		//
 		// add the Date Time
 		//
-		DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-		dateTime = dateTime.AddSeconds(deadPack.Timestamp).ToLocalTime();
+		DateTime dateTime = DateTime.UtcNow;
 		string dt = dateTime.ToString("dd-MMM-yyyy hh:mmtt");
 
 
@@ -96,9 +118,10 @@ public class DialogOpenDeadPack
 			Y = 1,
 			Width = Dim.Fill() - 1,
 			Height = Dim.Fill(),
-			Text = deadPack.Subject,
-			ReadOnly = true,
-			TabStop = false,
+			Text = deadPackSubject,
+			ReadOnly = false,
+			TabStop = true,
+			Multiline = false,
 			ColorScheme = Globals.StandardColors
 		};
 
@@ -107,7 +130,7 @@ public class DialogOpenDeadPack
             Y = 5,
             Width = Dim.Fill () - 1,
             Height = 4,
-			TabStop = false,
+			TabStop = true,
         };
 		viewSubject.Border.BorderStyle = BorderStyle.Single;
 		viewSubject.Add(subject);
@@ -121,9 +144,9 @@ public class DialogOpenDeadPack
 			Y = 1,
 			Width = Dim.Fill() - 2,
 			Height = Dim.Fill(),
-			Text = deadPack.Message,
-			ReadOnly = true,
-			TabStop = false,
+			Text = deadPackMessage,
+			ReadOnly = false,
+			TabStop = true,
 			ColorScheme = Globals.StandardColors
 		};
 
@@ -132,7 +155,7 @@ public class DialogOpenDeadPack
             Y = 9,
             Width = Dim.Fill () - 1,
             Height = 7,
-			TabStop = false,
+			TabStop = true,
         };
 		viewMessage.Border.BorderStyle = BorderStyle.Single;
 		viewMessage.Add(message);
@@ -145,20 +168,34 @@ public class DialogOpenDeadPack
 			X = 1,
 			Y = 16,
 			Width = Dim.Fill () - 61,
-			Height = Dim.Fill () - 2,
-			TabStop = false,
+			Height = Dim.Fill () - 2
 		};
-		var files = new ListView(deadPack.Files)
+		var files = new ListView(deadPackFiles)
 		{
 			X = 1,
 			Y = 1,
 			Width = Dim.Fill() - 2,
 			Height = Dim.Fill() - 2,
-			ColorScheme = Globals.StandardColors,
-			TabStop = false,
+			ColorScheme = Globals.StandardColors
 		};
-
 		viewLeft.Add(files);
+
+		//
+		// add the files add button
+		//
+		var add = new Button("+ Add")
+		{
+			X = 9,
+			Y = Pos.Top(viewLeft),
+			Width = 10,
+			Height = 1
+		
+		};
+		add.Clicked += () => 
+		{
+			(string filename, recursive, deadPackFiles) = new DialogSelectFiles().Build("Select Files");
+			files.SetSource(deadPackFiles);
+		};
 
 		//
 		// add the list of recipients
@@ -170,7 +207,7 @@ public class DialogOpenDeadPack
             Height = Dim.Fill () - 2,
 			TabStop = false,
         };
-		var recipients = new ListView(deadPack.Recipients) 
+		var recipients = new ListView(deadPackRecipients) 
 		{ 
 			X = 1, 
 			Y = 1, 
@@ -182,10 +219,10 @@ public class DialogOpenDeadPack
 		viewRight.Add(recipients);
 
 	
-		dialog.Add (viewFrom, viewCreated, viewSubject, viewMessage, viewRight);
-		dialog.Add (viewLeft);
+		dialog.Add (viewFrom, viewCreated, viewSubject, viewMessage, viewRight, viewLeft, add);
 		Application.Run (dialog);
 
 		return result;
+
 	}
 }

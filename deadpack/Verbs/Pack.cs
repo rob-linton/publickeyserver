@@ -63,7 +63,7 @@ class Pack
 
 			SearchOption s = SearchOption.TopDirectoryOnly;
 			if (opts.Recurse)
-				s = SearchOption.TopDirectoryOnly;
+				s = SearchOption.AllDirectories;
 
 			// get a list of files from the wildcard returning relative paths only
 			string[] fullPaths = Directory.GetFiles(currentDirectory, opts.File, s);

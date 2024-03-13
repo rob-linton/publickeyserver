@@ -33,6 +33,8 @@ public class ViewAliases : Window
 
 		// create the list view
 		Button addDeadPack = new Button("+ DeadPack") { X = Pos.Right(this) - 17, Y = 0, Width = 15, Height = 1 };
+		addDeadPack.Clicked += () => { new DialogCreateDeadPack().Build(Globals.Alias); };
+
 		var addAlias = new Button("+ Alias") { X = Pos.Left(addDeadPack) - 13, Y = 0, Width = 11, Height = 1 };
 		
 
@@ -40,11 +42,13 @@ public class ViewAliases : Window
 		var listViewReceived = new ListView(source) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
 		listViewReceived.ColorScheme = Globals.YellowColors;
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
+		listViewReceived.SelectedItemChanged += (args) => { Globals.Alias = args.Value.ToString(); };
 
 		var sent = new Label("Sent") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
 		var listViewSent = new ListView(source) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
 		listViewSent.ColorScheme = Globals.YellowColors;
 		listViewSent.OpenSelectedItem += listView_OpenSent;
+		listViewSent.SelectedItemChanged += (args) => { Globals.Alias = args.Value.ToString(); };
 
 		var outbox = new ListView(new List<string>() { "Outbox" }) { X = 0, Y = Pos.Bottom(listViewSent) + 1, Width = Dim.Fill(), Height = 1 };
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
