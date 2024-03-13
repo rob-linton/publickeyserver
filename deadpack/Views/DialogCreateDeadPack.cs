@@ -78,6 +78,32 @@ public class DialogCreateDeadPack
 		viewFrom.Border.BorderStyle = BorderStyle.Single;
 		viewFrom.Add(from);
 
+		// add a button
+		//
+		var addAlias = new Button("+ Select Alias")
+		{
+			X = 8,
+			Y = 1,
+			Width = 10,
+			Height = 1
+		
+		};
+		addAlias.Clicked += () => 
+		{
+			// get a list of aliases
+			List<Alias> aliases = Storage.GetAliases();
+			List<string> source = new List<string>();
+			foreach (var a in aliases)
+			{
+				source.Add(a.Name);
+			}
+
+			// create the select from list dialog
+			DialogSelectFromList dialogSelectFromList = new DialogSelectFromList();
+			deadPackFrom = dialogSelectFromList.Build(source, "Select Alias");
+			from.Text = deadPackFrom;
+		};
+
 		//
 		// add the Date Time
 		//
@@ -219,7 +245,7 @@ public class DialogCreateDeadPack
 		viewRight.Add(recipients);
 
 	
-		dialog.Add (viewFrom, viewCreated, viewSubject, viewMessage, viewRight, viewLeft, add);
+		dialog.Add (viewFrom, addAlias, viewCreated, viewSubject, viewMessage, viewRight, viewLeft, add);
 		Application.Run (dialog);
 
 		return result;
