@@ -34,7 +34,7 @@ public class DeadPack
 	{
 		DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 		dateTime = dateTime.AddSeconds(Timestamp).ToLocalTime();
-		string row = dateTime.ToString("dd-MMM-yyyy hh:mmtt") + "  " + From.PadRight(40) + "  " + Subject;
+		string row = dateTime.ToString("dd-MMM-yyyy hh.mmtt") + "  " + From.PadRight(40) + "  " + Subject;
 
 		return row;
 	}

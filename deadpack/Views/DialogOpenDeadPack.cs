@@ -47,7 +47,7 @@ public class DialogOpenDeadPack
 			TabStop = false,
 			Text = deadPack.From,
 			ReadOnly = true,
-			ColorScheme = Globals.StandardColors
+			ColorScheme = Globals.WhiteOnBlue
 		};
 
 
@@ -66,7 +66,7 @@ public class DialogOpenDeadPack
 		//
 		DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 		dateTime = dateTime.AddSeconds(deadPack.Timestamp).ToLocalTime();
-		string dt = dateTime.ToString("dd-MMM-yyyy hh:mmtt");
+		string dt = dateTime.ToString("dd-MMM-yyyy hh.mmtt");
 
 
 		var created = new TextView
@@ -78,7 +78,7 @@ public class DialogOpenDeadPack
 			TabStop = false,
 			Text = dt,
 			ReadOnly = true,
-			ColorScheme = Globals.StandardColors
+			ColorScheme = Globals.WhiteOnBlue
 		};
 
 
@@ -105,7 +105,7 @@ public class DialogOpenDeadPack
 			Text = deadPack.Subject,
 			ReadOnly = true,
 			TabStop = false,
-			ColorScheme = Globals.StandardColors
+			ColorScheme = Globals.WhiteOnBlue
 		};
 
 		FrameView viewSubject = new FrameView ("Subject") {
@@ -130,7 +130,7 @@ public class DialogOpenDeadPack
 			Text = deadPack.Message,
 			ReadOnly = true,
 			TabStop = false,
-			ColorScheme = Globals.StandardColors
+			ColorScheme = Globals.WhiteOnBlue
 		};
 
 		FrameView viewMessage = new FrameView ("Message") {

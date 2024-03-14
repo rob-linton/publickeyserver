@@ -26,7 +26,14 @@ public class DialogSelectFiles
 		var listView = new ListView(source) { X = 1, Y = Pos.Bottom(label)+3, Width = Dim.Fill() - 2, Height = Dim.Fill() - 2};
 
 		// create a textbox
-		var textBox = new TextField("*") { X = 1, Y = Pos.Bottom(label), Width = Dim.Fill() - 30, Height = 1 };
+		var textBox = new TextField("*") 
+		{ 
+			X = 1, 
+			Y = Pos.Bottom(label), 
+			Width = Dim.Fill() - 30, 
+			Height = 1,
+			ColorScheme = Globals.BlueOnWhite
+		};
 		// on press enter
 		textBox.KeyDown += (e) => 
 		{

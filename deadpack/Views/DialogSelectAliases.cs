@@ -38,7 +38,13 @@ public class DialogSelectAliases
 
 
 		// create a textbox
-		var textBox = new TextField("") { X = 1, Y = Pos.Bottom(label), Width = Dim.Fill() - 20, Height = 1 };
+		var textBox = new TextField("") { 
+			X = 1, 
+			Y = Pos.Bottom(label), 
+			Width = Dim.Fill() - 20, 
+			Height = 1,
+			ColorScheme = Globals.BlueOnWhite
+		};
 		// on press enter
 		
 		textBox.KeyDown += async (e) => 

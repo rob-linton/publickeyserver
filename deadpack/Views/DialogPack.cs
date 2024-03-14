@@ -74,11 +74,12 @@ public class DialogPack
 			X = 1, 
 			Y = 1, 
 			Width = Dim.Fill()-1, 
-			Height = Dim.Fill() 
+			Height = Dim.Fill(),
+			ColorScheme = Globals.BlueOnWhite
 		};
 		// set the output directory to the default download directory
 		//output.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads";
-		string readableDate = DateTime.Now.ToString("yyyy-MM-dd-HH.mm.ss");
+		string readableDate = DateTime.Now.ToString("dd-MMM-yyyy hh.mmtt");
 		output.Text = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"{readableDate}.deadpack");
 
 		Window viewOutput = new Window ("Output Location") {
@@ -99,6 +100,7 @@ public class DialogPack
 			Width = Dim.Fill () - 1,
 			Height = 1,
 			Fraction = 0.0F,
+			ColorScheme = Globals.WhiteOnBlue
 		};
 		
 		Label progressLabel = new Label("") 
@@ -106,7 +108,8 @@ public class DialogPack
 			X = 2, 
 			Y = Pos.Bottom(extractProgress) + 1, 
 			Width = Dim.Fill() - 1, 
-			Height = 1 
+			Height = 1,
+			ColorScheme = Globals.WhiteOnBlue
 		};
 
 		//

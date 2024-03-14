@@ -28,7 +28,7 @@ public class FileItem
 	{
 		DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 		dateTime = dateTime.AddSeconds(Ctime).ToLocalTime();
-		string d = dateTime.ToString("dd-MMM-yyyy hh:mmtt");
+		string d = dateTime.ToString("dd-MMM-yyyy hh.mmtt");
 
 		string s = Size.ToString().PadRight(10);
 		

@@ -199,7 +199,7 @@ class Receive
 					string fullKey = file.Key;
 					long size = file.Size;
 					DateTime modified = file.LastModified;
-					string date = modified.ToString("yyyy-MM-dd.HH-mm-ss");
+					string date = modified.ToString("dd-MMM-yyyy hh.mmtt");
 
 					// get the last bit of a/a/a
 					string[] parts = fullKey.Split("/");

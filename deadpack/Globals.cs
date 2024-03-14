@@ -34,7 +34,9 @@ public static class Globals
 	//
 	public static ColorScheme StandardColors; 
 
-	public static ColorScheme YellowColors;
+	public static ColorScheme WhiteOnBlue;
+
+	public static ColorScheme BlueOnWhite;
 
 	//
 	// progress for the gui

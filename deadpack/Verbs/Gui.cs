@@ -32,17 +32,25 @@ class Gui
 		Globals.StandardColors = new ColorScheme()
 		{
 			Normal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+			Focus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
+			HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
+		};
+
+		Globals.WhiteOnBlue = new ColorScheme()
+		{
+			Normal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
 			Focus = Application.Driver.MakeAttribute(Color.White, Color.Blue),
 			HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
 			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Blue),
 		};
 
-		Globals.YellowColors = new ColorScheme()
+		Globals.BlueOnWhite = new ColorScheme()
 		{
-			Normal = Application.Driver.MakeAttribute(Color.BrightYellow, Color.Blue),
-			Focus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
-			HotNormal = Application.Driver.MakeAttribute(Color.BrightYellow, Color.Blue),
-			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
+			Normal = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
+			Focus = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
+			HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
+			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
 		};
 
 		Globals.ProgressSource = new List<string>();

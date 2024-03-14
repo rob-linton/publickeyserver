@@ -44,7 +44,7 @@ public class ViewDeadPacks : Window
 
 		ListView listView = new ListView(deadPacks) { X = 0, Y = 3, Width = Dim.Fill(), Height = Dim.Fill() - 2};
 		listView.OpenSelectedItem += listView_OpenSelectedItem;
-		listView.ColorScheme = Globals.YellowColors;
+		listView.ColorScheme = Globals.StandardColors;
 		Add(listView, heading);
 	}
 
