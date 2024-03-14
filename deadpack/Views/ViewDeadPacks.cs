@@ -54,16 +54,8 @@ public class ViewDeadPacks : Window
 
 		string alias = Globals.Alias;
 		string location = Globals.Location;
-
 		
-		
-		var result = new DialogOpenDeadPack().Build(e, location);
-		if (result == Enums.DialogReturn.Extract)
-		{
-			string input = deadPack.Filename;
-
-			new DialogUnpack().Build(input, alias);
-		}
+		new DialogOpenDeadPack().Build(e);
 	}
 
 	private void listView_LeftArrow(ListViewItemEventArgs e)

@@ -10,7 +10,7 @@ namespace deadrop.Verbs;
 public class DialogOpenDeadPack 
 {
 	// build
-	public Enums.DialogReturn Build(dynamic e, string location)
+	public void Build(dynamic e)
 	{
 		DeadPack deadPack = (DeadPack)e.Value;
 
@@ -20,7 +20,13 @@ public class DialogOpenDeadPack
 		cancel.Clicked += () => Application.RequestStop ();
 
 		var extract = new Button("Extract");
-		extract.Clicked += () => { Application.RequestStop (); result = Enums.DialogReturn.Extract; };
+		extract.Clicked += () => 
+		{
+			string input = deadPack.Filename;
+			new DialogUnpack().Build(input, deadPack.Alias); 
+
+			Application.RequestStop (); 
+		};
 
 		int width = Application.Top.Frame.Width;
 		int height = Application.Top.Frame.Height;
@@ -186,6 +192,6 @@ public class DialogOpenDeadPack
 		dialog.Add (viewLeft);
 		Application.Run (dialog);
 
-		return result;
+		return;
 	}
 }
