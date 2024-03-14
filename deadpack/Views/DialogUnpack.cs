@@ -71,7 +71,7 @@ public class DialogUnpack
 		
 		
 
-		Window viewOutput = new Window ("Output Location") {
+		FrameView viewOutput = new FrameView ("Output Location") {
         	X = 1,
             Y = 0,
             Width = Dim.Fill () - 1,
@@ -104,7 +104,7 @@ public class DialogUnpack
 		//
 		// add the progress view list
 		//
-		Window viewProgress = new Window ("Packing Slip Verification") {
+		FrameView viewProgress = new FrameView ("Packing Slip Verification") {
 			X = 1,
 			Y = Pos.Bottom(progressLabel) + 1, 
 			Width = Dim.Fill () - 1,

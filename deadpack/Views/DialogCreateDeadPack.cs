@@ -286,8 +286,6 @@ public class DialogCreateDeadPack
 			}
 			
 		};
-
-
 	
 		dialog.Add (viewFrom, addAlias, viewCreated, viewSubject, viewMessage, viewRight, viewLeft, addFiles, addRecipient);
 		Application.Run (dialog);

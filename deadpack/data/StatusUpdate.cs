@@ -4,10 +4,14 @@ namespace deadrop;
 
 public class StatusUpdate
 {
-    [JsonPropertyName("index")]
-    public required float Index { get; set; }
+	[JsonPropertyName("index")]
+	public float Index { get; set; } = 0;
 
 	[JsonPropertyName("count")]
-    public required float Count { get; set; }
+	public float Count { get; set; } = 0;
+
+	[JsonPropertyName("status")]
+    public string? Status { get; set; }
+
 
 }

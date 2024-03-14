@@ -37,6 +37,7 @@ public static class Globals
 	public static ColorScheme WhiteOnBlue;
 
 	public static ColorScheme BlueOnWhite;
+	
 
 	//
 	// progress for the gui
@@ -62,7 +63,12 @@ public static class Globals
 		}
 		try
 		{
-			Progressbar.Fraction = index / count;
+			try
+			{
+				Progressbar.Fraction = index / count;
+			}
+			catch { }
+
 			if (index == count)
 			{
 				ProgressLabel.Text = $"{action} complete";

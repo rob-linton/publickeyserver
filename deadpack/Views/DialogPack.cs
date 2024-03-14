@@ -82,7 +82,7 @@ public class DialogPack
 		string readableDate = DateTime.Now.ToString("dd-MMM-yyyy hh.mmtt");
 		output.Text = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"{readableDate}.deadpack");
 
-		Window viewOutput = new Window ("Output Location") {
+		FrameView viewOutput = new FrameView ("Output Location") {
         	X = 1,
             Y = 0,
             Width = Dim.Fill () - 1,
@@ -115,7 +115,7 @@ public class DialogPack
 		//
 		// add the progress view list
 		//
-		Window viewProgress = new Window ("Packing Slip Verification") {
+		FrameView viewProgress = new FrameView ("Packing Slip Verification") {
 			X = 1,
 			Y = Pos.Bottom(progressLabel) + 1, 
 			Width = Dim.Fill () - 1,

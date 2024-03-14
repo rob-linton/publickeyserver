@@ -24,7 +24,7 @@ public class CreateOptions : Options
 }
 class Create 
 {
-	public static async Task<int> Execute(CreateOptions opts)
+	public static async Task<int> Execute(CreateOptions opts, IProgress<StatusUpdate> progress = null)
 	{
 		try
 		{
@@ -139,6 +139,15 @@ class Create
 			Misc.LogCheckMark("Root certificate fingerprint saved");
 
 			Misc.LogLine($"\nAlias {alias} created\n");
+
+			// update the progress bar if it is not null
+			StatusUpdate statusUpdate = new StatusUpdate
+			{
+				Status = $"Alias {alias} created"
+			};
+
+			progress?.Report(statusUpdate);
+			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
 		}
 		catch (Exception ex)
 		{

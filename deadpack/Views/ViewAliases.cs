@@ -36,6 +36,10 @@ public class ViewAliases : Window
 		addDeadPack.Clicked += () => { new DialogCreateDeadPack().Build(Globals.Alias); };
 
 		var addAlias = new Button("+ Alias") { X = Pos.Left(addDeadPack) - 13, Y = 0, Width = 11, Height = 1 };
+		addAlias.Clicked += () => 
+		{ 
+			new DialogCreateAlias().Build(); 
+		};
 		
 
 		var received = new Label("Received") { X = 0, Y = Pos.Bottom(addAlias), Width = Dim.Fill(), Height = 1 };
