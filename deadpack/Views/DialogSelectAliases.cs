@@ -17,6 +17,7 @@ public class DialogSelectAliases
 	{	
 		string selected = "";
 		List<string> source = new List<string>();
+		string lastSearch = "";
 		
 
 		// create a label
@@ -35,27 +36,28 @@ public class DialogSelectAliases
 		// create a textbox
 		var textBox = new TextField("") { X = 1, Y = Pos.Bottom(label), Width = Dim.Fill() - 20, Height = 1 };
 		// on press enter
-		/*
-		textBox.KeyPress += async (e) => 
+		
+		textBox.KeyDown += async (e) => 
 		{
 			if (e.KeyEvent.Key == Key.Enter)
 			{
-				string toDomain = Misc.GetDomain(fromAlias);
-				
-				// get a list of deadpacks from the server
-				string result = await HttpHelper.Get($"https://" + toDomain + "/lookup/" + textBox.Text.ToString());
-
-				// parse the json
-				ListResult files = JsonSerializer.Deserialize<ListResult>(result) ?? throw new Exception($"Could not parse json: {result}");
-				foreach (var file in files.Files)
+				if (lastSearch == textBox.Text.ToString())
 				{
-					string alias = file.Key.Replace(".pem", "").Replace("cert/", "");
-					source.Add(alias);
+					return;
 				}
-				listView.SetSource(source);
+				lastSearch = textBox.Text.ToString();
+
+				string toDomain = Misc.GetDomain(fromAlias);
+
+				//
+				// get a list of deadpacks from the server
+				//
+				string lookup = textBox.Text.ToString();
+				LookupAlias(fromAlias, lookup, source, listView, lastSearch); 
 			}
 		};
-		*/
+		
+		
 
 		// create a button at the end of the textbox
 		var search = new Button("Search")
@@ -74,17 +76,11 @@ public class DialogSelectAliases
 				return;
 			}
 
+			//
 			// get a list of deadpacks from the server
-			string result = await HttpHelper.Get($"https://" + toDomain + "/lookup/" + search);
-
-			// parse the json
-			ListResult files = JsonSerializer.Deserialize<ListResult>(result) ?? throw new Exception($"Could not parse json: {result}");
-			foreach (var file in files.Files)
-			{
-				string alias = file.Key.Replace(".pem", "").Replace("cert/", "");
-				source.Add(alias);
-			}
-			listView.SetSource(source);
+			//
+			string lookup = textBox.Text.ToString();
+			LookupAlias(fromAlias, lookup, source, listView, lastSearch); 
 						
 		};
 
@@ -98,16 +94,56 @@ public class DialogSelectAliases
 		cancel.Clicked += () => { Application.RequestStop(); selected = "";  };
 
 
-		var dialog = new Dialog (title, 0, 0, ok);
+		var dialog = new Dialog (title, 0, 0, ok, cancel);
 		dialog.Border.BorderStyle = BorderStyle.Double;
 		dialog.ColorScheme = Colors.Base;
-
+		dialog.FocusFirst();
 		
-		dialog.Add(label, textBox, search, listView);
+		dialog.Add(textBox, label, search, listView);
 		Application.Run (dialog);
 
 		return selected;
 
 	}
-	
+
+	private async void LookupAlias(string fromAlias, string lookup, List<string> source, ListView listView, string lastSearch) 
+	{
+		string toDomain = Misc.GetDomain(fromAlias);
+
+		//
+		// get a list of deadpacks from the server
+		//
+
+		// sign it with the sender
+		long unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+		string privateKeyPem = Storage.GetPrivateKey($"{fromAlias}.rsa", Globals.Password);
+		AsymmetricCipherKeyPair privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
+
+		string domain = Misc.GetDomainFromAlias(fromAlias);
+		byte[] data = $"{fromAlias}{unixTimestamp.ToString()}{domain}".ToBytes();
+		byte[] signature = BouncyCastleHelper.SignData(data, privateKey.Private);
+		string base64Signature = Convert.ToBase64String(signature);
+
+		// get a list of deadpacks from the server
+		//string lookup = textBox.Text.ToString();
+		string result = await HttpHelper.Get($"https://{toDomain}/lookup/{lookup}?alias={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}");
+
+
+		//string result = await HttpHelper.Get($"https://" + toDomain + "/lookup/" + textBox.Text.ToString());
+
+		// parse the json
+		ListResult files = JsonSerializer.Deserialize<ListResult>(result) ?? throw new Exception($"Could not parse json: {result}");
+		source.Clear();
+		foreach (var file in files.Files)
+		{
+			string alias = file.Key;
+			if (!source.Contains(alias))
+				source.Add(alias);
+		}
+		listView.SetSource(source);
+		listView.SetFocus();
+
+		lastSearch = lookup;
+	}
 }

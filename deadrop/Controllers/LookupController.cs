@@ -46,10 +46,18 @@ namespace publickeyserver
 		// ------------------------------------------------------------------------------------------------------------
 		[Produces("application/json")]
 		[HttpGet("{recipient}")]
-		public async Task<IActionResult> List(string recipient)
+		public async Task<IActionResult> List(string recipient, string alias, string timestamp, string signature)
 		{
 			try
 			{
+				signature = signature.Replace(" ", "+");
+				
+				string host = Request.Host.Host + ":" + Request.Host.Port;
+
+				string result = await PackageHelper.ValidateRecipient(alias, host, signature, timestamp);
+				if (!String.IsNullOrEmpty(result))
+					return BadRequest(result);
+
 				string key = $"cert/{recipient}";
 
 				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
@@ -72,8 +80,9 @@ namespace publickeyserver
 						List<ListFile> listFiles = new List<ListFile>();
 						foreach (S3Object entry in response.S3Objects)
 						{
+							string S3key = entry.Key.Replace(".pem", "").Replace("cert/", "");
 							ListFile listFile = new ListFile () {
-								Key = entry.Key,
+								Key = S3key,
 								Size = entry.Size,
 								LastModified = entry.LastModified
 							};

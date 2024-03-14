@@ -156,7 +156,7 @@ public class DialogCreateDeadPack
             Y = 5,
             Width = Dim.Fill () - 1,
             Height = 4,
-			TabStop = true,
+			TabStop = false,
         };
 		viewSubject.Border.BorderStyle = BorderStyle.Single;
 		viewSubject.Add(subject);

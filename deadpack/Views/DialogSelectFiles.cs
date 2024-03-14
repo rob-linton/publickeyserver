@@ -17,6 +17,7 @@ public class DialogSelectFiles
 		// return value
 		string filename = "";
 		bool recursive = false;
+		string lastSearch = "";
 
 		// create a label
 		var label = new Label("Enter path or file, (* wildcards ok)") { X = 1, Y = 1, Width = Dim.Fill() - 2, Height = 1 };
@@ -29,21 +30,14 @@ public class DialogSelectFiles
 		// on press enter
 		textBox.KeyDown += (e) => 
 		{
-			if (e.KeyEvent.Key == Key.Enter)
 			{
-				// get the current directory
-				string currentDirectory = Directory.GetCurrentDirectory();
+				if (lastSearch == textBox.Text.ToString())
+				{
+					return;
+				}
+				lastSearch = textBox.Text.ToString();
 
-				SearchOption s = SearchOption.TopDirectoryOnly;
-				if (recursive)
-					s = SearchOption.AllDirectories;
-
-				// get a list of files from the wildcard returning relative paths only
-				string[] fullPaths = Directory.GetFiles(currentDirectory, textBox.Text.ToString(), s);
-
-				// Convert full paths to relative paths
-				source = fullPaths.Select(fullPath => fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();
-				listView.SetSource(source);
+				GetFiles(recursive, textBox, listView, ref source);
 			}
 		};
 
@@ -56,20 +50,8 @@ public class DialogSelectFiles
 			Height = 1
 		};
 		search.Clicked += () => 
-		{ 
-			// get the current directory
-			string currentDirectory = Directory.GetCurrentDirectory();
-
-			SearchOption s = SearchOption.TopDirectoryOnly;
-			if (recursive)
-				s = SearchOption.AllDirectories;
-
-			// get a list of files from the wildcard returning relative paths only
-			string[] fullPaths = Directory.GetFiles(currentDirectory, textBox.Text.ToString(), s);
-
-			// Convert full paths to relative paths
-        	source = fullPaths.Select(fullPath => fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();
-			listView.SetSource(source);
+		{
+			GetFiles(recursive, textBox, listView, ref source);
 		};
 
 		//
@@ -98,15 +80,31 @@ public class DialogSelectFiles
 		var dialog = new Dialog (title, 0, 0, ok);
 		dialog.Border.BorderStyle = BorderStyle.Double;
 		dialog.ColorScheme = Colors.Base;
-
+		dialog.FocusFirst();
 		
 		
 		
-		dialog.Add(label, textBox, search, checkBox, listView);
+		dialog.Add(textBox, label, search, checkBox, listView);
 		Application.Run (dialog);
 
 		return (filename, recursive, source);
 
+	}
+	private static void GetFiles(bool recursive, TextField textBox, ListView listView, ref string[] source)
+	{
+		// get the current directory
+		string currentDirectory = Directory.GetCurrentDirectory();
+
+		SearchOption s = SearchOption.TopDirectoryOnly;
+		if (recursive)
+			s = SearchOption.AllDirectories;
+
+		// get a list of files from the wildcard returning relative paths only
+		string[] fullPaths = Directory.GetFiles(currentDirectory, textBox.Text.ToString(), s);
+
+		// Convert full paths to relative paths
+		source = fullPaths.Select(fullPath => fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();
+		listView.SetSource(source);
 	}
 	
 }
