@@ -295,7 +295,6 @@ class Receive
 					
 					// get a compact string showing the date and time
 					long timestamp = envelope.Created;
-
 					string filename = $"{timestamp}-{Guid.NewGuid()}.deadpack";
 					
 					string destFilename = Storage.GetDeadPackDirectoryInbox(alias, filename);

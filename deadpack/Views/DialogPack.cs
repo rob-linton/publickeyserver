@@ -7,39 +7,51 @@ using Terminal.Gui.Trees;
 
 namespace deadrop.Verbs;
 
-public class DialogUnpack
+public class DialogPack
 {
 	
   	private TextField output = new TextField();
 
 	// build
-	public void Build(string input, String alias)
+	public void Build(PackOptions opts)
 	{
 
 		Globals.ProgressSource.Clear();
 
-		var ok = new Button("Go");
-		ok.Clicked += async () => { 
-			
-			Globals.UpdateProgressBar(0, 0, "Unpacking");
-			
-			UnpackOptions opts = new UnpackOptions()
-			{
-				Alias = alias,
-				Output = output.Text.ToString(),
-				File = input
-			};
+
+		var ok = new Button("Pack to a File");
+		ok.Clicked += async () => {
+
+			Globals.UpdateProgressBar(0, 0, "Packing to File");
+
+			opts.Output = output.Text.ToString();
 			
 			// report on progress
 			var progress = new Progress<StatusUpdate>(StatusUpdate =>
 			{
-				Globals.UpdateProgressBar(StatusUpdate.Index, StatusUpdate.Count, "Unpacking");
+				Globals.UpdateProgressBar(StatusUpdate.Index, StatusUpdate.Count, "Packing");
 			});
 
-			if (String.IsNullOrEmpty(alias))
-				await Unpack.Execute(opts, progress);
-			else
-				await Unpack.ExecuteInternal(opts, alias, progress);
+			int result = await Pack.Execute(opts, progress);
+			
+		};
+
+		var outBox = new Button("Pack to Outbox");
+		outBox.Clicked += async () => {
+
+			Globals.UpdateProgressBar(0, 0, "Packing to Outbox");
+
+			string timestamp = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds().ToString();
+			string filename = $"{timestamp}-{Guid.NewGuid()}.deadpack";
+			opts.Output = Path.Join(Storage.GetDeadPackDirectoryOutbox(""), filename);
+			
+			// report on progress
+			var progress = new Progress<StatusUpdate>(StatusUpdate =>
+			{
+				Globals.UpdateProgressBar(StatusUpdate.Index, StatusUpdate.Count, "Packing");
+			});
+
+			int result = await Pack.Execute(opts, progress);
 			
 		};
 
@@ -49,7 +61,7 @@ public class DialogUnpack
 			Application.RequestStop();
 		};
 
-		var dialog = new Dialog ("", 0, 0, cancel, ok);
+		var dialog = new Dialog ("", 0, 0, cancel, ok, outBox);
 		
 		dialog.Border.BorderStyle = BorderStyle.Double;
 		dialog.ColorScheme = Colors.Base;
@@ -65,9 +77,9 @@ public class DialogUnpack
 			Height = Dim.Fill() 
 		};
 		// set the output directory to the default download directory
-		output.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads";
-		
-		
+		//output.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads";
+		string readableDate = DateTime.Now.ToString("yyyy-MM-dd-HH.mm.ss");
+		output.Text = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"{readableDate}.deadpack");
 
 		Window viewOutput = new Window ("Output Location") {
         	X = 1,

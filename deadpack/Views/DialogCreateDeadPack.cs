@@ -12,23 +12,41 @@ public class DialogCreateDeadPack
 	// build
 	public Enums.DialogReturn Build(string alias = "")
 	{
-		
 
-		string deadPackFrom = alias;
-		string deadPackSubject = "";
+
+		TextView from = null;
+		TextView subject = null;
+		TextView message = null;
 		string deadPackMessage = "";
 		List<string> deadPackRecipients = new List<string>();
 		string[] deadPackFiles = new string[0];
 		bool recursive = false;
+		string filename = "";
 
 
 		Enums.DialogReturn result = Enums.DialogReturn.Cancel;
 
-		var cancel = new Button("Cancel");
+		var cancel = new Button("Close");
 		cancel.Clicked += () => Application.RequestStop ();
 
 		var extract = new Button("Create");
-		extract.Clicked += () => { Application.RequestStop (); result = Enums.DialogReturn.Extract; };
+		extract.Clicked += () => 
+		{
+			PackOptions opts = new PackOptions()
+			{
+				File = filename,
+				Recurse = recursive,
+				InputAliases = deadPackRecipients,
+				Output = "",
+				Message = message.Text.ToString(),
+				Subject = subject.Text.ToString(),
+				From = from.Text.ToString(),
+			};
+			
+			new DialogPack().Build(opts); 
+
+			//Application.RequestStop (); 
+		};
 
 		int width = Application.Top.Frame.Width;
 		int height = Application.Top.Frame.Height;
@@ -37,6 +55,22 @@ public class DialogCreateDeadPack
 		dialog.Border.BorderStyle = BorderStyle.None;
 		dialog.ColorScheme = Colors.Base;
 
+		
+		
+		//
+		// add the from
+		//
+		from = new TextView
+		{
+			X = 1,
+			Y = 1,
+			Width = Dim.Fill() - 2,
+			Height = Dim.Fill(),
+			TabStop = false,
+			ReadOnly = true,
+			ColorScheme = Globals.StandardColors
+		};
+		
 		if (string.IsNullOrEmpty(alias))
 		{
 			// get a list of aliases
@@ -49,24 +83,8 @@ public class DialogCreateDeadPack
 
 			// create the select from list dialog
 			DialogSelectFromList dialogSelectFromList = new DialogSelectFromList();
-			deadPackFrom = dialogSelectFromList.Build(source, "Select Alias");
+			from.Text = dialogSelectFromList.Build(source, "Select Alias");
 		}
-		
-		//
-		// add the from
-		//
-		var from = new TextView
-		{
-			X = 1,
-			Y = 1,
-			Width = Dim.Fill() - 2,
-			Height = Dim.Fill(),
-			TabStop = false,
-			Text = deadPackFrom,
-			ReadOnly = true,
-			ColorScheme = Globals.StandardColors
-		};
-		
 
 		FrameView viewFrom = new FrameView ("From") {
         	X = 1,
@@ -100,8 +118,8 @@ public class DialogCreateDeadPack
 
 			// create the select from list dialog
 			DialogSelectFromList dialogSelectFromList = new DialogSelectFromList();
-			deadPackFrom = dialogSelectFromList.Build(source, "Select Alias");
-			from.Text = deadPackFrom;
+			from.Text = dialogSelectFromList.Build(source, "Select Alias");
+			
 		};
 
 		//
@@ -138,13 +156,12 @@ public class DialogCreateDeadPack
 		//
 		// add the subject
 		//
-		var subject = new TextView
+		subject = new TextView
 		{
 			X = 1,
 			Y = 1,
 			Width = Dim.Fill() - 1,
 			Height = Dim.Fill(),
-			Text = deadPackSubject,
 			ReadOnly = false,
 			TabStop = true,
 			Multiline = false,
@@ -164,13 +181,12 @@ public class DialogCreateDeadPack
 		//
 		// add the message body
 		//
-		var message = new TextView
+		message = new TextView
 		{
 			X = 1,
 			Y = 1,
 			Width = Dim.Fill() - 2,
 			Height = Dim.Fill(),
-			Text = deadPackMessage,
 			ReadOnly = false,
 			TabStop = true,
 			ColorScheme = Globals.StandardColors
@@ -219,7 +235,7 @@ public class DialogCreateDeadPack
 		};
 		addFiles.Clicked += () => 
 		{
-			(string filename, recursive, deadPackFiles) = new DialogSelectFiles().Build("Select Files");
+			(filename, recursive, deadPackFiles) = new DialogSelectFiles().Build("Select Files");
 			files.SetSource(deadPackFiles);
 		};
 
@@ -256,7 +272,7 @@ public class DialogCreateDeadPack
 		};
 		addRecipient.Clicked += async () => 
 		{
-			string lookupAlias = await new DialogSelectAliases().Build("Select Alias", deadPackFrom);
+			string lookupAlias = await new DialogSelectAliases().Build("Select Alias", from.Text.ToString());
 			deadPackRecipients.Add(lookupAlias);
 			recipients.SetSource(deadPackRecipients);
 		};

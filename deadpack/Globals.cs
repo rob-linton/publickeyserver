@@ -48,7 +48,7 @@ public static class Globals
 		catch { }
 	}
 
-	public static void UpdateProgressBar(float index, float count)
+	public static void UpdateProgressBar(float index, float count, string action)
 	{
 		if (index > count)
 		{
@@ -63,15 +63,15 @@ public static class Globals
 			Progressbar.Fraction = index / count;
 			if (index == count)
 			{
-				ProgressLabel.Text = "Unpacking complete";
+				ProgressLabel.Text = $"{action} complete";
 			}
 			else if (index == 0)
 			{
-				ProgressLabel.Text = "Unpacking...";
+				ProgressLabel.Text = $"{action}...";
 			}
 			else
 			{
-				ProgressLabel.Text = "Unpacking " + index.ToString() + " of " + count.ToString() + "...";
+				ProgressLabel.Text = $"{action} " + index.ToString() + " of " + count.ToString() + "...";
 			}
 
 		}

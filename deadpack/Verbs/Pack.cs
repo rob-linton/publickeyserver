@@ -39,7 +39,7 @@ public class PackOptions : Options
 }
 class Pack 
 {
-	public static async Task<int> Execute(PackOptions opts)
+	public static async Task<int> Execute(PackOptions opts, IProgress<StatusUpdate> progress = null)
 	{
 		try
 		{
@@ -176,6 +176,7 @@ class Pack
 			using (FileStream zipFileStream = new FileStream(outputFile, FileMode.Create))
 			using (ZipArchive zip = new ZipArchive(zipFileStream, ZipArchiveMode.Create))
 			{
+				int index = 1;
 				foreach (string filePath in relativePaths)
 				{
 					Misc.LogLine($"\n  deadpacking {filePath}");
@@ -221,6 +222,18 @@ class Pack
 							Blocks = blockList
 						});
 
+						// update the progress bar if it is not null
+						//Globals.UpdateProgressBar((float)manifest.Files.IndexOf(file) + 1, (float)manifest.Files.Count);
+						StatusUpdate statusUpdate = new StatusUpdate
+						{
+							Index = (float)index,
+							Count = (float)relativePaths.Count()
+						};
+
+						progress?.Report(statusUpdate);
+						await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
+
+						index++;
 					}
 					else
 					{

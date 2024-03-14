@@ -38,7 +38,7 @@ public class ViewAliases : Window
 		var addAlias = new Button("+ Alias") { X = Pos.Left(addDeadPack) - 13, Y = 0, Width = 11, Height = 1 };
 		
 
-		var received = new Label("Inbox") { X = 0, Y = Pos.Bottom(addAlias), Width = Dim.Fill(), Height = 1 };
+		var received = new Label("Received") { X = 0, Y = Pos.Bottom(addAlias), Width = Dim.Fill(), Height = 1 };
 		var listViewReceived = new ListView(source) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
 		listViewReceived.ColorScheme = Globals.YellowColors;
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
