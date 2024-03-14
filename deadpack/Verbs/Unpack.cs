@@ -284,7 +284,7 @@ class Unpack
 							Misc.LogLine($"\n  Unpacking {file.Name}");
 
 							// create a file stream to write the file to
-							using (FileStream fs = File.Create(file.Name))
+							using (FileStream fs = File.Create(Path.Join(outputDirectory,file.Name)))
 							{
 								Misc.LogChar("  ");
 								// decrypt the file and populate the file stream

@@ -10,12 +10,13 @@ namespace deadrop.Verbs;
 public class DialogUnpack
 {
 	
+  	private TextField output = new TextField();
 
 	// build
 	public Enums.DialogReturn Build(string input, String alias)
 	{
-		// get the current directory
-		string currentDirectory = Environment.CurrentDirectory;
+
+		
 
 		Globals.ProgressSource.Clear();
 
@@ -29,7 +30,7 @@ public class DialogUnpack
 			UnpackOptions opts = new UnpackOptions()
 			{
 				Alias = alias,
-				Output = currentDirectory,
+				Output = output.Text.ToString(),
 				File = input
 			};
 			
@@ -60,9 +61,17 @@ public class DialogUnpack
 		//
 		// add the output location
 		//
-		var output = new TextView() { X = 1, Y = 1, Width = Dim.Fill()-1, Height = Dim.Fill() };
-		output.Text = currentDirectory;
-		//output.ColorScheme = Globals.YellowColors;
+		output = new TextField() 
+		{ 
+			X = 1, 
+			Y = 1, 
+			Width = Dim.Fill()-1, 
+			Height = Dim.Fill() 
+		};
+		// set the output directory to the default download directory
+		output.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads";
+		
+		
 
 		Window viewOutput = new Window ("Output Location") {
         	X = 1,
@@ -95,7 +104,7 @@ public class DialogUnpack
 		//
 		// add the progress view list
 		//
-		Window viewProgress = new Window ("Extract Verification") {
+		Window viewProgress = new Window ("Packing Slip Verification") {
 			X = 1,
 			Y = Pos.Bottom(progressLabel) + 1, 
 			Width = Dim.Fill () - 1,

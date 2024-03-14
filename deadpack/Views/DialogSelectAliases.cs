@@ -31,6 +31,10 @@ public class DialogSelectAliases
 			Application.RequestStop (); 
 			selected = e.Value.ToString(); 
 		};
+		listView.SelectedItemChanged += (e) => 
+		{ 
+			selected = e.Value.ToString();  
+		};
 
 
 		// create a textbox
@@ -83,6 +87,7 @@ public class DialogSelectAliases
 			LookupAlias(fromAlias, lookup, source, listView, lastSearch); 
 						
 		};
+		
 
 		//
 		// create the dialog
