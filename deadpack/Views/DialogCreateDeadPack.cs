@@ -26,10 +26,15 @@ public class DialogCreateDeadPack
 
 		Enums.DialogReturn result = Enums.DialogReturn.Cancel;
 
-		var cancel = new Button("Close");
+		var cancel = new Button("Close")
+		{
+		};
 		cancel.Clicked += () => Application.RequestStop ();
 
-		var extract = new Button("Create");
+		var extract = new Button("Create")
+		{ 
+			Enabled = false
+		};
 		extract.Clicked += () => 
 		{
 			PackOptions opts = new PackOptions()
@@ -273,8 +278,13 @@ public class DialogCreateDeadPack
 		addRecipient.Clicked += async () => 
 		{
 			string lookupAlias = await new DialogSelectAliases().Build("Select Alias", from.Text.ToString());
-			deadPackRecipients.Add(lookupAlias);
-			recipients.SetSource(deadPackRecipients);
+			if (!String.IsNullOrEmpty(lookupAlias))
+			{
+				deadPackRecipients.Add(lookupAlias);
+				recipients.SetSource(deadPackRecipients);
+				extract.Enabled = true;
+			}
+			
 		};
 
 
