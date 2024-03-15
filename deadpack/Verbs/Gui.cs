@@ -26,75 +26,91 @@ class Gui
 	}
 	public static async void Build()
 	{
-		// start the Gui
-		Application.Init ();
-
-		Globals.StandardColors = new ColorScheme()
+		try
 		{
-			Normal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
-			Focus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
-			HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
-			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
-		};
+			// start the Gui
+			Application.Init();
+			Application.Top.ColorScheme = new ColorScheme()
+			{
+				Normal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+				Focus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
+				HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+				HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
+			};
 
-		Globals.WhiteOnBlue = new ColorScheme()
+			Globals.StandardColors = new ColorScheme()
+			{
+				Normal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+				Focus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
+				HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+				HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Gray),
+			};
+
+			Globals.WhiteOnBlue = new ColorScheme()
+			{
+				Normal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+				Focus = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+				HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+				HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Blue),
+			};
+
+			Globals.BlueOnWhite = new ColorScheme()
+			{
+				Normal = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
+				Focus = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
+				HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
+				HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
+			};
+
+			Globals.ProgressSource = new List<string>();
+			Globals.Verbose = 0;
+
+			ViewMenu menu = new ViewMenu();
+			ViewStatusBar statusBar = new ViewStatusBar();
+
+			Globals.ViewLeft = new FrameView("Aliases")
+			{
+				X = 0,
+				Y = 1,
+				Width = 60,
+				Height = Dim.Fill() - 1,
+				ColorScheme = Globals.StandardColors
+			};
+
+
+
+
+			Globals.ViewRight = new FrameView("DeadPacks")
+			{
+				X = 60,
+				Y = 1,
+				Width = Dim.Fill(),
+				Height = Dim.Fill() - 1,
+				ColorScheme = Globals.StandardColors
+			};
+
+			Globals.ViewAliases = new ViewAliases();
+			Globals.ViewLeft.Add(Globals.ViewAliases);
+
+
+			// add the list of deadpacks
+			Globals.ViewDeadPacks = new ViewDeadPacks(Globals.Alias, Globals.Location);
+			Globals.ViewRight.Add(Globals.ViewDeadPacks);
+
+
+			// Add both menu and win in a single call
+			Application.Top.RemoveAll();
+			Application.Top.Add(menu.Menu, statusBar.StatusBar, Globals.ViewRight);
+			Application.Top.Add(Globals.ViewLeft);
+			Application.Run();
+			Application.Shutdown();
+
+			return;
+		}
+		catch (Exception e)
 		{
-			Normal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
-			Focus = Application.Driver.MakeAttribute(Color.White, Color.Blue),
-			HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
-			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Blue),
-		};
-
-		Globals.BlueOnWhite = new ColorScheme()
-		{
-			Normal = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
-			Focus = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
-			HotNormal = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
-			HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
-		};
-
-		Globals.ProgressSource = new List<string>();
-		Globals.Verbose = 0;
-
-		ViewMenu menu = new ViewMenu();
-		ViewStatusBar statusBar = new ViewStatusBar();
-
-        Globals.ViewLeft = new FrameView ("Aliases") {
-            X = 0,
-            Y = 1,
-            Width = 60,
-            Height = Dim.Fill () - 1,
-			ColorScheme = Globals.StandardColors
-        };
-	 	
-
-
-
-		Globals.ViewRight = new FrameView ("DeadPacks") {
-			X = 60,
-			Y = 1,
-			Width = Dim.Fill (),
-			Height = Dim.Fill () - 1,
-			ColorScheme = Globals.StandardColors
-		};
-
-		Globals.ViewAliases = new ViewAliases();
-		Globals.ViewLeft.Add(Globals.ViewAliases);
-
-
-		// add the list of deadpacks
-		Globals.ViewDeadPacks = new ViewDeadPacks(Globals.Alias, Globals.Location);
-		Globals.ViewRight.Add(Globals.ViewDeadPacks);
-		
-
-		// Add both menu and win in a single call
-		Application.Top.RemoveAll();
-        Application.Top.Add (menu.Menu, statusBar.StatusBar, Globals.ViewRight);
-		Application.Top.Add(Globals.ViewLeft);
-        Application.Run ();
-        Application.Shutdown ();
-
-		return;
+			DialogError error = new DialogError(e.Message);
+		}
 	}
 
 	

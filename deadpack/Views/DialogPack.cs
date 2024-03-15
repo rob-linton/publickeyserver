@@ -82,7 +82,7 @@ public class DialogPack
 		string readableDate = DateTime.Now.ToString("dd-MMM-yyyy hh.mmtt");
 		output.Text = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"{readableDate}.deadpack");
 
-		FrameView viewOutput = new FrameView ("Output Location") {
+		FrameView viewOutput = new FrameView ("File Location") {
         	X = 1,
             Y = 0,
             Width = Dim.Fill () - 1,

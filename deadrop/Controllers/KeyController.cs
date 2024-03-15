@@ -442,7 +442,7 @@ namespace publickeyserver
 				}
 				else if (email.Length > 0 && token.Length == 0)
 				{
-						return Misc.err(Response, "Token must be provided with an email address", Help.simpleenroll);
+						return Misc.err(Response, "Email verification code must be provided when associating an email address", Help.simpleenroll);
 				}
 				else if (email.Length == 0 && token.Length > 0)
 				{

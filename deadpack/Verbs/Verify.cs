@@ -18,10 +18,25 @@ public class VerifyOptions : Options
 }
 class Verify 
 {
-	public static async Task<int> Execute(VerifyOptions opts)
+	public static async Task<int> Execute(VerifyOptions opts, IProgress<StatusUpdate> progress = null)
 	{
+		StatusUpdate statusUpdate = new StatusUpdate();
 		try
 		{
+			if (String.IsNullOrEmpty(opts.Email	))
+			{
+				statusUpdate.Status = "Email is required";
+				try
+				{
+					progress?.Report(statusUpdate);
+					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+				}
+				catch { }
+		
+				Misc.LogError("Email is required");
+				return 1;
+			}
+
 			Misc.LogHeader();
 			Misc.LogLine($"Verifying...");
 
@@ -35,10 +50,25 @@ class Verify
 
 			var result = await HttpHelper.Post($"https://{domain}/verify/{opts.Email}", "");
 
+			// update the progress bar if it is not null
+			statusUpdate.Status = result.Replace("\"", "");
+			try
+			{
+				progress?.Report(statusUpdate);
+				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+			}
+			catch { }
 			Misc.LogLine($"\n{result}\n");
 		}
 		catch (Exception ex)
 		{
+			statusUpdate.Status = ex.Message;
+			try
+			{
+				progress?.Report(statusUpdate);
+				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+			}
+			catch { }
 			Misc.LogError("Unable to verify email", ex.Message);
 			return 1;
 		}

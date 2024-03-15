@@ -223,16 +223,19 @@ class Pack
 						});
 
 						// update the progress bar if it is not null
-						//Globals.UpdateProgressBar((float)manifest.Files.IndexOf(file) + 1, (float)manifest.Files.Count);
 						StatusUpdate statusUpdate = new StatusUpdate
 						{
 							Index = (float)index,
 							Count = (float)relativePaths.Count()
 						};
 
-						progress?.Report(statusUpdate);
-						await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
-
+						try
+						{
+							progress?.Report(statusUpdate);
+							await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+						}
+						catch { }
+						
 						index++;
 					}
 					else

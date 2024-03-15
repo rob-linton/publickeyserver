@@ -89,7 +89,7 @@ namespace publickeyserver
 
 				// send a response that the token has already been sent
 				if (generateToken == false)
-					return Misc.err(Response, "Token already sent to email address, please wait 1 hour between verification requests to the same email", Help.simpleenroll);
+					return Misc.err(Response, "Email verification code already sent to email address, please wait 1 hour between verification requests to the same email", Help.simpleenroll);
 			
 				// no token file, so generate one
 				string tokenFileContentsNew = Misc.GetRandomString(8);
@@ -111,15 +111,15 @@ namespace publickeyserver
 				};
 
 				// now send the email
-				string emailBody = $"Your token is {tokenFileContentsNew}";
-				string emailSubject = $"Your email verification token for {GLOBALS.origin}";
+				string emailBody = $"Your email verification code is {tokenFileContentsNew}";
+				string emailSubject = $"Your email verification code for {GLOBALS.origin}";
 				string emailFrom = GLOBALS.emailFrom;
 				string emailTo = email;
 
 				// send the email
 				await EmailHelper.SendEmail(emailFrom, emailTo, emailSubject, emailBody);
 
-				return Ok("Token sent to email address");
+				return Ok("Verification code sent to email address");
 					
 			}
 			catch (AmazonS3Exception e)

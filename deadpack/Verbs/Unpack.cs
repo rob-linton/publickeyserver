@@ -315,8 +315,12 @@ class Unpack
 								Count = (float)manifest.Files.Count
 							};
 
-							progress?.Report(statusUpdate);
-							await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
+							try
+							{
+								progress?.Report(statusUpdate);
+								await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
+							}
+							catch { }
 						}
 						Misc.LogLine($"\n\nYour files are located in {opts.Output}");
 						Misc.LogLine("\nDone\n");

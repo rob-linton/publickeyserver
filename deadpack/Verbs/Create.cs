@@ -146,11 +146,26 @@ class Create
 				Status = $"Alias {alias} created"
 			};
 
-			progress?.Report(statusUpdate);
-			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
+			try
+			{
+				progress?.Report(statusUpdate);
+				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
+			}
+			catch { }
 		}
 		catch (Exception ex)
 		{
+			try
+			{
+				StatusUpdate statusUpdate = new StatusUpdate
+				{
+					Status = ex.Message
+				};
+				progress?.Report(statusUpdate);
+				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
+			}
+			catch { }
+
 			Misc.LogError("Unable to create alias", ex.Message);
 			return 1;
 		}

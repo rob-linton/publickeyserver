@@ -40,8 +40,16 @@ public class Program
 	}
 
     static async Task<int> Main(string[] args)
-    {	
-		return await ParseOptions(args);
+    {	try
+		{
+			return await ParseOptions(args);
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine("An error occurred: ");
+			Console.WriteLine(e.Message);
+			return 1;
+		}
 
     }
 	

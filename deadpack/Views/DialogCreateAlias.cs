@@ -25,8 +25,8 @@ public class DialogCreateAlias
 		ok.Clicked += async () => 
 		{
 			progressLabel.Text = "Creating Alias...";
-			progressLabel.SetNeedsDisplay();
-			progressLabel.Redraw(progressLabel.Bounds);
+			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX UPDATE
+			
 
 			var progress = new Progress<StatusUpdate>(StatusUpdate =>
 			{
@@ -134,13 +134,22 @@ public class DialogCreateAlias
 			Height = 1	
 		};
 		verifyEmail.Clicked += async () => {
+
+			// report on progress
+			var progress = new Progress<StatusUpdate>(StatusUpdate =>
+			{
+				progressLabel.Text = StatusUpdate.Status;
+			});
+
 			// verify the email
 			VerifyOptions verifyOpts = new VerifyOptions()
 			{
 				Email = email.Text.ToString(),
 				Domain = domain.Text.ToString()	
 			};
-			int result = await Verify.Execute(verifyOpts);
+			int result = await Verify.Execute(verifyOpts, progress);
+			//progressLabel.Text = "Email verification code sent. Please check your email.";
+			//await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX UPDATE
 		};
 
 		FrameView viewEmail = new FrameView ("Email (Optional)") {

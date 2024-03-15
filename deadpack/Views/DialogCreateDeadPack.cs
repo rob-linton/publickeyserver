@@ -90,6 +90,10 @@ public class DialogCreateDeadPack
 			DialogSelectFromList dialogSelectFromList = new DialogSelectFromList();
 			from.Text = dialogSelectFromList.Build(source, "Select Alias");
 		}
+		else
+		{
+			from.Text = alias;
+		}
 
 		FrameView viewFrom = new FrameView ("From") {
         	X = 1,
@@ -190,7 +194,7 @@ public class DialogCreateDeadPack
 		{
 			X = 1,
 			Y = 1,
-			Width = Dim.Fill() - 2,
+			Width = Dim.Fill() - 1,
 			Height = Dim.Fill(),
 			ReadOnly = false,
 			TabStop = true,

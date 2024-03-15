@@ -49,6 +49,7 @@ public static class Globals
 			ProgressSource.Add(message);
 		}
 		catch { }
+		
 	}
 
 	public static void UpdateProgressBar(float index, float count, string action)
