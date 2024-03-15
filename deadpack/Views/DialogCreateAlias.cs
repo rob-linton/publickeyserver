@@ -52,9 +52,9 @@ public class DialogCreateAlias
 		int width = Application.Top.Frame.Width;
 		int height = Application.Top.Frame.Height;
 
-		var dialog = new Dialog ("", width, height, cancel, ok);
-		
-		dialog.Border.BorderStyle = BorderStyle.None;
+		var dialog = new Dialog ("Create Alias", width, height, cancel, ok);
+
+		dialog.Border.BorderStyle = BorderStyle.Double;
 		dialog.ColorScheme = Colors.Base;
 
 		
@@ -73,7 +73,7 @@ public class DialogCreateAlias
 
 		FrameView viewDomain = new FrameView ("Key Server") {
         	X = 1,
-            Y = 0,
+            Y = 1,
             Width = Dim.Fill () - 1,
             Height = 4,
         };
@@ -176,7 +176,7 @@ public class DialogCreateAlias
 		//
 		// add the progress view list
 		//
-		FrameView viewProgress = new FrameView ("Alias Verification") {
+		FrameView viewProgress = new FrameView ("Alias Creation Verification") {
 			X = 1,
 			Y = Pos.Bottom(progressLabel) + 1,
 			Width = Dim.Fill () - 1,

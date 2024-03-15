@@ -56,8 +56,8 @@ public class DialogCreateDeadPack
 		int width = Application.Top.Frame.Width;
 		int height = Application.Top.Frame.Height;
 
-		var dialog = new Dialog ("", width, height, cancel, extract);
-		dialog.Border.BorderStyle = BorderStyle.None;
+		var dialog = new Dialog ("Create DeadPack", width, height, cancel, extract);
+		dialog.Border.BorderStyle = BorderStyle.Double;
 		dialog.ColorScheme = Colors.Base;
 
 		
