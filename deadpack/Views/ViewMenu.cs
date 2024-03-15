@@ -47,10 +47,10 @@ class ViewMenu
                 }),
             }),
 			new MenuBarItem ("_Send/Receive", new MenuItem [] {
-                new MenuItem ("_Send Pending DeadPacks", "", () => { 
+                new MenuItem ("_Send Pending DeadPacks in the Outbox", "", () => { 
                     Application.RequestStop (); 
                 },null,null,Key.CtrlMask | Key.S),
-				new MenuItem ("_Refresh New DeadPacks", "", () => { 
+				new MenuItem ("_Check for New DeadPacks", "", () => { 
                     Application.RequestStop (); 
                 },null,null,Key.CtrlMask | Key.R),
             }),

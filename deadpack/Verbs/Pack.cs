@@ -153,7 +153,8 @@ class Pack
 			else
 			{
 				Misc.LogError($"Alias {opts.From} is *NOT* valid");
-				return 1;
+				throw new Exception($"Alias {opts.From} is *NOT* valid");
+				//return 1;
 			}
 
 
@@ -235,7 +236,7 @@ class Pack
 							await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
 						}
 						catch { }
-						
+
 						index++;
 					}
 					else
@@ -260,9 +261,9 @@ class Pack
 				catch (Exception ex)
 				{
 					Misc.LogError($"Error: could not read private key for {opts.From}", ex.Message);
-
+					throw new Exception($"Error: could not read private key for {opts.From}");
 					// application exit
-					return 1;
+					//return 1;
 				}
 
 				//
@@ -277,7 +278,8 @@ class Pack
 					if (!privateKey.Public.Equals(fromPublicKey))
 					{
 						Misc.LogError($"Public key does not match private key for alias {opts.From}");
-						return 1;
+						throw new Exception($"Public key does not match private key for alias {opts.From}");
+						//return 1;
 					}
 					else
 					{
@@ -287,7 +289,8 @@ class Pack
 				else
 				{
 					Misc.LogError($"Could not find certificate for {opts.From}");
-					return 1;
+					throw new Exception($"Could not find certificate for {opts.From}");
+					//return 1;
 				}
 
 				//
@@ -348,7 +351,8 @@ class Pack
 								if (!fromFingerprint.SequenceEqual(toFingerprint))
 								{
 									Misc.LogLine($"Aliases do not share the same root certificate {opts.From} -> {alias}");
-									return 1;
+									throw new Exception($"Aliases do not share the same root certificate {opts.From} -> {alias}");
+									//return 1;
 								}
 
 								Misc.LogCheckMark($"Recipient Alias {alias} is valid");
@@ -357,7 +361,8 @@ class Pack
 							else
 							{
 								Misc.LogError($"Recipient Alias {alias} is *NOT* valid");
-								return 1;
+								throw new Exception($"Recipient Alias {alias} is *NOT* valid");
+								//return 1;
 							}
 
 							var toX509 = await Misc.GetCertificate(alias);
@@ -472,6 +477,13 @@ class Pack
 		}
 		catch (Exception ex)
 		{
+			try
+			{
+				progress?.Report(new StatusUpdate { Status = ex.Message });
+				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+			}
+			catch { }
+
 			Misc.LogError("Unable to pack files", ex.Message);
 			return 1;
 		}

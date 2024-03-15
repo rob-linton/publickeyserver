@@ -23,7 +23,7 @@ public class CertifyOptions : Options
 }
 class Certify 
 {
-	public static async Task<int> Execute(CertifyOptions opts)
+	public static async Task<int> Execute(CertifyOptions opts, IProgress<StatusUpdate> progress = null)
 	{
 		try
 		{
@@ -71,6 +71,13 @@ class Certify
 		}
 		catch (Exception ex)
 		{
+			try
+			{
+				progress?.Report(new StatusUpdate { Status = ex.Message });
+				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+			}
+			catch { }
+
 			Misc.LogError("Unable to validate alias", ex.Message);
 			return 1;
 		}

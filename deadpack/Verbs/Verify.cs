@@ -25,16 +25,9 @@ class Verify
 		{
 			if (String.IsNullOrEmpty(opts.Email	))
 			{
-				statusUpdate.Status = "Email is required";
-				try
-				{
-					progress?.Report(statusUpdate);
-					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
-				}
-				catch { }
-		
 				Misc.LogError("Email is required");
-				return 1;
+				throw new Exception("Email is required");
+				//return 1;
 			}
 
 			Misc.LogHeader();

@@ -125,7 +125,8 @@ class Unpack
 				if (!validAlias)
 				{
 					Misc.LogError($"Could not verify alias {envelope.From}");
-					return 1;
+					throw new Exception($"Could not verify alias {envelope.From}");
+					//return 1;
 				}
 
 				// get the public key from the alias
@@ -145,7 +146,8 @@ class Unpack
 				{
 					Misc.LogError("Envelope signature is *NOT* valid");
 					Misc.LogLine(ex.Message);
-					return 1;
+					throw new Exception("Envelope signature is *NOT* valid", ex);
+					//return 1;
 				}
 
 				//
@@ -161,7 +163,8 @@ class Unpack
 				catch (Exception ex)
 				{
 					Misc.LogError("Manifest signature is *NOT* valid", ex.Message);
-					return 1;
+					throw new Exception("Manifest signature is *NOT* valid", ex);
+					//return 1;
 				}
 
 				// now iterate through the manifest and see if our alias matches one of the to addresses
@@ -186,7 +189,8 @@ class Unpack
 						if (!validToAlias)
 						{
 							Misc.LogError($"Could not verify alias {alias}");
-							return 1;
+							throw new Exception($"Could not verify alias {alias}");
+							//return 1;
 						}
 
 						//
@@ -195,7 +199,8 @@ class Unpack
 						if (!fromFingerprint.SequenceEqual(toFingerprint))
 						{
 							Misc.LogError($"Aliases do not share the same root certificate {envelope.From} -> {alias}");
-							return 1;
+							throw new Exception($"Aliases do not share the same root certificate {envelope.From} -> {alias}");
+							//return 1;
 						}
 						else
 						{
@@ -221,7 +226,8 @@ class Unpack
 						if (!keyPair.Public.Equals(toPublicKey))
 						{
 							Misc.LogError($"Error: public key does not match for alias {alias}");
-							return 1;
+							throw new Exception($"Error: public key does not match for alias {alias}");
+							//return 1;
 						}
 						else
 						{
@@ -242,9 +248,9 @@ class Unpack
 						catch (Exception ex)
 						{
 							Misc.LogError($"Error: could not read kyber private key for {alias}", ex.Message);
-
+							throw new Exception($"Error: could not read kyber private key for {alias}", ex);
 							// application exit
-							return 1;
+							//return 1;
 						}
 
 						// now decrypt the key using kyber
@@ -330,19 +336,26 @@ class Unpack
 				if (!found_alias)
 				{
 					Misc.LogLine($"Error: could not find alias {alias} in deadpack");
-					return 1;
+					throw new Exception($"Error: could not find alias {alias} in deadpack");
 				}
 			}
 			catch (Exception ex)
 			{
 				Misc.LogError("Unable to unpack package", ex.Message);
-				return 1;
+				throw new Exception("Unable to unpack package", ex);
 			}
 
 			return 0;
 		}
 		catch (Exception ex)
 		{
+			try
+			{
+				progress?.Report(new StatusUpdate { Status = ex.Message });
+				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+			}
+			catch { }
+
 			Misc.LogError("Error unpacking package", ex.Message);
 			return 1;
 		}

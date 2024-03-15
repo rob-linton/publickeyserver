@@ -86,7 +86,8 @@ class Create
 			if (publicKeyPem == null)
 			{
 				Misc.LogError("Could not read public key from new key pair");
-				return 1;
+				throw new Exception("Could not read public key from new key pair");
+				//return 1;
 			}
 
 			// save it as PEM format
@@ -103,7 +104,8 @@ class Create
 			if (String.IsNullOrEmpty(j?.Certificate))
 			{
 				Misc.LogError("No certificate returned from simpleenroll");
-				return 1;
+				throw new Exception("No certificate returned from simpleenroll");
+				//return 1;
 			}
 		
 			
@@ -112,7 +114,8 @@ class Create
 			if (privateKeyPem == null)
 			{
 				Misc.LogError("Could not read private key");
-				return 1;
+				throw new Exception("Could not read private key");
+				//return 1;
 			}
 			Storage.StorePrivateKey($"{alias}.rsa", privateKeyPem, Globals.Password);
 
@@ -129,7 +132,8 @@ class Create
 			if (!valid)
 			{
 				Misc.LogError("Unable to verify alias");
-				return 1;
+				throw new Exception("Unable to verify alias");
+				//return 1;
 			}
 
 			// now save the root fingerprint to a file

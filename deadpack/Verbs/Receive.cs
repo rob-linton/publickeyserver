@@ -31,7 +31,7 @@ public class ReceiveOptions : Options
 
 class Receive 
 {
-	public static async Task<int> Execute(ReceiveOptions opts)
+	public static async Task<int> Execute(ReceiveOptions opts, IProgress<StatusUpdate> progress = null)
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Receiving packages...");
@@ -46,7 +46,7 @@ class Receive
 
 		if (!String.IsNullOrEmpty(opts.Alias))
 		{
-			return await ExecuteInternal(opts, opts.Alias);
+			return await ExecuteInternal(opts, opts.Alias, progress);
 		}
 		else
 		{
@@ -55,12 +55,12 @@ class Receive
 			{
 				string alias = a.Name;
 				Misc.LogLine($"\nChecking alias {alias}...");
-				int result = await ExecuteInternal(opts, alias);
+				int result = await ExecuteInternal(opts, alias, progress);
 			}
 			return 0;
 		}
 	}
-	public static async Task<int> ExecuteInternal(ReceiveOptions opts, string alias)
+	public static async Task<int> ExecuteInternal(ReceiveOptions opts, string alias, IProgress<StatusUpdate> progress = null)
 	{
 		// get a tmp output directory
 		string tmpOutputDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -321,6 +321,13 @@ class Receive
 		}
 		catch (Exception ex)
 		{
+			try
+			{
+				progress?.Report(new StatusUpdate { Status = ex.Message });
+				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+			}
+			catch { }
+
 			Misc.LogError("Error receiving package", ex.Message);
 			return 1;
 		}
