@@ -7,6 +7,7 @@ namespace deadrop;
 
 public class HttpHelper 
 {
+
 	/// <summary>
 	/// Sends a GET request to the specified URL and returns the response as a string.
 	/// </summary>
@@ -117,9 +118,9 @@ public class HttpHelper
 	/// <param name="opts">The options for the request.</param>
 	/// <param name="filePath">The path of the file to be posted.</param>
 	/// <returns>A task that represents the asynchronous operation. The task result contains the response data as a string.</returns>
-	public static async Task<string> PostFile(string url, string filePath)
+	public static async Task<string> PostFile(string url, string filePath, IProgress<StatusUpdate> progressFile)
     {
-		
+
 
 #if DEBUG
 		url = url.Replace("https://", "http://");	
@@ -128,7 +129,7 @@ public class HttpHelper
 
 		using (var client = new HttpClient())
 		using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
-		using (var content = new ProgressContent(fileStream))
+		using (var content = new ProgressContent(fileStream, progressFile))
 		{
 			content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
 
@@ -196,14 +197,16 @@ public class HttpHelper
 					if (totalBytesDownloaded / OneMB > bytesDownloaded)
 					{
 						hashesPrinted++;
-						Console.Write("#");
+						//Console.Write("#");
+						Misc.LogChar("#");
 						bytesDownloaded++;
 					}
 
 					if (hashesPrinted > 109)
 					{
 						hashesPrinted = 0;
-						Console.WriteLine();
+						//Console.WriteLine();
+						Misc.LogLine("");
 					}
 				}
 			}
@@ -223,13 +226,19 @@ public class ProgressContent : HttpContent
     private readonly Stream _content;
     private readonly int _bufferSize;
 
+	private IProgress<StatusUpdate> _progress;
+	long _length;
+
 /// <summary>
 /// Initializes a new instance of the <see cref="ProgressContent"/> class with the specified content and buffer size.
 /// </summary>
 /// <param name="content">The stream content.</param>
 /// <param name="bufferSize">The size of the buffer used for reading the content. The default value is 4096.</param>
-    public ProgressContent(Stream content, int bufferSize = 4096)
+    public ProgressContent(FileStream content, IProgress<StatusUpdate> progress, int bufferSize = 4096)
     {
+		_progress = progress;
+		_length = content.Length;
+
         _content = content ?? throw new ArgumentNullException(nameof(content));
         _bufferSize = bufferSize;
 
@@ -259,13 +268,17 @@ public class ProgressContent : HttpContent
 			if (totalBytesRead / OneMB > (totalBytesRead - bytesRead) / OneMB)
 			{
 				hashesPrinted++;
-				Console.Write("#");
+				//Console.Write("#");
+				Misc.LogChar("#");
+				_progress?.Report(new StatusUpdate { Index = totalBytesRead, Count =  stream.Length});
+					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 
 			if (hashesPrinted > 109)
 			{
 				hashesPrinted = 0;
-				Console.WriteLine();
+				//Console.WriteLine();
+				Misc.LogLine("");
 			}
 			
 		}

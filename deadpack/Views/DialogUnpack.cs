@@ -113,7 +113,7 @@ public class DialogUnpack
 		var listViewProgress = new ListView(Globals.ProgressSource) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
 		
 		// setup the progress
-		Globals.SetupProgress(listViewProgress, extractProgress, progressLabel);
+		Globals.SetupProgress(extractProgress, progressLabel);
 
 		viewProgress.Add(listViewProgress);
 	

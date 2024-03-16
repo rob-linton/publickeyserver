@@ -230,12 +230,8 @@ class Pack
 							Count = (float)relativePaths.Count()
 						};
 
-						try
-						{
-							progress?.Report(statusUpdate);
-							await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
-						}
-						catch { }
+						progress?.Report(statusUpdate);
+						await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
 
 						index++;
 					}
@@ -477,12 +473,8 @@ class Pack
 		}
 		catch (Exception ex)
 		{
-			try
-			{
-				progress?.Report(new StatusUpdate { Status = ex.Message });
-				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
-			}
-			catch { }
+			progress?.Report(new StatusUpdate { Status = ex.Message });
+			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
 
 			Misc.LogError("Unable to pack files", ex.Message);
 			return 1;

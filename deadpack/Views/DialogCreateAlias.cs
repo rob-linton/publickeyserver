@@ -185,7 +185,7 @@ public class DialogCreateAlias
 		var listViewProgress = new ListView(Globals.ProgressSource) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
 		viewProgress.Add(listViewProgress);
 		
-		Globals.SetupProgress(listViewProgress, null, progressLabel);
+		Globals.SetupProgress(null, progressLabel);
 	
 		dialog.Add (viewDomain, viewEmail, viewProgress, progressLabel);
 		Application.Run (dialog);

@@ -45,23 +45,19 @@ class Verify
 
 			// update the progress bar if it is not null
 			statusUpdate.Status = result.Replace("\"", "");
-			try
-			{
-				progress?.Report(statusUpdate);
-				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
-			}
-			catch { }
+
+			progress?.Report(statusUpdate);
+			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+
 			Misc.LogLine($"\n{result}\n");
 		}
 		catch (Exception ex)
 		{
 			statusUpdate.Status = ex.Message;
-			try
-			{
-				progress?.Report(statusUpdate);
-				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
-			}
-			catch { }
+
+			progress?.Report(statusUpdate);
+			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+
 			Misc.LogError("Unable to verify email", ex.Message);
 			return 1;
 		}

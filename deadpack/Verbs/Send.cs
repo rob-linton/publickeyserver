@@ -19,7 +19,8 @@ public class SendOptions : Options
 
 class Send 
 {
-	public static async Task<int> Execute(SendOptions opts, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> Execute(SendOptions opts, IProgress<StatusUpdate> progressFile = null,
+	Progress<StatusUpdate> progressOverall = null)
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Sending...");
@@ -29,21 +30,22 @@ class Send
 
 		if (!String.IsNullOrEmpty(opts.File))
 		{
-			return await ExecuteInternal(opts, opts.File, false, progress);
+			return await ExecuteInternal(opts, opts.File, false, progressFile, progressOverall);
 		}
 		else
 		{
 			var deadpacks = Storage.ListDeadPacks("","outbox", Globals.Password);
 			foreach (var file in deadpacks)
 			{
-				await ExecuteInternal(opts, file.Filename, true, progress);
+				await ExecuteInternal(opts, file.Filename, true, progressFile, progressOverall);
 			}
 			return 0;
 		}
 
 	}
 
-	public static async Task<int> ExecuteInternal(SendOptions opts, string file, bool move, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> ExecuteInternal(SendOptions opts, string file, bool move, 
+	IProgress<StatusUpdate> progressFile = null, IProgress<StatusUpdate> progressOverall = null)
 	{
 		try
 		{
@@ -84,6 +86,7 @@ class Send
 			List<string> toAliases = envelope.To.Select(r => r.Alias).ToList();
 
 			// loop through each toAlias
+			int i = 1;
 			foreach (string toAlias in toAliases)
 			{
 				if (toAlias == fromAlias)
@@ -152,17 +155,22 @@ class Send
 
 					Misc.LogLine($"\nSending deadpack to {toAlias}...\n");
 					// UploadPackage(string sender, string recipient, string timestamp, string signature)
-					var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", file);
+					var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", 
+						file, progressFile);
 
 					// show result ok
 					Misc.LogLine($"\n{result}\n");
+
+					progressOverall?.Report(new StatusUpdate { Status = result, Index = i, Count =  toAliases.Count});
+					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+					i++;
 
 				}
 				catch (Exception ex)
 				{
 					try
 					{
-						progress?.Report(new StatusUpdate { Status = ex.Message });
+						progressOverall?.Report(new StatusUpdate { Status = ex.Message });
 						await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
 					}
 					catch { }
@@ -186,7 +194,7 @@ class Send
 		{
 			try
 			{
-				progress?.Report(new StatusUpdate { Status = ex.Message });
+				progressOverall?.Report(new StatusUpdate { Status = ex.Message });
 				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 			catch { }

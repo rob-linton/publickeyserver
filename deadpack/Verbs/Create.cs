@@ -150,12 +150,8 @@ class Create
 				Status = $"Alias {alias} created"
 			};
 
-			try
-			{
-				progress?.Report(statusUpdate);
-				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
-			}
-			catch { }
+			progress?.Report(statusUpdate);
+			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
 		}
 		catch (Exception ex)
 		{

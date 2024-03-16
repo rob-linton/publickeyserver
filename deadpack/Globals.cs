@@ -90,19 +90,16 @@ public static class Globals
 		}
 	}
 	
-	public static void SetupProgress(ListView progressListView, ProgressBar progressBar, Label progressLabel)
+	public static void SetupProgress(ProgressBar progressBar, Label progressLabel)
 	{
-		ProgressListView = progressListView;
 		Progressbar = progressBar;
 		ProgressLabel = progressLabel;
 	}
 
 
 	public static List<string> ProgressSource;
-	private static ListView ProgressListView;
 	private static ProgressBar Progressbar;
 	private static Label ProgressLabel;
-
 
 
     public const string Test = "test123";

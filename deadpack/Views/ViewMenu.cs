@@ -1,4 +1,6 @@
 
+using deadrop;
+using deadrop.Verbs;
 using Terminal.Gui;
 
 class ViewMenu
@@ -26,8 +28,8 @@ class ViewMenu
             }),
 			new MenuBarItem ("_File", new MenuItem [] {
                 new MenuItem ("New _DeadPack", "", () => { 
-                    Application.RequestStop (); 
-                },null,null,Key.CtrlMask | Key.F | Key.D),
+                    new DialogCreateDeadPack().Build(Globals.Alias); 
+                },null,null,Key.CtrlMask | Key.D),
 				new MenuItem ("_Open DeadPack", "", () => { 
                     Application.RequestStop (); 
                 }),
@@ -48,7 +50,7 @@ class ViewMenu
             }),
 			new MenuBarItem ("_Send/Receive", new MenuItem [] {
                 new MenuItem ("_Send Pending DeadPacks in the Outbox", "", () => { 
-                    Application.RequestStop (); 
+                    MenuSend(); 
                 },null,null,Key.CtrlMask | Key.S),
 				new MenuItem ("_Check for New DeadPacks", "", () => { 
                     Application.RequestStop (); 
@@ -72,5 +74,11 @@ class ViewMenu
                 }),
             }),
         });
+	}
+
+	public void MenuSend()
+	{
+		SendOptions opts = new SendOptions();
+		new DialogSend().Build(opts);
 	}
 }
