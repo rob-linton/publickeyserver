@@ -159,6 +159,7 @@ public class Storage
 		{
 
 			// get the private key for this alias
+			long i = 1;
 			foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
 			{
 				Envelope envelope = Envelope.LoadFromFile(file);
@@ -205,7 +206,9 @@ public class Storage
 					Recipients = recipients
 				};
 
-				sorted.Add(timestamp, deadpack);
+				// create a random long
+				sorted.Add(timestamp + i, deadpack);
+				i++;
 
 			}
 

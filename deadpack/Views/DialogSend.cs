@@ -9,8 +9,8 @@ namespace deadrop.Verbs;
 
 public class DialogSend
 {
-	
-  	
+
+	string _currentReceiveAlias = "";
 
 	// build
 	public void Build(SendOptions optsSend, ReceiveOptions optsReceive)
@@ -63,6 +63,21 @@ public class DialogSend
 		//
 		// receive progress reporters
 		//
+		var progressOverallAliasReceive = new Progress<StatusUpdate>(StatusUpdate =>
+		{
+			if (!string.IsNullOrEmpty(StatusUpdate.Status))
+			{
+				_currentReceiveAlias = StatusUpdate.Status;
+				progressLabelReceive.Text = $"Checking {_currentReceiveAlias}";
+			}
+			else
+			{
+				_currentReceiveAlias = "";
+				progressLabelReceive.Text = "";
+			}
+
+			
+		});
 
 		var progressOverallReceive = new Progress<StatusUpdate>(StatusUpdate =>
 		{
@@ -70,7 +85,7 @@ public class DialogSend
 			if (!errorReceive)
 			{
 				if (String.IsNullOrEmpty(StatusUpdate.Status))
-					progressLabelReceive.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Receiving", true);
+					progressLabelReceive.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, $"Receiving {_currentReceiveAlias}", true);
 				else
 				{
 					errorReceive = true;
@@ -93,10 +108,17 @@ public class DialogSend
 		ok.Clicked += async () => {
 
 			optsSend.File = input.Text.ToString();
-			Send.Execute(optsSend, progressFileSend, progressOverallSend);
-
-			Receive.Execute(optsReceive, progressFileReceive, progressOverallReceive);
+			await Send.Execute(optsSend, progressFileSend, progressOverallSend);
+			fileProgressSend.Fraction = 1.0F;
+			overallProgressSend.Fraction = 1.0F;
+			progressLabelSend.Text = "Sending complete";
 			
+
+			await Receive.Execute(optsReceive, progressFileReceive, progressOverallReceive, progressOverallAliasReceive);
+			overallProgressReceive.Fraction = 1.0F;
+			fileProgressReceive.Fraction = 1.0F;
+			progressLabelReceive.Text = "Receiving complete";
+
 		};
 
 
@@ -139,7 +161,7 @@ public class DialogSend
 		fileProgressSend = new ProgressBar () {
 			X = 2,
 			Y = Pos.Bottom(viewInput) + 1,
-			Width = Dim.Fill () - 1,
+			Width = Dim.Fill () - 2,
 			Height = 1,
 			Fraction = 0.0F,
 			ColorScheme = Globals.WhiteOnBlue
@@ -148,7 +170,7 @@ public class DialogSend
 		bytesSend = new Label("") 
 		{ 
 			X = Pos.Right(fileProgressSend) - 12, 
-			Y = Pos.Bottom(fileProgressSend) + 1,
+			Y = Pos.Bottom(fileProgressSend),
 			Width = 11, 
 			Height = 1,
 			ColorScheme = Globals.WhiteOnBlue,
@@ -160,7 +182,7 @@ public class DialogSend
 			Y = Pos.Bottom(fileProgressSend) + 1,
 			Width = Dim.Fill () - 2,
 			Height = 1,
-			Fraction = 0.6F,
+			Fraction = 0.0F,
 			ColorScheme = Globals.WhiteOnBlue
 		};
 		
@@ -190,15 +212,15 @@ public class DialogSend
 		fileProgressReceive = new ProgressBar () {
 			X = 2,
 			Y = 1,
-			Width = Dim.Fill () - 1,
+			Width = Dim.Fill () - 2,
 			Height = 1,
-			Fraction = 0.8F,
+			Fraction = 0.0F,
 			ColorScheme = Globals.WhiteOnBlue
 		};
 
 		bytesReceive = new Label("") 
 		{ 
-			X = Pos.Right(fileProgressReceive) - 12, 
+			X = Pos.Right(fileProgressReceive) - 11, 
 			Y = Pos.Bottom(fileProgressReceive),
 			Width = 10, 
 			Height = 1,
@@ -208,10 +230,10 @@ public class DialogSend
 
 		overallProgressReceive = new ProgressBar () {
 			X = 2,
-			Y = Pos.Bottom(fileProgressReceive) + 1,
+			Y = Pos.Bottom(bytesReceive),
 			Width = Dim.Fill () - 2,
 			Height = 1,
-			Fraction = 1.0F,
+			Fraction = 0.0F,
 			ColorScheme = Globals.WhiteOnBlue
 		};
 		

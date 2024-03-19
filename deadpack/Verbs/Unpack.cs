@@ -322,7 +322,7 @@ class Unpack
 							};
 
 							progress?.Report(statusUpdate);
-							await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
+							await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
 						}
 						Misc.LogLine($"\n\nYour files are located in {opts.Output}");
 						Misc.LogLine("\nDone\n");
@@ -346,7 +346,7 @@ class Unpack
 		catch (Exception ex)
 		{
 			progress?.Report(new StatusUpdate { Status = ex.Message });
-			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 
 			Misc.LogError("Error unpacking package", ex.Message);
 			return 1;

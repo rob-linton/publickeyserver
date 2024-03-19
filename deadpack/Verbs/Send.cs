@@ -39,14 +39,14 @@ class Send
 			foreach (var file in deadpacks)
 			{
 				progressOverall?.Report(new StatusUpdate { Index = i, Count = deadpacks.Count});
-					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+					await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 					i++;
 
 				await ExecuteInternal(opts, file.Filename, true, progressFile, progressOverall);
 			}
 
 			progressOverall?.Report(new StatusUpdate { Index = i, Count = deadpacks.Count});
-					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+					await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 					i++;
 			return 0;
 		}
@@ -169,13 +169,14 @@ class Send
 					// show result ok
 					Misc.LogLine($"\n{result}\n");
 
+
 				}
 				catch (Exception ex)
 				{
 					try
 					{
 						progressOverall?.Report(new StatusUpdate { Status = ex.Message });
-						await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+						await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 					}
 					catch { }
 
@@ -199,7 +200,7 @@ class Send
 			try
 			{
 				progressOverall?.Report(new StatusUpdate { Status = ex.Message });
-				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+				await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 			catch { }
 

@@ -377,6 +377,11 @@ public class Misc
 	/// <returns>A string representation of the formatted size.</returns>
 	internal static string FormatBytes(long receiveSize)
 	{
+		if (receiveSize == 0)
+		{
+			return "0 B";
+		}
+		
 		// format the btyes to a pretty string
 		string[] sizes = { "B", "KB", "MB", "GB", "TB" };
 		double len = receiveSize;

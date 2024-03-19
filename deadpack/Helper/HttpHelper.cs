@@ -135,6 +135,7 @@ public class HttpHelper
 
 			try
 			{
+				client.Timeout = TimeSpan.FromMinutes(1440);
 				var response = await client.PostAsync(url, content);
 				if (response.StatusCode != System.Net.HttpStatusCode.OK)
 				{
@@ -175,8 +176,10 @@ public class HttpHelper
 	#endif
 
 		using (var client = new HttpClient())
-		using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+		//using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
 		{
+			client.Timeout = TimeSpan.FromMinutes(1440);
+			var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
 			if (response.StatusCode != System.Net.HttpStatusCode.OK)
 			{
 				throw new Exception($"{response.StatusCode}");
@@ -185,6 +188,9 @@ public class HttpHelper
 			using (var fileStream = new FileStream(saveFilePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
 			using (var responseStream = await response.Content.ReadAsStreamAsync())
 			{
+				// get the contentlength header
+				long contentLength = response.Content.Headers.ContentLength.Value;
+
 				var buffer = new byte[4096];
 				int bytesRead;
 
@@ -199,10 +205,10 @@ public class HttpHelper
 						hashesPrinted++;
 						Misc.LogChar("#");
 						
-						progress?.Report(new StatusUpdate { Index = bytesDownloaded, Count = fileStream.Length});
-						await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
-
 						bytesDownloaded++;
+
+						progress?.Report(new StatusUpdate { Index = totalBytesDownloaded, Count = contentLength});
+						await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 					}
 
 					if (hashesPrinted > 109)
@@ -211,6 +217,8 @@ public class HttpHelper
 						Misc.LogLine("");
 					}
 				}
+				progress?.Report(new StatusUpdate { Index = totalBytesDownloaded, Count = contentLength});
+						await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 		}
 	}
@@ -273,7 +281,7 @@ public class ProgressContent : HttpContent
 				Misc.LogChar("#");
 
 				_progress?.Report(new StatusUpdate { Index = totalBytesRead, Count = _length});
-					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+				await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 
 			if (hashesPrinted > 109)
@@ -281,8 +289,9 @@ public class ProgressContent : HttpContent
 				hashesPrinted = 0;
 				Misc.LogLine("");
 			}
-			
 		}
+		_progress?.Report(new StatusUpdate { Index = totalBytesRead, Count = _length});
+		await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 	}
 
 /// <summary>

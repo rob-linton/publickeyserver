@@ -32,7 +32,8 @@ public class ReceiveOptions : Options
 class Receive 
 {
 	public static async Task<int> Execute(ReceiveOptions opts, IProgress<StatusUpdate> progressFile = null,
-		IProgress<StatusUpdate> progressOverall = null)
+		IProgress<StatusUpdate> progressOverall = null,
+		IProgress<StatusUpdate> progressOverallAlias = null)
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Receiving packages...");
@@ -56,8 +57,15 @@ class Receive
 			{
 				string alias = a.Name;
 				Misc.LogLine($"\nChecking alias {alias}...");
+				
+				progressOverallAlias?.Report(new StatusUpdate { Status = alias});
+				await System.Threading.Tasks.Task.Delay(10); // DO NOT REMOVE-REQUIRED FOR UX
+
 				int result = await ExecuteInternal(opts, alias, progressFile, progressOverall);
 			}
+
+			progressOverallAlias?.Report(new StatusUpdate { Status = ""});
+			await System.Threading.Tasks.Task.Delay(10); // DO NOT REMOVE-REQUIRED FOR UX
 			return 0;
 		}
 	}
@@ -160,7 +168,7 @@ class Receive
 
 				// sound the bell if there are deadpacks waiting
 				if (opts.Interval == 0 || receiveCount > 0)
-					Misc.LogLine($"\n{receiveCount} deadpack(s) waiting of {Misc.FormatBytes(receiveSize)} total size\n");
+					Misc.LogLine($"\n" + receiveCount + " deadpack(s) waiting of " + Misc.FormatBytes(receiveSize) + " total size\n");
 				
 				if (opts.Interval > 0 && receiveCount > 0)
 				{
@@ -278,13 +286,13 @@ class Receive
 
 					string tmpOutputName = Path.Combine(tmpOutputDirectory, key);
 
-					progressOverall?.Report(new StatusUpdate { Index = i, Count = selectedFiles.Files.Count});
-					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
-					ii++;
 
 					Misc.LogLine($"\nGetting deadpack {key}...");
 					await HttpHelper.GetFile($"https://{toDomain}/package/{alias}/{key}?timestamp={unixTimestamp}&signature={base64Signature}", opts, tmpOutputName, progressFile);
 
+					progressOverall?.Report(new StatusUpdate { Index = ii, Count = selectedFiles.Files.Count});
+					await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
+					ii++;
 
 					// get the envelope from the file
 					Envelope envelope = Envelope.LoadFromFile(tmpOutputName);
@@ -311,8 +319,8 @@ class Receive
 
 				}
 
-				progressOverall?.Report(new StatusUpdate { Index = i, Count = selectedFiles.Files.Count});
-				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+				progressOverall?.Report(new StatusUpdate { Index = ii, Count = selectedFiles.Files.Count});
+				await System.Threading.Tasks.Task.Delay(10); // DO NOT REMOVE-REQUIRED FOR UX
 
 				if (opts.Interval == 0)
 				{
@@ -333,7 +341,7 @@ class Receive
 			try
 			{
 				progressOverall?.Report(new StatusUpdate { Status = ex.Message });
-				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+				await System.Threading.Tasks.Task.Delay(10); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 			catch { }
 

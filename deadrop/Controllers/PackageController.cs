@@ -213,10 +213,10 @@ namespace publickeyserver
 				Response.Body.Close();
 				if (!hasErrored)
 				{
-					using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
-					{
-						await AwsHelper.Delete(_s3Client, key);
-					}
+					//using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+					//{
+					//	await AwsHelper.Delete(_s3Client, key);
+					//}
 				}
 			}
 		}

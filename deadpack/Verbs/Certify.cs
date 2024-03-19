@@ -74,7 +74,7 @@ class Certify
 			try
 			{
 				progress?.Report(new StatusUpdate { Status = ex.Message });
-				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+				await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 			catch { }
 

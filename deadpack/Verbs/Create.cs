@@ -151,7 +151,7 @@ class Create
 			};
 
 			progress?.Report(statusUpdate);
-			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
+			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
 		}
 		catch (Exception ex)
 		{
@@ -162,7 +162,7 @@ class Create
 					Status = ex.Message
 				};
 				progress?.Report(statusUpdate);
-				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
+				await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
 			}
 			catch { }
 

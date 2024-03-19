@@ -47,7 +47,7 @@ class Verify
 			statusUpdate.Status = result.Replace("\"", "");
 
 			progress?.Report(statusUpdate);
-			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 
 			Misc.LogLine($"\n{result}\n");
 		}
@@ -56,7 +56,7 @@ class Verify
 			statusUpdate.Status = ex.Message;
 
 			progress?.Report(statusUpdate);
-			await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 
 			Misc.LogError("Unable to verify email", ex.Message);
 			return 1;
