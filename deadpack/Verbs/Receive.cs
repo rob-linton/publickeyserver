@@ -31,7 +31,8 @@ public class ReceiveOptions : Options
 
 class Receive 
 {
-	public static async Task<int> Execute(ReceiveOptions opts, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> Execute(ReceiveOptions opts, IProgress<StatusUpdate> progressFile = null,
+		IProgress<StatusUpdate> progressOverall = null)
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Receiving packages...");
@@ -46,7 +47,7 @@ class Receive
 
 		if (!String.IsNullOrEmpty(opts.Alias))
 		{
-			return await ExecuteInternal(opts, opts.Alias, progress);
+			return await ExecuteInternal(opts, opts.Alias, progressFile, progressOverall);
 		}
 		else
 		{
@@ -55,12 +56,13 @@ class Receive
 			{
 				string alias = a.Name;
 				Misc.LogLine($"\nChecking alias {alias}...");
-				int result = await ExecuteInternal(opts, alias, progress);
+				int result = await ExecuteInternal(opts, alias, progressFile, progressOverall);
 			}
 			return 0;
 		}
 	}
-	public static async Task<int> ExecuteInternal(ReceiveOptions opts, string alias, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> ExecuteInternal(ReceiveOptions opts, string alias, IProgress<StatusUpdate> progressFile = null,
+		IProgress<StatusUpdate> progressOverall = null)
 	{
 		// get a tmp output directory
 		string tmpOutputDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -263,6 +265,7 @@ class Receive
 				}
 
 				// loop through each package and receive it
+				int ii = 1;
 				foreach (ListFile file in selectedFiles.Files)
 				{
 					string fullKey = file.Key;
@@ -275,8 +278,12 @@ class Receive
 
 					string tmpOutputName = Path.Combine(tmpOutputDirectory, key);
 
+					progressOverall?.Report(new StatusUpdate { Index = i, Count = selectedFiles.Files.Count});
+					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+					ii++;
+
 					Misc.LogLine($"\nGetting deadpack {key}...");
-					await HttpHelper.GetFile($"https://{toDomain}/package/{alias}/{key}?timestamp={unixTimestamp}&signature={base64Signature}", opts, tmpOutputName);
+					await HttpHelper.GetFile($"https://{toDomain}/package/{alias}/{key}?timestamp={unixTimestamp}&signature={base64Signature}", opts, tmpOutputName, progressFile);
 
 
 					// get the envelope from the file
@@ -304,6 +311,8 @@ class Receive
 
 				}
 
+				progressOverall?.Report(new StatusUpdate { Index = i, Count = selectedFiles.Files.Count});
+				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
 
 				if (opts.Interval == 0)
 				{
@@ -323,7 +332,7 @@ class Receive
 		{
 			try
 			{
-				progress?.Report(new StatusUpdate { Status = ex.Message });
+				progressOverall?.Report(new StatusUpdate { Status = ex.Message });
 				await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 			catch { }

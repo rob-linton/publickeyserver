@@ -13,21 +13,7 @@ class ViewMenu
 		// menubar
 		 Menu = new MenuBar (new MenuBarItem [] {
             new MenuBarItem ("_DeadPack", new MenuItem [] {
-                new MenuItem ("_About", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Update", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				 new MenuItem ("_Settings", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Quit", "", () => { 
-                    Application.RequestStop (); 
-                },null,null,Key.CtrlMask | Key.D | Key.Q),
-            }),
-			new MenuBarItem ("_File", new MenuItem [] {
-                new MenuItem ("New _DeadPack", "", () => { 
+				new MenuItem ("New _DeadPack", "", () => { 
                     new DialogCreateDeadPack().Build(Globals.Alias); 
                 },null,null,Key.CtrlMask | Key.D),
 				new MenuItem ("_Open DeadPack", "", () => { 
@@ -36,6 +22,16 @@ class ViewMenu
 				new MenuItem ("_Certify DeadPack", "", () => { 
                     Application.RequestStop (); 
                 }),
+				new MenuItem ("--------------------------", "", () => {  
+                }),
+				 new MenuItem ("_Settings", "", () => { 
+                    Application.RequestStop (); 
+                }),
+				new MenuItem ("--------------------------", "", () => {  
+                }),
+				new MenuItem ("_Quit", "", () => { 
+                    Application.RequestStop (); 
+                },null,null,Key.CtrlMask | Key.Q),
             }),
 			new MenuBarItem ("_Alias", new MenuItem [] {
                 new MenuItem ("New _Alias", "", () => { 
@@ -48,15 +44,20 @@ class ViewMenu
                     Application.RequestStop (); 
                 }),
             }),
-			new MenuBarItem ("_Send/Receive", new MenuItem [] {
-                new MenuItem ("_Send Pending DeadPacks in the Outbox", "", () => { 
+			new MenuBarItem ("_Refresh", new MenuItem [] {
+                new MenuItem ("_Refresh DeadPacks (Send/Receive)", "", () => { 
                     MenuSend(); 
-                },null,null,Key.CtrlMask | Key.S),
-				new MenuItem ("_Check for New DeadPacks", "", () => { 
-                    Application.RequestStop (); 
-                },null,null,Key.CtrlMask | Key.R),
+                },null,null,Key.CtrlMask | Key.R)
             }),
 			new MenuBarItem ("_Help", new MenuItem [] {
+				  new MenuItem ("_About", "", () => { 
+                    Application.RequestStop (); 
+                }),
+				new MenuItem ("_Update", "", () => { 
+                    Application.RequestStop (); 
+                }),
+				new MenuItem ("-------------", "", () => {  
+                }),
                 new MenuItem ("_Overview", "", () => { 
                     Application.RequestStop (); 
                 }),
@@ -78,7 +79,8 @@ class ViewMenu
 
 	public void MenuSend()
 	{
-		SendOptions opts = new SendOptions();
-		new DialogSend().Build(opts);
+		SendOptions optsSend = new SendOptions();
+		ReceiveOptions optsReceive = new ReceiveOptions(){ Force = true, Interval = 0 };
+		new DialogSend().Build(optsSend, optsReceive);
 	}
 }

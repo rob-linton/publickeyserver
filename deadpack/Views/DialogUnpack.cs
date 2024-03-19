@@ -18,14 +18,24 @@ public class DialogUnpack
 	// build
 	public void Build(string input, String alias)
 	{
-
+		bool error = false;
 	
 		Globals.ClearProgressSource();
 		var progress = new Progress<StatusUpdate>(StatusUpdate =>
-		{
-			progressBar.Fraction = StatusUpdate.Index / StatusUpdate.Count;
-			progressLabel.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Unpacking");
-		});
+			{
+				progressBar.Fraction = StatusUpdate.Index / StatusUpdate.Count;
+				if (!error)
+				{
+					if (String.IsNullOrEmpty(StatusUpdate.Status))
+						progressLabel.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Unpacking");
+					else
+					{
+						error = true;
+						progressLabel.Text = StatusUpdate.Status;
+					}
+				}
+				
+			});
 
 		var ok = new Button("Go");
 		ok.Clicked += async () => { 

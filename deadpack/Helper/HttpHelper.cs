@@ -163,7 +163,7 @@ public class HttpHelper
 	/// <param name="opts">The options for retrieving the file.</param>
 	/// <param name="saveFilePath">The file path where the retrieved file will be saved.</param>
 	/// <returns>A task representing the asynchronous operation.</returns>
-	public static async Task GetFile(string url, Options opts, string saveFilePath)
+	public static async Task GetFile(string url, Options opts, string saveFilePath, IProgress<StatusUpdate> progress = null)
 	{
 		const int OneMB = 1024 * 1024;
 		int bytesDownloaded = 0;
@@ -197,15 +197,17 @@ public class HttpHelper
 					if (totalBytesDownloaded / OneMB > bytesDownloaded)
 					{
 						hashesPrinted++;
-						//Console.Write("#");
 						Misc.LogChar("#");
+						
+						progress?.Report(new StatusUpdate { Index = bytesDownloaded, Count = fileStream.Length});
+						await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+
 						bytesDownloaded++;
 					}
 
 					if (hashesPrinted > 109)
 					{
 						hashesPrinted = 0;
-						//Console.WriteLine();
 						Misc.LogLine("");
 					}
 				}
@@ -268,8 +270,7 @@ public class ProgressContent : HttpContent
 			if (totalBytesRead / OneMB > (totalBytesRead - bytesRead) / OneMB)
 			{
 				hashesPrinted++;
-				//Console.Write("#");
-				//Misc.LogChar("#");
+				Misc.LogChar("#");
 
 				_progress?.Report(new StatusUpdate { Index = totalBytesRead, Count = _length});
 					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
@@ -278,7 +279,6 @@ public class ProgressContent : HttpContent
 			if (hashesPrinted > 109)
 			{
 				hashesPrinted = 0;
-				//Console.WriteLine();
 				Misc.LogLine("");
 			}
 			

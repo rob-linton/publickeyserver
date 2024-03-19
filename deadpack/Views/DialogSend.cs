@@ -10,55 +10,92 @@ namespace deadrop.Verbs;
 public class DialogSend
 {
 	
-  	private TextField input = new TextField();
-	private Label progressLabel = new Label("");
+  	
 
 	// build
-	public void Build(SendOptions opts)
+	public void Build(SendOptions optsSend, ReceiveOptions optsReceive)
 	{
-
+		TextField input = new TextField();
 		Globals.ClearProgressSource();
-		ProgressBar overallProgress = new ProgressBar();
-		ProgressBar fileProgress = new ProgressBar();
-		progressLabel.Text = Misc.UpdateProgressBarLabel(0, 0, "Sending");
-		Label bytesSent = new Label("");
-		bool error = false;
 
+		ProgressBar overallProgressSend = new ProgressBar();
+		ProgressBar fileProgressSend = new ProgressBar();
+		Label progressLabelSend = new Label(Misc.UpdateProgressBarLabel(0, 0, "Sending"));
+		Label bytesSend = new Label("");
+
+		ProgressBar overallProgressReceive = new ProgressBar();
+		ProgressBar fileProgressReceive = new ProgressBar();
+		Label progressLabelReceive = new Label(Misc.UpdateProgressBarLabel(0, 0, "Receiving"));
+		Label bytesReceive = new Label("");
 		
-		var ok = new Button("Send");
+		bool errorSend = false;
+		bool errorReceive = false;
+
+		//
+		// send progress reporters
+		//
+
+		// report on overall progress
+		var progressOverallSend = new Progress<StatusUpdate>(StatusUpdate =>
+		{
+			overallProgressSend.Fraction = StatusUpdate.Index / StatusUpdate.Count;
+			if (!errorSend)
+			{
+				if (String.IsNullOrEmpty(StatusUpdate.Status))
+					progressLabelSend.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Sending", true);
+				else
+				{
+					errorSend = true;
+					progressLabelSend.Text = StatusUpdate.Status;
+				}
+			}
+		});
+
+		// report on file progress
+		var progressFileSend = new Progress<StatusUpdate>(StatusUpdate =>
+		{
+			fileProgressSend.Fraction = StatusUpdate.Index / StatusUpdate.Count;
+			//string bytes = Misc.FormatBytes((long)StatusUpdate.Index);
+			string bytes = Math.Round(StatusUpdate.Index / 1000 / 1000, 0).ToString() + " MB";
+			bytesSend.Text = bytes;
+		});
+
+		//
+		// receive progress reporters
+		//
+
+		var progressOverallReceive = new Progress<StatusUpdate>(StatusUpdate =>
+		{
+			overallProgressReceive.Fraction = StatusUpdate.Index / StatusUpdate.Count;
+			if (!errorReceive)
+			{
+				if (String.IsNullOrEmpty(StatusUpdate.Status))
+					progressLabelReceive.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Receiving", true);
+				else
+				{
+					errorReceive = true;
+					progressLabelReceive.Text = StatusUpdate.Status;
+				}
+			}
+			
+		});
+
+		// report on file progress
+		var progressFileReceive = new Progress<StatusUpdate>(StatusUpdate =>
+		{
+			fileProgressReceive.Fraction = StatusUpdate.Index / StatusUpdate.Count;
+			//string bytes = Misc.FormatBytes((long)StatusUpdate.Index);
+			string bytes = Math.Round(StatusUpdate.Index / 1000 / 1000, 0).ToString() + " MB";
+			bytesReceive.Text = bytes;
+		});
+
+		var ok = new Button("Send/Receive");
 		ok.Clicked += async () => {
 
-			
+			optsSend.File = input.Text.ToString();
+			Send.Execute(optsSend, progressFileSend, progressOverallSend);
 
-			opts.File = input.Text.ToString();
-			
-			// report on overall progress
-			var progressOverall = new Progress<StatusUpdate>(StatusUpdate =>
-			{
-				overallProgress.Fraction = StatusUpdate.Index / StatusUpdate.Count;
-				if (!error)
-				{
-					if (String.IsNullOrEmpty(StatusUpdate.Status))
-						progressLabel.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Sending", true);
-					else
-					{
-						error = true;
-						progressLabel.Text = StatusUpdate.Status;
-					}
-				}
-				
-			});
-
-			// report on file progress
-			var progressFile = new Progress<StatusUpdate>(StatusUpdate =>
-			{
-				fileProgress.Fraction = StatusUpdate.Index / StatusUpdate.Count;
-				//string bytes = Misc.FormatBytes((long)StatusUpdate.Index);
-				string bytes = Math.Round(StatusUpdate.Index / 1000 / 1000, 0).ToString() + " MB";
-				bytesSent.Text = bytes;
-			});
-
-			int result = await Send.Execute(opts, progressFile, progressOverall);
+			Receive.Execute(optsReceive, progressFileReceive, progressOverallReceive);
 			
 		};
 
@@ -86,7 +123,7 @@ public class DialogSend
 			ColorScheme = Globals.BlueOnWhite
 		};
 		
-		FrameView viewInput = new FrameView ("Input DeadPack file (leave blank to send all in the outbox)") {
+		FrameView viewInput = new FrameView ("Input DeadPack file to send (Optional)") {
         	X = 1,
             Y = 0,
             Width = Dim.Fill () - 1,
@@ -96,49 +133,111 @@ public class DialogSend
 		viewInput.Add(input);
 
 		//
-		// add the progress bars
+		// add the send progress bars
 		//
-
-		fileProgress = new ProgressBar () {
+		
+		fileProgressSend = new ProgressBar () {
 			X = 2,
-			Y = 4,
+			Y = Pos.Bottom(viewInput) + 1,
 			Width = Dim.Fill () - 1,
 			Height = 1,
 			Fraction = 0.0F,
 			ColorScheme = Globals.WhiteOnBlue
 		};
 
-		bytesSent = new Label("") 
+		bytesSend = new Label("") 
 		{ 
-			X = Pos.Right(fileProgress) - 12, 
-			Y = 5,
+			X = Pos.Right(fileProgressSend) - 12, 
+			Y = Pos.Bottom(fileProgressSend) + 1,
+			Width = 11, 
+			Height = 1,
+			ColorScheme = Globals.WhiteOnBlue,
+			TextAlignment = TextAlignment.Right
+		};
+
+		overallProgressSend = new ProgressBar () {
+			X = 2,
+			Y = Pos.Bottom(fileProgressSend) + 1,
+			Width = Dim.Fill () - 2,
+			Height = 1,
+			Fraction = 0.6F,
+			ColorScheme = Globals.WhiteOnBlue
+		};
+		
+		progressLabelSend = new Label("") 
+		{ 
+			X = 2, 
+			Y = Pos.Bottom(overallProgressSend) + 1, 
+			Width = Dim.Fill() - 1, 
+			Height = 1,
+			ColorScheme = Globals.WhiteOnBlue
+		};
+
+		FrameView frameTitleSend = new FrameView("Send") 
+		{ 
+			X = 2, 
+			Y = 1, 
+			Width = Dim.Fill() - 1, 
+			Height = 12,
+			ColorScheme = Globals.WhiteOnBlue
+		};
+		frameTitleSend.Add(viewInput, fileProgressSend, overallProgressSend, progressLabelSend, bytesSend);
+
+		//
+		// add the receive progress bars
+		//
+
+		fileProgressReceive = new ProgressBar () {
+			X = 2,
+			Y = 1,
+			Width = Dim.Fill () - 1,
+			Height = 1,
+			Fraction = 0.8F,
+			ColorScheme = Globals.WhiteOnBlue
+		};
+
+		bytesReceive = new Label("") 
+		{ 
+			X = Pos.Right(fileProgressReceive) - 12, 
+			Y = Pos.Bottom(fileProgressReceive),
 			Width = 10, 
 			Height = 1,
 			ColorScheme = Globals.WhiteOnBlue,
 			TextAlignment = TextAlignment.Right
 		};
 
-		overallProgress = new ProgressBar () {
+		overallProgressReceive = new ProgressBar () {
 			X = 2,
-			Y = Pos.Bottom(fileProgress) + 1,
+			Y = Pos.Bottom(fileProgressReceive) + 1,
 			Width = Dim.Fill () - 2,
 			Height = 1,
-			Fraction = 0.0F,
+			Fraction = 1.0F,
 			ColorScheme = Globals.WhiteOnBlue
 		};
 		
-		progressLabel = new Label("") 
+		progressLabelReceive = new Label("") 
 		{ 
 			X = 2, 
-			Y = Pos.Bottom(overallProgress) + 1, 
+			Y = Pos.Bottom(overallProgressReceive) + 1, 
 			Width = Dim.Fill() - 1, 
 			Height = 1,
 			ColorScheme = Globals.WhiteOnBlue
 		};
 
+		FrameView frameTitleReceive = new FrameView("Receive") 
+		{ 
+			X = 2, 
+			Y = Pos.Bottom(frameTitleSend) + 2, 
+			Width = Dim.Fill() - 1, 
+			Height = 9,
+			ColorScheme = Globals.WhiteOnBlue
+		};
+		frameTitleReceive.Add(fileProgressReceive, overallProgressReceive, progressLabelReceive, bytesReceive);
+		
 		//
 		// add the progress view list
 		//
+		/*
 		FrameView viewProgress = new FrameView ("Packing Slip Verification") {
 			X = 1,
 			Y = Pos.Bottom(progressLabel) + 1, 
@@ -148,8 +247,9 @@ public class DialogSend
 		var listViewProgress = new ListView(Globals.GetProgressSource()) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
 
 		viewProgress.Add(listViewProgress);
-	
-		dialog.Add (viewInput, fileProgress, overallProgress, progressLabel, viewProgress, bytesSent);
+		*/
+
+		dialog.Add (frameTitleSend, frameTitleReceive);
 		Application.Run (dialog);
 
 		return;
