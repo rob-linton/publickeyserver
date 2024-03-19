@@ -47,7 +47,7 @@ class ViewMenu
 			new MenuBarItem ("_Refresh", new MenuItem [] {
                 new MenuItem ("_Refresh DeadPacks (Send/Receive)", "", () => { 
                     MenuSend(false); 
-                },null,null,Key.CtrlMask | Key.Z)
+                },null,null)
             }),
 			new MenuBarItem ("_Help", new MenuItem [] {
 				  new MenuItem ("_About", "", () => { 
