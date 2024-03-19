@@ -205,7 +205,7 @@ public class Misc
 	/// <param name="message">The message to be logged.</param>
 	public static void LogChar(string message)
 	{
-		//if (Globals.Verbose > 0)
+		if (Globals.Verbose > 0)
 			Console.Write(message);
 	}
 	// --------------------------------------------------------------------------------------------------------

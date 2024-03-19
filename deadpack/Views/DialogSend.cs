@@ -53,6 +53,7 @@ public class DialogSend
 			var progressFile = new Progress<StatusUpdate>(StatusUpdate =>
 			{
 				fileProgress.Fraction = StatusUpdate.Index / StatusUpdate.Count;
+				//string bytes = Misc.FormatBytes((long)StatusUpdate.Index);
 				string bytes = Math.Round(StatusUpdate.Index / 1000 / 1000, 0).ToString() + " MB";
 				bytesSent.Text = bytes;
 			});
