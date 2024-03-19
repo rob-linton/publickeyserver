@@ -11,17 +11,26 @@ public class DialogUnpack
 {
 	
   	private TextField output = new TextField();
+	private Label progressLabel = new Label("");
+	private ProgressBar progressBar = new ProgressBar ();
+
 
 	// build
 	public void Build(string input, String alias)
 	{
 
-		Globals.ProgressSource.Clear();
+	
+		Globals.ClearProgressSource();
+		var progress = new Progress<StatusUpdate>(StatusUpdate =>
+		{
+			progressBar.Fraction = StatusUpdate.Index / StatusUpdate.Count;
+			progressLabel.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Unpacking");
+		});
 
 		var ok = new Button("Go");
 		ok.Clicked += async () => { 
 			
-			Globals.UpdateProgressBar(0, 0, "Unpacking");
+			progressLabel.Text = Misc.UpdateProgressBarLabel(0, 0, "Unpacking");
 			
 			UnpackOptions opts = new UnpackOptions()
 			{
@@ -30,12 +39,7 @@ public class DialogUnpack
 				File = input
 			};
 			
-			// report on progress
-			var progress = new Progress<StatusUpdate>(StatusUpdate =>
-			{
-				Globals.UpdateProgressBar(StatusUpdate.Index, StatusUpdate.Count, "Unpacking");
-			});
-
+			// report on progress and execute
 			if (String.IsNullOrEmpty(alias))
 				await Unpack.Execute(opts, progress);
 			else
@@ -83,7 +87,7 @@ public class DialogUnpack
 		//
 		// add the progress bar
 		//
-		ProgressBar extractProgress = new ProgressBar () {
+		progressBar = new ProgressBar () {
 			X = 2,
 			Y = 4,
 			Width = Dim.Fill () - 1,
@@ -92,10 +96,10 @@ public class DialogUnpack
 			ColorScheme = Globals.WhiteOnBlue
 		};
 		
-		Label progressLabel = new Label("") 
+		progressLabel = new Label("") 
 		{ 
 			X = 2, 
-			Y = Pos.Bottom(extractProgress) + 1, 
+			Y = Pos.Bottom(progressBar) + 1, 
 			Width = Dim.Fill() - 1, 
 			Height = 1,
 			ColorScheme = Globals.WhiteOnBlue
@@ -110,14 +114,11 @@ public class DialogUnpack
 			Width = Dim.Fill () - 1,
 			Height = Dim.Fill () - 2
 		};
-		var listViewProgress = new ListView(Globals.ProgressSource) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
-		
-		// setup the progress
-		Globals.SetupProgress(extractProgress, progressLabel);
+		var listViewProgress = new ListView(Globals.GetProgressSource()) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
 
 		viewProgress.Add(listViewProgress);
 	
-		dialog.Add (viewOutput, extractProgress, progressLabel, viewProgress);
+		dialog.Add (viewOutput, progressBar, progressLabel, viewProgress);
 		Application.Run (dialog);
 
 		return;

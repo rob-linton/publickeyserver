@@ -205,7 +205,7 @@ public class Misc
 	/// <param name="message">The message to be logged.</param>
 	public static void LogChar(string message)
 	{
-		if (Globals.Verbose > 0)
+		//if (Globals.Verbose > 0)
 			Console.Write(message);
 	}
 	// --------------------------------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ public class Misc
 	{
 		message = "[ \u2713 ]  " + message;
 
-		Globals.UpdateProgressMessage(message);
+		Globals.UpdateProgressSource(message);
 		
 		if (Globals.Verbose > 0)
 		{
@@ -225,7 +225,7 @@ public class Misc
 	public static void LogCross(string message)
 	{
 		message = "[ X ]  " + message;
-		Globals.UpdateProgressMessage(message);
+		Globals.UpdateProgressSource(message);
 	
 		if (Globals.Verbose > 0)
 		{
@@ -431,5 +431,47 @@ public class Misc
 	{
 		string s = input + "                                                                                                                  ";
 		return s.Substring(0, length);
+	}
+
+	public static string UpdateProgressBarLabel(float index, float count, string action, bool pre = false)
+	{
+		try
+		{
+			if (!pre)
+			{
+				if (index == count)
+				{
+					return $"{action} complete";
+				}
+				else if (index == 0)
+				{
+					return $"{action}...";
+				}
+				else
+				{
+					return $"{action} " + index.ToString() + " of " + count.ToString() + "...";
+				}
+			}
+			else
+			{
+				if (index == count)
+				{
+					return $"{action} complete";
+				}
+				else if (index == 0)
+				{
+					return $"{action} " + (index+1).ToString() + " of " + count.ToString() + "...";
+				}
+				else
+				{
+					return $"{action} " + (index+1).ToString() + " of " + count.ToString() + "...";
+				}
+			}
+
+		}
+		catch 
+		{
+			return $"{action}...";
+		}
 	}
 }

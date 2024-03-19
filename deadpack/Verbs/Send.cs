@@ -20,7 +20,7 @@ public class SendOptions : Options
 class Send 
 {
 	public static async Task<int> Execute(SendOptions opts, IProgress<StatusUpdate> progressFile = null,
-	Progress<StatusUpdate> progressOverall = null)
+		IProgress<StatusUpdate> progressOverall = null)
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Sending...");
@@ -35,17 +35,26 @@ class Send
 		else
 		{
 			var deadpacks = Storage.ListDeadPacks("","outbox", Globals.Password);
+			int i = 0;
 			foreach (var file in deadpacks)
 			{
+				progressOverall?.Report(new StatusUpdate { Index = i, Count = deadpacks.Count});
+					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+					i++;
+
 				await ExecuteInternal(opts, file.Filename, true, progressFile, progressOverall);
 			}
+
+			progressOverall?.Report(new StatusUpdate { Index = i, Count = deadpacks.Count});
+					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
+					i++;
 			return 0;
 		}
 
 	}
 
 	public static async Task<int> ExecuteInternal(SendOptions opts, string file, bool move, 
-	IProgress<StatusUpdate> progressFile = null, IProgress<StatusUpdate> progressOverall = null)
+		IProgress<StatusUpdate> progressFile = null, IProgress<StatusUpdate> progressOverall = null)
 	{
 		try
 		{
@@ -86,7 +95,6 @@ class Send
 			List<string> toAliases = envelope.To.Select(r => r.Alias).ToList();
 
 			// loop through each toAlias
-			int i = 1;
 			foreach (string toAlias in toAliases)
 			{
 				if (toAlias == fromAlias)
@@ -160,10 +168,6 @@ class Send
 
 					// show result ok
 					Misc.LogLine($"\n{result}\n");
-
-					progressOverall?.Report(new StatusUpdate { Status = result, Index = i, Count =  toAliases.Count});
-					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
-					i++;
 
 				}
 				catch (Exception ex)

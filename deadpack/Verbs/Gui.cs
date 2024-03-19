@@ -62,7 +62,7 @@ class Gui
 				HotFocus = Application.Driver.MakeAttribute(Color.White, Color.Cyan),
 			};
 
-			Globals.ProgressSource = new List<string>();
+			Globals.SetProgressSource(new List<string>());
 			Globals.Verbose = 0;
 
 			ViewMenu menu = new ViewMenu();

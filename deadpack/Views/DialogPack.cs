@@ -11,48 +11,40 @@ public class DialogPack
 {
 	
   	private TextField output = new TextField();
+	private Label progressLabel = new Label("");
+	private ProgressBar progressBar = new ProgressBar ();
+	
 
 	// build
 	public void Build(PackOptions opts)
 	{
 
-		Globals.ProgressSource.Clear();
-
+		Globals.ClearProgressSource();
+		var progress = new Progress<StatusUpdate>(StatusUpdate =>
+		{
+			progressBar.Fraction = StatusUpdate.Index / StatusUpdate.Count;
+			progressLabel.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Packing");
+		});
 
 		var ok = new Button("Pack to a File");
 		ok.Clicked += async () => {
-
-			Globals.UpdateProgressBar(0, 0, "Packing to File");
-
+			progressBar.Fraction = 0.0F;
+			progressLabel.Text = Misc.UpdateProgressBarLabel(0, 0, "Packing");
 			opts.Output = output.Text.ToString();
 			
-			// report on progress
-			var progress = new Progress<StatusUpdate>(StatusUpdate =>
-			{
-				Globals.UpdateProgressBar(StatusUpdate.Index, StatusUpdate.Count, "Packing");
-			});
-
+			// report on progress and execute
 			int result = await Pack.Execute(opts, progress);
 			
 		};
 
 		var outBox = new Button("Pack to Outbox");
 		outBox.Clicked += async () => {
-
-			Globals.UpdateProgressBar(0, 0, "Packing to Outbox");
-
 			string timestamp = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds().ToString();
 			string filename = $"{timestamp}-{Guid.NewGuid()}.deadpack";
 			opts.Output = Path.Join(Storage.GetDeadPackDirectoryOutbox(""), filename);
 			
-			// report on progress
-			var progress = new Progress<StatusUpdate>(StatusUpdate =>
-			{
-				Globals.UpdateProgressBar(StatusUpdate.Index, StatusUpdate.Count, "Packing");
-			});
-
+			// report on progress and execute
 			int result = await Pack.Execute(opts, progress);
-			
 		};
 
 		var cancel = new Button("Close");
@@ -94,7 +86,7 @@ public class DialogPack
 		//
 		// add the progress bar
 		//
-		ProgressBar extractProgress = new ProgressBar () {
+		progressBar = new ProgressBar () {
 			X = 2,
 			Y = 4,
 			Width = Dim.Fill () - 1,
@@ -103,10 +95,10 @@ public class DialogPack
 			ColorScheme = Globals.WhiteOnBlue
 		};
 		
-		Label progressLabel = new Label("") 
+		progressLabel = new Label("") 
 		{ 
 			X = 2, 
-			Y = Pos.Bottom(extractProgress) + 1, 
+			Y = Pos.Bottom(progressBar) + 1, 
 			Width = Dim.Fill() - 1, 
 			Height = 1,
 			ColorScheme = Globals.WhiteOnBlue
@@ -121,14 +113,11 @@ public class DialogPack
 			Width = Dim.Fill () - 1,
 			Height = Dim.Fill () - 2
 		};
-		var listViewProgress = new ListView(Globals.ProgressSource) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
-		
-		// setup the progress
-		Globals.SetupProgress(extractProgress, progressLabel);
+		var listViewProgress = new ListView(Globals.GetProgressSource()) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
 
 		viewProgress.Add(listViewProgress);
 	
-		dialog.Add (viewOutput, extractProgress, progressLabel, viewProgress);
+		dialog.Add (viewOutput, progressBar, progressLabel, viewProgress);
 		Application.Run (dialog);
 
 		return;

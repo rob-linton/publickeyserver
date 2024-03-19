@@ -269,8 +269,9 @@ public class ProgressContent : HttpContent
 			{
 				hashesPrinted++;
 				//Console.Write("#");
-				Misc.LogChar("#");
-				_progress?.Report(new StatusUpdate { Index = totalBytesRead, Count =  stream.Length});
+				//Misc.LogChar("#");
+
+				_progress?.Report(new StatusUpdate { Index = totalBytesRead, Count = _length});
 					await System.Threading.Tasks.Task.Delay(100); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 

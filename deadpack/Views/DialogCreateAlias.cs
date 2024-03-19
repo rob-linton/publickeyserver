@@ -126,7 +126,7 @@ public class DialogCreateAlias
 			ColorScheme = Globals.BlueOnWhite
 		};
 
-		Button verifyEmail = new Button("Verify Email")
+		Button verifyEmail = new Button("Get Verification Code")
 		{
 			X = Pos.Percent(80) + 6,
 			Y = Pos.Bottom(emailLabel), 
@@ -182,10 +182,8 @@ public class DialogCreateAlias
 			Width = Dim.Fill () - 1,
 			Height = Dim.Fill () - 2
 		};
-		var listViewProgress = new ListView(Globals.ProgressSource) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
+		var listViewProgress = new ListView(Globals.GetProgressSource()) { X = 1, Y = 1, Width = Dim.Fill()-2, Height = Dim.Fill() - 2 };
 		viewProgress.Add(listViewProgress);
-		
-		Globals.SetupProgress(null, progressLabel);
 	
 		dialog.Add (viewDomain, viewEmail, viewProgress, progressLabel);
 		Application.Run (dialog);

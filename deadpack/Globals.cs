@@ -42,65 +42,41 @@ public static class Globals
 	//
 	// progress for the gui
 	//
-	public static void UpdateProgressMessage(string message)
+	public static void UpdateProgressSource(string message)
 	{
 		try
 		{
-			ProgressSource.Add(message);
+			lock (ProgressSource)
+			{
+				ProgressSource.Add(message);
+			}
 		}
 		catch { }
-		
 	}
 
-	public static void UpdateProgressBar(float index, float count, string action)
+	public static void ClearProgressSource()
 	{
-		if (index > count)
+		lock (ProgressSource)
 		{
-			index = count;
-		}
-		if (count == 0)
-		{
-			count = 1;
-		}
-		try
-		{
-			try
-			{
-				Progressbar.Fraction = index / count;
-			}
-			catch { }
-
-			if (index == count)
-			{
-				ProgressLabel.Text = $"{action} complete";
-			}
-			else if (index == 0)
-			{
-				ProgressLabel.Text = $"{action}...";
-			}
-			else
-			{
-				ProgressLabel.Text = $"{action} " + index.ToString() + " of " + count.ToString() + "...";
-			}
-
-		}
-		catch (Exception e)
-		{
-			//Console.WriteLine(e.Message);
+			ProgressSource.Clear();
 		}
 	}
+
+	// create the get set properties for the progress source
 	
-	public static void SetupProgress(ProgressBar progressBar, Label progressLabel)
+	public static List<string> GetProgressSource()
 	{
-		Progressbar = progressBar;
-		ProgressLabel = progressLabel;
+		// no lock as it is read only
+		return ProgressSource;
 	}
 
+	public static void SetProgressSource(List<string> value)
+	{
+		// no lock, call once initially
+		ProgressSource = value;
+	}
 
-	public static List<string> ProgressSource;
-	private static ProgressBar Progressbar;
-	private static Label ProgressLabel;
-
+	private static List<string> ProgressSource;
 
     public const string Test = "test123";
 }
