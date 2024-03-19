@@ -46,8 +46,8 @@ class ViewMenu
             }),
 			new MenuBarItem ("_Refresh", new MenuItem [] {
                 new MenuItem ("_Refresh DeadPacks (Send/Receive)", "", () => { 
-                    MenuSend(); 
-                },null,null,Key.CtrlMask | Key.R)
+                    MenuSend(false); 
+                },null,null,Key.CtrlMask | Key.Z)
             }),
 			new MenuBarItem ("_Help", new MenuItem [] {
 				  new MenuItem ("_About", "", () => { 
@@ -77,10 +77,10 @@ class ViewMenu
         });
 	}
 
-	public void MenuSend()
+	public static void MenuSend(bool auto)
 	{
 		SendOptions optsSend = new SendOptions();
 		ReceiveOptions optsReceive = new ReceiveOptions(){ Force = true, Interval = 0 };
-		new DialogSend().Build(optsSend, optsReceive);
+		new DialogSend().Build(optsSend, optsReceive, auto);
 	}
 }

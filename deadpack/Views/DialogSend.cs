@@ -118,6 +118,16 @@ public class DialogSend
 			fileProgressReceive.Fraction = 1.0F;
 			progressLabelReceive.Text = "Receiving complete";
 
+			if (errorSend || errorReceive)
+			{
+				MessageBox.ErrorQuery("Error", "An error occurred during the send/receive process", "Ok");
+			}
+			
+			if (auto)
+			{
+				Application.RequestStop();
+			}
+
 		};
 
 
@@ -128,9 +138,17 @@ public class DialogSend
 		};
 
 		var dialog = new Dialog ("", 0, 0, cancel, ok);
-		
+
 		dialog.Border.BorderStyle = BorderStyle.Double;
 		dialog.ColorScheme = Colors.Base;
+		dialog.Ready += () => 
+		{
+			if (auto)
+			{
+				// press the ok button
+				ok.OnClicked();
+			}
+		};
 		
 		//
 		// add the input location
