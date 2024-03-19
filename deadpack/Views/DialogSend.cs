@@ -13,7 +13,7 @@ public class DialogSend
 	string _currentReceiveAlias = "";
 
 	// build
-	public void Build(SendOptions optsSend, ReceiveOptions optsReceive)
+	public void Build(SendOptions optsSend, ReceiveOptions optsReceive, bool auto = false)
 	{
 		TextField input = new TextField();
 		Globals.ClearProgressSource();
@@ -113,7 +113,6 @@ public class DialogSend
 			overallProgressSend.Fraction = 1.0F;
 			progressLabelSend.Text = "Sending complete";
 			
-
 			await Receive.Execute(optsReceive, progressFileReceive, progressOverallReceive, progressOverallAliasReceive);
 			overallProgressReceive.Fraction = 1.0F;
 			fileProgressReceive.Fraction = 1.0F;

@@ -273,7 +273,7 @@ class Receive
 				}
 
 				// loop through each package and receive it
-				int ii = 1;
+				int ii = 0;
 				foreach (ListFile file in selectedFiles.Files)
 				{
 					string fullKey = file.Key;
@@ -286,13 +286,14 @@ class Receive
 
 					string tmpOutputName = Path.Combine(tmpOutputDirectory, key);
 
+					progressOverall?.Report(new StatusUpdate { Index = ii, Count = selectedFiles.Files.Count});
+					await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
+					ii++;
 
 					Misc.LogLine($"\nGetting deadpack {key}...");
 					await HttpHelper.GetFile($"https://{toDomain}/package/{alias}/{key}?timestamp={unixTimestamp}&signature={base64Signature}", opts, tmpOutputName, progressFile);
 
-					progressOverall?.Report(new StatusUpdate { Index = ii, Count = selectedFiles.Files.Count});
-					await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
-					ii++;
+					
 
 					// get the envelope from the file
 					Envelope envelope = Envelope.LoadFromFile(tmpOutputName);

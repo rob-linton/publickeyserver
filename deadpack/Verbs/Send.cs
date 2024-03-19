@@ -39,8 +39,8 @@ class Send
 			foreach (var file in deadpacks)
 			{
 				progressOverall?.Report(new StatusUpdate { Index = i, Count = deadpacks.Count});
-					await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
-					i++;
+				await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
+				i++;
 
 				await ExecuteInternal(opts, file.Filename, true, progressFile, progressOverall);
 			}
