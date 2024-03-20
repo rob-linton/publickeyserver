@@ -47,10 +47,11 @@ public class ViewDeadPacks : Window
 
 
 			// add the heding
-			var heading = new Label("DeadPacks") { X = 0, Y = 2, Width = Dim.Fill(), Height = 1 };
-			heading.Text = $"Created              From                                      Subject";
+			var heading = new Label("DeadPacks") { X = 0, Y = 0, Width = Dim.Fill(), Height = 1 };
+			//heading.Text = $"Created              From                                      Subject";
+			heading.Text = DeadPack.Headings();
 
-			ListView listView = new ListView(deadPacks) { X = 0, Y = 3, Width = Dim.Fill(), Height = Dim.Fill() - 2 };
+			ListView listView = new ListView(deadPacks) { X = 0, Y = 1, Width = Dim.Fill(), Height = Dim.Fill() - 2 };
 			listView.OpenSelectedItem += listView_OpenSelectedItem;
 			listView.ColorScheme = Globals.StandardColors;
 			Add(listView, heading);

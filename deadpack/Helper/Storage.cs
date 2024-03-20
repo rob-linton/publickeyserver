@@ -160,8 +160,11 @@ public class Storage
 
 			// get the private key for this alias
 			long i = 1;
+			Random random = new Random();
 			foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.deadpack"))
 			{
+				long size = new FileInfo(file).Length;
+
 				Envelope envelope = Envelope.LoadFromFile(file);
 
 				// if the alias is blank, then get it from the envelope
@@ -193,7 +196,6 @@ public class Storage
 				// remove the from alias from the recipients
 				recipients.RemoveAll(r => r.Alias == fromAlias);
 
-
 				DeadPack deadpack = new DeadPack
 				{
 					Subject = subject,
@@ -203,11 +205,18 @@ public class Storage
 					From = fromAlias,
 					Alias = alias,
 					Filename = file,
-					Recipients = recipients
+					Recipients = recipients,
+					Size = size
 				};
 
 				// create a random long
-				sorted.Add(timestamp + i, deadpack);
+
+				try
+				{
+					string randomTimestamp = timestamp.ToString() + random.Next(1, 1000).ToString().PadLeft(3, '0');
+					sorted.Add(Convert.ToInt64(randomTimestamp), deadpack);
+				}
+				catch { }
 				i++;
 
 			}
