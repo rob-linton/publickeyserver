@@ -9,9 +9,9 @@ namespace deadrop.Verbs;
 
 public class DialogMessage
 {
-	public DialogMessage(string message)
+	public DialogMessage(string message, string title = "Message")
 	{
-		MessageBox.ErrorQuery("Message", message, "Ok");
+		MessageBox.ErrorQuery(title, "\n    " + message + "    \n", "Ok");
 		//Build(message);
 	}
 	

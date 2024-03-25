@@ -41,6 +41,9 @@ public class DialogCreateAlias
 			};
 
 			int result = await Create.Execute(opts, progress);
+			new DialogMessage(progressLabel.Text.ToString(), "Alias Created");
+
+			Gui.Build();
 		};
 
 		var cancel = new Button("Close");
@@ -148,8 +151,7 @@ public class DialogCreateAlias
 				Domain = domain.Text.ToString()	
 			};
 			int result = await Verify.Execute(verifyOpts, progress);
-			//progressLabel.Text = "Email verification code sent. Please check your email.";
-			//await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX UPDATE
+			new DialogMessage("Email verification code sent. Please check your email.", "Email Verification");
 		};
 
 		FrameView viewEmail = new FrameView ("Email (Optional)") {
