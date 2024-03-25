@@ -13,4 +13,9 @@ public class Alias
     [JsonPropertyName("timestamp")]
     public required long Timestamp { get; set; }
 
+	public override string ToString()
+	{	
+		return $"{Name}"; 
+	}
+
 }

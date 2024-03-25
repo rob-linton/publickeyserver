@@ -240,7 +240,7 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					raw = await AwsHelper.Get(client, $"cert/{alias}.pem");
+					raw = await AwsHelper.Get(client, $"email/{email}/{alias}.pem");
 				};
 
 				string cert = raw.FromBytes();
@@ -564,6 +564,118 @@ namespace publickeyserver
 			return new JsonResult(ret);
 
 		}
-		
+
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		// deletes a public key pair in PEM format on behalf of the user
+		// -------------------------------------------------------------------------------------------------------------------------------------------------------
+		[Route("{alias}")]
+		[Produces("application/json")]
+		[HttpDelete]
+		public async Task<IActionResult> DeleteCert(string alias, string timestamp, string signature)
+		{
+			alias = alias + "." + GLOBALS.origin;
+
+			string key = $"cert/{alias}.pem";
+			try
+			{
+				// fix the signature
+				signature = signature.Replace(" ", "+");
+
+				// get the url host header
+				string host = Request.Host.Host + ":" + Request.Host.Port;
+				
+				string result = await PackageHelper.ValidateRecipient(alias, host, signature, timestamp);
+				if (!String.IsNullOrEmpty(result))
+					return BadRequest(result);
+
+				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				{
+					var request = new DeleteObjectRequest
+					{
+						BucketName = GLOBALS.s3bucket,
+						Key = key
+					};
+
+					var response = await _s3Client.DeleteObjectAsync(request);
+					return Ok();
+				}
+			}
+			catch (AmazonS3Exception e)
+			{
+				return BadRequest($"Error encountered on server. Message:'{e.Message}'");
+			}
+			catch (Exception e)
+			{
+				return BadRequest($"Unknown error encountered on server. Message:'{e.Message}'");
+			}
+			finally
+			{
+				Response.Body.Close();
+			}
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		// deletes a public key pair and email in PEM format on behalf of the user
+		// -------------------------------------------------------------------------------------------------------------------------------------------------------
+		[Route("email/{email}/{alias}")]
+		[Produces("application/json")]
+		[HttpDelete]
+		public async Task<IActionResult> DeleteCertEmail(string alias, string email, string timestamp, string signature)
+		{
+			string longAlias = alias + "." + GLOBALS.origin;
+
+			try
+			{
+				// fix the signature
+				signature = signature.Replace(" ", "+");
+
+				// get the url host header
+				string host = Request.Host.Host + ":" + Request.Host.Port;
+				
+				string result = await PackageHelper.ValidateRecipient(longAlias, host, signature, timestamp);
+				if (!String.IsNullOrEmpty(result))
+					return BadRequest(result);
+
+				string key = $"email/{email}/{longAlias}.pem";
+				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				{
+					var request = new DeleteObjectRequest
+					{
+						BucketName = GLOBALS.s3bucket,
+						Key = key
+					};
+
+					var response = await _s3Client.DeleteObjectAsync(request);
+				}
+
+				key = $"cert/{longAlias}.pem";
+				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				{
+					var request = new DeleteObjectRequest
+					{
+						BucketName = GLOBALS.s3bucket,
+						Key = key
+					};
+
+					var response = await _s3Client.DeleteObjectAsync(request);
+					
+				}
+
+				return Ok();
+
+			}
+			catch (AmazonS3Exception e)
+			{
+				return BadRequest($"Error encountered on server. Message:'{e.Message}'");
+			}
+			catch (Exception e)
+			{
+				return BadRequest($"Unknown error encountered on server. Message:'{e.Message}'");
+			}
+			finally
+			{
+				Response.Body.Close();
+			}
+		}
+		// ---------------------------------------------------------------------------------------------------------------
 	}
 }

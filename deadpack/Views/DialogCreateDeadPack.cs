@@ -281,13 +281,18 @@ public class DialogCreateDeadPack
 		};
 		addRecipient.Clicked += async () => 
 		{
-			string lookupAlias = await new DialogSelectAliases().Build("Select Alias", from.Text.ToString());
-			if (!String.IsNullOrEmpty(lookupAlias))
+			List<string> lookupAlias = await new DialogSelectAliases().Build("Select Alias", from.Text.ToString());
+			foreach (var a in lookupAlias)
 			{
-				deadPackRecipients.Add(lookupAlias);
-				recipients.SetSource(deadPackRecipients);
-				extract.Enabled = true;
+				// if it does not already exist then add it
+				if (!deadPackRecipients.Contains(a))
+				{
+					deadPackRecipients.Add(a);
+					extract.Enabled = true;
+				}
 			}
+			recipients.SetSource(deadPackRecipients);
+			
 			
 		};
 	

@@ -52,6 +52,26 @@ public class BouncyCastleHelper
 
 		return keyPair;
     }
+
+	public static List<string> GetAltNames(string targetCertificatePem)
+	{
+		List<string> names = new List<string>();
+
+		// get the certificate
+		Org.BouncyCastle.X509.X509Certificate cert = ReadCertificateFromPemString(targetCertificatePem);
+
+		// get the alt names
+		var altNames = cert.GetSubjectAlternativeNames();
+
+		// check if the alias is in the alt names
+		foreach (var altName in altNames)
+		{
+			names.Add(altName[1].ToString());
+		}
+
+		return names;
+	}
+
 	public static bool CheckIfCertificateAltNamesMatch(string alias, string email, string targetCertificatePem)
 	{
 		// get the certificate
@@ -631,10 +651,32 @@ public class BouncyCastleHelper
 
 			bool validAltName = CheckIfCertificateAltNamesMatch(alias, email, certificate);
 
-			if (valid)
-				return (true, fingerprint);
-			else
-				return (false, new byte[0]);
+		if (valid)
+		{
+			string historyAlias = Storage.GetDeadPackDirectoryHistory($"{alias}.pem");
+
+			// get a list of private keys
+			List<Alias> privateKeys = Storage.GetAliases();
+
+			// check if this alias is in the list
+			bool found = false;
+			foreach (Alias a in privateKeys)
+			{
+				if (a.Name == alias)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			// if valid then save the certificate if it is not an existing alias
+			if (!found)
+				File.WriteAllText(historyAlias, certificate);
+
+			return (true, fingerprint);
+		}
+		else
+			return (false, new byte[0]);
 		}
 		// --------------------------------------------------------------------------------------------------------
 		public static string GetCustomExtensionData(X509Certificate cert, string oid)

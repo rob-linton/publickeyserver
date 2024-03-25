@@ -33,21 +33,21 @@ public class Storage
 		File.WriteAllBytes(Path.Join(deadDropFolder, $"{alias}"), cipherText);
 	}
 	/// <summary>
-	/// Retrieves a list of aliases from the current directory.
+	/// Retrieves a list of aliases from the aliases directory.
 	/// </summary>
 	/// <returns>A list of aliases.</returns>
-	public static List<Alias> GetAliases()
+	public static List<Alias> GetAliases(string location = "aliases", string type = "rsa")
 	{
 		SortedList<string, Alias> aliases = new SortedList<string, Alias>();
 
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "aliases"));
-		string  deadDropFolder = Path.Join(localAppData, "deadpack", "aliases");
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", location);
 
-		foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.rsa"))
+		foreach (string file in Directory.EnumerateFiles(deadDropFolder, $"*.{type}"))
 		{
-			string sAlias = Path.GetFileNameWithoutExtension(file).Replace(".rsa", "");
+			string sAlias = Path.GetFileNameWithoutExtension(file).Replace($".{type}", "");
 			
 			// get the unix timestamp of the file in seconds
 			long timestamp = (long)(File.GetCreationTime(file) - new DateTime(1970, 1, 1)).TotalSeconds;
@@ -63,6 +63,20 @@ public class Storage
 		}
 
 		return aliases.Values.ToList();
+	}
+
+	public static void DeletePrivateKey(string alias)
+	{
+		// get the users home userdata directoru
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "aliases", "deleted"));
+		string deadDropFolder = Path.Join(localAppData, "deadpack", "aliases");
+		string deadDropDeletedFolder = Path.Join(localAppData, "deadpack", "aliases", "deleted");
+
+		File.Move(Path.Join(deadDropFolder, $"{alias}.rsa"), Path.Join(deadDropDeletedFolder, $"{alias}.rsa"));
+		File.Move(Path.Join(deadDropFolder, $"{alias}.dilithium"), Path.Join(deadDropDeletedFolder, $"{alias}.dilithium"));
+		File.Move(Path.Join(deadDropFolder, $"{alias}.kyber"), Path.Join(deadDropDeletedFolder, $"{alias}.kyber"));
+		File.Move(Path.Join(deadDropFolder, $"{alias}.root"), Path.Join(deadDropDeletedFolder, $"{alias}.root"));
 	}
 
 	/// <summary>
@@ -137,8 +151,21 @@ public class Storage
 			return Path.Join(deadDropFolder, dir);
 	}
 
-	public static List<DeadPack> ListDeadPacks(string alias, string location, string password)
+	public static string GetDeadPackDirectoryHistory(string dir)
 	{
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "history"));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", "history");
+		if (string.IsNullOrEmpty(dir))
+			return deadDropFolder;
+		else
+			return Path.Join(deadDropFolder, dir);
+	}
+
+	public static List<DeadPack> ListDeadPacks(string useAlias, string location, string password)
+	{
+		string alias = useAlias;
 		SortedList<long, DeadPack> sorted = new SortedList<long, DeadPack>();
 
 		// get the users home userdata directory
@@ -168,7 +195,7 @@ public class Storage
 				Envelope envelope = Envelope.LoadFromFile(file);
 
 				// if the alias is blank, then get it from the envelope
-				if (String.IsNullOrEmpty(alias))
+				if (String.IsNullOrEmpty(useAlias))
 				{
 					alias = envelope.From;
 				}

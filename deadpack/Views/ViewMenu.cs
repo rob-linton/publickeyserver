@@ -35,12 +35,9 @@ class ViewMenu
             }),
 			new MenuBarItem ("_Alias", new MenuItem [] {
                 new MenuItem ("New _Alias", "", () => { 
-                    Application.RequestStop (); 
+                    new DialogCreateAlias().Build(); 
                 },null,null,Key.CtrlMask | Key.A),
 				new MenuItem ("_Delete Alias", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Certify Alias", "", () => { 
                     Application.RequestStop (); 
                 }),
             }),

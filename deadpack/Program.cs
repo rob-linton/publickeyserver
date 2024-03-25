@@ -24,7 +24,7 @@ public class Program
 			args = newArgs.ToArray();
 		}
 
-		var opts = Parser.Default.ParseArguments<Options, PackOptions, UnpackOptions, CreateOptions, CertifyOptions, ListOptions, SendOptions, ReceiveOptions, VerifyOptions, GuiOptions>(args);
+		var opts = Parser.Default.ParseArguments<Options, PackOptions, UnpackOptions, CreateOptions, CertifyOptions, ListOptions, SendOptions, ReceiveOptions, VerifyOptions, GuiOptions, DeleteOptions>(args);
 
 		return opts.MapResult(
 		(CreateOptions opts) 	=> Verbs.Create.Execute(opts).Result,
@@ -36,6 +36,7 @@ public class Program
 		(ReceiveOptions opts) 		=> Verbs.Receive.Execute(opts).Result,
 		(VerifyOptions opts) 		=> Verbs.Verify.Execute(opts).Result,
 		(GuiOptions opts) 		=> Verbs.Gui.Execute(opts).Result,
+		(DeleteOptions opts) 		=> Verbs.Delete.Execute(opts).Result,
 		errors => 1);
 	}
 

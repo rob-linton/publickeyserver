@@ -266,7 +266,7 @@ public class DialogSend
 		FrameView frameTitleReceive = new FrameView("Receive") 
 		{ 
 			X = 2, 
-			Y = Pos.Bottom(frameTitleSend) + 2, 
+			Y = Pos.Bottom(frameTitleSend) + 1, 
 			Width = Dim.Fill() - 1, 
 			Height = 9,
 			ColorScheme = Globals.WhiteOnBlue

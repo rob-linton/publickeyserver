@@ -13,27 +13,39 @@ public class DialogSelectAliases
 {
 	// build
 	// public static async Task<int> Execute(PackOptions opts)
-	public async Task<string> Build(string title, string fromAlias)
+	public async Task<List<string>> Build(string title, string fromAlias)
 	{	
-		string selected = "";
+		List<string> selected = new List<string>();
 		List<string> source = new List<string>();
 		string lastSearch = "";
 		
+		//
+		// search
+		//
 
 		// create a label
 		var label = new Label("Enter alias, (partial ok)") { X = 1, Y = 1, Width = Dim.Fill() - 2, Height = 1 };
 	
 		// create the listView
-		var listView = new ListView(source) { X = 1, Y = Pos.Bottom(label)+3, Width = Dim.Fill() - 2, Height = Dim.Fill() - 2};
+		var listView = new ListView(source) 
+		{ 
+			X = 1, 
+			Y = Pos.Bottom(label) + 3, 
+			Width = Dim.Fill() - 2, 
+			Height = Dim.Fill() - 2,
+			AllowsMultipleSelection = true,
+			AllowsMarking = true
+		};
 		// on open
 		listView.OpenSelectedItem += (e) => 
 		{ 
-			Application.RequestStop (); 
-			selected = e.Value.ToString(); 
+			//Application.RequestStop (); 
+			//selected = e.Value.ToString(); 
 		};
 		listView.SelectedItemChanged += (e) => 
 		{ 
-			selected = e.Value.ToString();  
+			// if not already in the list then add it
+			//selected = e.Value.ToString();  
 		};
 
 
@@ -67,8 +79,6 @@ public class DialogSelectAliases
 			}
 		};
 		
-		
-
 		// create a button at the end of the textbox
 		var search = new Button("Search")
 		{
@@ -90,27 +100,117 @@ public class DialogSelectAliases
 			// get a list of deadpacks from the server
 			//
 			string lookup = textBox.Text.ToString();
+
 			LookupAlias(fromAlias, lookup, source, listView, lastSearch); 
 						
 		};
 		
+		//
+		// history
+		//
+
+		// get a list of history aliases sorted by date (earliest first)
+		List<Alias> history = Storage.GetAliases("history", "pem");
+
+		SortedList<long, Alias> sorted = new SortedList<long, Alias>();
+		Random random = new Random();
+		foreach (Alias a in history)
+		{
+			long timestamp = a.Timestamp;
+			try
+			{
+				string randomTimestamp = timestamp.ToString() + random.Next(1, 1000).ToString().PadLeft(3, '0');
+				sorted.Add(Convert.ToInt64(randomTimestamp), a);
+			}
+			catch { }
+		}
+		
+		var sortedList = sorted.Values.ToList().Reverse<Alias>().ToList();
+
+		// create the listView
+		var historyListView = new ListView(sortedList) 
+		{ 
+			X = 1, 
+			Y = 1, 
+			Width = Dim.Fill() - 2, 
+			Height = Dim.Fill() - 2,
+			AllowsMultipleSelection = true,
+			AllowsMarking = true
+		};
+		// on open
+		historyListView.OpenSelectedItem += (e) => 
+		{ 
+			//Application.RequestStop (); 
+			//selected = e.Value.ToString(); 
+		};
+		historyListView.SelectedItemChanged += (e) => 
+		{ 
+			//selected = e.Value.ToString();  
+		};
 
 		//
 		// create the dialog
 		//
 		var ok = new Button("OK");
-		ok.Clicked += () => { Application.RequestStop();};
+		ok.Clicked += () => 
+		{
+			int i = 0;
+			foreach (string item in source)
+			{
+				if (listView.Source.IsMarked(i))
+				{
+					selected.Add(item);
+				}
+				i++;
+			}
+			i = 0;
+			foreach (Alias item in sortedList)
+			{
+				if (historyListView.Source.IsMarked(i))
+				{
+					selected.Add(item.Name);
+				}
+				i++;
+			}
+
+			Application.RequestStop();
+		};
 
 		var cancel = new Button("Cancel");
-		cancel.Clicked += () => { Application.RequestStop(); selected = "";  };
+		cancel.Clicked += () => { Application.RequestStop(); selected.Clear();  };
 
 
-		var dialog = new Dialog (title, 0, 0, ok, cancel);
+		var dialog = new Dialog ("Select Aliases", 0, 0, ok, cancel);
 		dialog.Border.BorderStyle = BorderStyle.Double;
 		dialog.ColorScheme = Colors.Base;
 		dialog.FocusFirst();
 		
-		dialog.Add(textBox, label, search, listView);
+		//
+		// frames
+		//
+
+		FrameView searchAlias = new FrameView("Search for alias") 
+		{
+			X = 1,
+			Y = 1,
+			Width = Dim.Percent(50),
+			Height = Dim.Fill() - 2
+		};
+		searchAlias.Border.BorderStyle = BorderStyle.Single;
+		//searchAlias.ColorScheme = Globals.WhiteOnBlue;
+		searchAlias.Add(textBox, label, search, listView);
+
+		FrameView historyAlias = new FrameView("History") 
+		{
+			X = Pos.Right(searchAlias) + 1,
+			Y = 1,
+			Width = Dim.Percent(50) - 2,
+			Height = Dim.Fill() - 2
+		};
+		historyAlias.Border.BorderStyle = BorderStyle.Single;
+		historyAlias.Add(historyListView);
+
+		dialog.Add(searchAlias, historyAlias);
 		Application.Run (dialog);
 
 		return selected;

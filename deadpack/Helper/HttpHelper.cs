@@ -91,7 +91,7 @@ public class HttpHelper
 	/// <param name="url">The URL to send the DELETE request to.</param>
 	/// <param name="opts">The options for the request.</param>
 	/// <returns>The response content as a string.</returns>
-	public static async Task<string> Delete(string url, Options opts)
+	public static async Task<string> Delete(string url)
 	{
 #if DEBUG
 		url = url.Replace("https://", "http://");	
