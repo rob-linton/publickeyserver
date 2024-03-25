@@ -10,9 +10,9 @@ namespace deadrop.Verbs;
 public class DialogOpenDeadPack 
 {
 	// build
-	public void Build(dynamic e)
+	public void Build(DeadPack deadPack)
 	{
-		DeadPack deadPack = (DeadPack)e.Value;
+		//DeadPack deadPack = (DeadPack)e.Value;
 
 		Enums.DialogReturn result = Enums.DialogReturn.Cancel;
 

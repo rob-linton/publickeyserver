@@ -38,11 +38,11 @@ class ViewMenu
                     new DialogCreateAlias().Build(); 
                 },null,null,Key.CtrlMask | Key.A),
 				new MenuItem ("_Delete Alias", "", () => { 
-                    Application.RequestStop (); 
+                    MenuDelete (); 
                 }),
             }),
-			new MenuBarItem ("_Refresh", new MenuItem [] {
-                new MenuItem ("_Refresh DeadPacks (Send/Receive)", "", () => { 
+			new MenuBarItem ("_Send/Receive", new MenuItem [] {
+                new MenuItem ("_Send/Receive DeadPacks", "", () => { 
                     MenuSend(false); 
                 },null,null)
             }),
@@ -79,5 +79,12 @@ class ViewMenu
 		SendOptions optsSend = new SendOptions();
 		ReceiveOptions optsReceive = new ReceiveOptions(){ Force = true, Interval = 0 };
 		new DialogSend().Build(optsSend, optsReceive, auto);
+	}
+
+	public async static void MenuDelete()
+	{
+		DeleteOptions deleteOptions = new DeleteOptions() {Alias = Globals.Alias};
+		await Delete.Execute(deleteOptions);
+		Gui.Build();
 	}
 }

@@ -67,16 +67,20 @@ public class Storage
 
 	public static void DeletePrivateKey(string alias)
 	{
-		// get the users home userdata directoru
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "aliases", "deleted"));
-		string deadDropFolder = Path.Join(localAppData, "deadpack", "aliases");
-		string deadDropDeletedFolder = Path.Join(localAppData, "deadpack", "aliases", "deleted");
+		try
+		{
+			// get the users home userdata directoru
+			string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+			Directory.CreateDirectory(Path.Join(localAppData, "deadpack", "aliases", "deleted"));
+			string deadDropFolder = Path.Join(localAppData, "deadpack", "aliases");
+			string deadDropDeletedFolder = Path.Join(localAppData, "deadpack", "aliases", "deleted");
 
-		File.Move(Path.Join(deadDropFolder, $"{alias}.rsa"), Path.Join(deadDropDeletedFolder, $"{alias}.rsa"));
-		File.Move(Path.Join(deadDropFolder, $"{alias}.dilithium"), Path.Join(deadDropDeletedFolder, $"{alias}.dilithium"));
-		File.Move(Path.Join(deadDropFolder, $"{alias}.kyber"), Path.Join(deadDropDeletedFolder, $"{alias}.kyber"));
-		File.Move(Path.Join(deadDropFolder, $"{alias}.root"), Path.Join(deadDropDeletedFolder, $"{alias}.root"));
+			File.Move(Path.Join(deadDropFolder, $"{alias}.rsa"), Path.Join(deadDropDeletedFolder, $"{alias}.rsa"));
+			File.Move(Path.Join(deadDropFolder, $"{alias}.dilithium"), Path.Join(deadDropDeletedFolder, $"{alias}.dilithium"));
+			File.Move(Path.Join(deadDropFolder, $"{alias}.kyber"), Path.Join(deadDropDeletedFolder, $"{alias}.kyber"));
+			File.Move(Path.Join(deadDropFolder, $"{alias}.root"), Path.Join(deadDropDeletedFolder, $"{alias}.root"));
+		}
+		catch { }
 	}
 
 	/// <summary>

@@ -96,7 +96,9 @@ class Delete
 			Misc.LogError("Unable to validate alias", ex.Message);
 			return 1;
 		}
-		
-		return 0;
+		finally
+		{
+			Storage.DeletePrivateKey($"{opts.Alias}");
+		}
 	}
 }

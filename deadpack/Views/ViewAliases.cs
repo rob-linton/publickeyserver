@@ -20,7 +20,12 @@ public class ViewAliases : Window
 	{
 		// remove all of the existing widgets from this view
 		RemoveAll();
-
+		try
+		{
+			Globals.ViewDeadPacks.RemoveAll();
+		}
+		catch { }
+		
 		// get the aliases
 		List<Alias> aliases = Storage.GetAliases();
 
@@ -32,17 +37,38 @@ public class ViewAliases : Window
 		}
 
 		// create the list view
-		Button addDeadPack = new Button("+ DeadPack") { X = Pos.Right(this) - 17, Y = 0, Width = 15, Height = 1 };
-		addDeadPack.Clicked += () => { new DialogCreateDeadPack().Build(Globals.Alias); };
 
-		var addAlias = new Button("+ Alias") { X = Pos.Left(addDeadPack) - 13, Y = 0, Width = 11, Height = 1 };
+		// add refresh button
+		var refresh = new Button("Refresh") { X = 0, Y = 0, Width = 8, Height = 1 };
+		refresh.Clicked += () => 
+		{ 
+			Globals.ViewDeadPacks.RemoveAll();
+			Build();
+		};
+
+		var addAlias = new Button("+ Alias") { X = Pos.Right(refresh) + 1, Y = 0, Width = 11, Height = 1 };
 		addAlias.Clicked += () => 
 		{ 
 			new DialogCreateAlias().Build(); 
 		};
-		
 
-		var received = new Label("Received") { X = 0, Y = Pos.Bottom(addAlias), Width = Dim.Fill(), Height = 1 };
+		// add delete button
+		var delete = new Button("Delete") { X = Pos.Right(this) - 15, Y = 0, Width = 15, Height = 1 };
+		delete.Clicked += async () => 
+		{
+			if (string.IsNullOrEmpty(Globals.Alias))
+			{
+				new DialogError("You must select an alias.");
+				return;
+			}
+			DeleteOptions deleteOptions = new DeleteOptions() {Alias = Globals.Alias};
+			await Delete.Execute(deleteOptions);
+			Globals.ViewDeadPacks.RemoveAll();
+			Build();
+		};
+
+
+		var received = new Label("Received") { X = 0, Y = Pos.Bottom(addAlias) + 1, Width = Dim.Fill(), Height = 1 };
 		var listViewReceived = new ListView(source) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
 		listViewReceived.ColorScheme = Globals.StandardColors;
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
@@ -58,7 +84,7 @@ public class ViewAliases : Window
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
 		outbox.OpenSelectedItem += listView_OpenOutbox;
 		outbox.ColorScheme = Globals.StandardColors;
-		Add(received, listViewReceived, sent, listViewSent, outbox, addAlias, addDeadPack);		
+		Add(received, listViewReceived, sent, listViewSent, outbox, addAlias, delete, refresh);		
 		
 		
 	}

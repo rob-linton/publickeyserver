@@ -36,6 +36,7 @@ public class ViewDeadPacks : Window
 		try
 		{
 			_location = location;
+			ListView listView = new ListView();
 
 			// remove all of the existing widgets from this view
 			RemoveAll();
@@ -43,18 +44,82 @@ public class ViewDeadPacks : Window
 			// get a list of deadpacks
 			List<DeadPack> deadPacks = Storage.ListDeadPacks(alias, location, Globals.Password);
 
+			// add the delete button
+			Button delete = new Button("Delete") 
+			{ 
+				X = Pos.Right(this) - 13, 
+				Y = 0, 
+				Width = 8, 
+				Height = 1 
+			};
+			delete.Clicked += async () => 
+			{
+				if (listView.Source.Count == 0)
+				{
+					return;
+				}
+				DeadPack deadPack = deadPacks.ElementAt(listView.SelectedItem);
+				if (deadPack == null)
+				{
+					return;
+				}
+				// get the deadpack location
+				File.Delete(deadPack.Filename);
+				Build(alias, location);
+			};
 
+			// add the open button
+			Button open = new Button("Open") 
+			{ 
+				X = Pos.Left(delete) - 8, 
+				Y = 0, 
+				Width = 6, 
+				Height = 1 
+			};
+			open.Clicked += () => 
+			{
+				if (listView.Source.Count == 0)
+				{
+					return;
+				}
+				DeadPack deadPack = deadPacks.ElementAt(listView.SelectedItem);
+				if (deadPack == null)
+				{
+					return;
+				}
+				new DialogOpenDeadPack().Build(deadPack);
+			};
 
+			// create the refresh button
+			Button refresh = new Button("Refresh") 
+			{ 
+				X = 0, 
+				Y = 0, 
+				Width = 8, 
+				Height = 1 
+			};
+			refresh.Clicked += () => 
+			{
+				Build(alias, location);
+			};
+
+			Button addDeadPack = new Button("+ DeadPack") { X = Pos.Right(refresh) + 1, Y = 0, Width = 8, Height = 1 };
+			addDeadPack.Clicked += () => { new DialogCreateDeadPack().Build(Globals.Alias); };
 
 			// add the heding
-			var heading = new Label("DeadPacks") { X = 0, Y = 0, Width = Dim.Fill(), Height = 1 };
-			//heading.Text = $"Created              From                                      Subject";
+			var heading = new Label("") { X = 0, Y = 2, Width = Dim.Fill(), Height = 1 };
 			heading.Text = DeadPack.Headings();
 
-			ListView listView = new ListView(deadPacks) { X = 0, Y = 1, Width = Dim.Fill(), Height = Dim.Fill() - 2 };
+			listView = new ListView(deadPacks) 
+			{ 
+				X = 0, 
+				Y = 3, 
+				Width = Dim.Fill(), 
+				Height = Dim.Fill() - 2 
+			};
 			listView.OpenSelectedItem += listView_OpenSelectedItem;
 			listView.ColorScheme = Globals.StandardColors;
-			Add(listView, heading);
+			Add(listView, heading, delete, open, refresh, addDeadPack);
 		}
 		catch (Exception ex)
 		{
@@ -64,12 +129,7 @@ public class ViewDeadPacks : Window
 
 	private void listView_OpenSelectedItem(ListViewItemEventArgs e)
 	{
-		DeadPack deadPack = (DeadPack)e.Value;
-
-		string alias = Globals.Alias;
-		string location = Globals.Location;
-		
-		new DialogOpenDeadPack().Build(e);
+		new DialogOpenDeadPack().Build(e.Value as DeadPack);
 	}
 
 	private void listView_LeftArrow(ListViewItemEventArgs e)
