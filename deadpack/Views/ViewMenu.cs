@@ -16,19 +16,16 @@ class ViewMenu
 				new MenuItem ("New _DeadPack", "", () => { 
                     new DialogCreateDeadPack().Build(Globals.Alias); 
                 },null,null,Key.CtrlMask | Key.D),
-				new MenuItem ("_Open DeadPack", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Certify DeadPack", "", () => { 
+				new MenuItem ("_Open DeadPack From Disk", "", () => { 
                     Application.RequestStop (); 
                 }),
 				new MenuItem ("--------------------------", "", () => {  
                 }),
-				 new MenuItem ("_Settings", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("--------------------------", "", () => {  
-                }),
+				//new MenuItem ("_Settings", "", () => { 
+                //    Application.RequestStop (); 
+                //}),
+				//new MenuItem ("--------------------------", "", () => {  
+                //}),
 				new MenuItem ("_Quit", "", () => { 
                     Application.RequestStop (); 
                 },null,null,Key.CtrlMask | Key.Q),
@@ -48,8 +45,9 @@ class ViewMenu
             }),
 			new MenuBarItem ("_Help", new MenuItem [] {
 				  new MenuItem ("_About", "", () => { 
-                    Application.RequestStop (); 
+                    ShowAbout(); 
                 }),
+				/*
 				new MenuItem ("_Update", "", () => { 
                     Application.RequestStop (); 
                 }),
@@ -70,6 +68,7 @@ class ViewMenu
 				new MenuItem ("_Key Servers", "", () => { 
                     Application.RequestStop (); 
                 }),
+				*/
             }),
         });
 	}
@@ -86,5 +85,21 @@ class ViewMenu
 		DeleteOptions deleteOptions = new DeleteOptions() {Alias = Globals.Alias};
 		await Delete.Execute(deleteOptions);
 		Gui.Build();
+	}
+
+	// show the message dialog
+	public static void ShowAbout()
+	{
+		string message = 
+@"
+    DeadPack is a secure messaging system that uses the DeadDrop protocol.    
+Written by Rob Linton, 2024.
+Version 1.0.0
+
+More information can be found at:
+https://github/rob-linton/deadrop
+";
+
+		MessageBox.ErrorQuery("About", message, "Ok");
 	}
 }

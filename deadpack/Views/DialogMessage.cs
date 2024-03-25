@@ -7,11 +7,11 @@ using Terminal.Gui.Trees;
 
 namespace deadrop.Verbs;
 
-public class DialogError
+public class DialogMessage
 {
-	public DialogError(string message)
+	public DialogMessage(string message)
 	{
-		MessageBox.ErrorQuery("Error", message, "Ok");
+		MessageBox.ErrorQuery("Message", message, "Ok");
 		//Build(message);
 	}
 	
@@ -30,7 +30,7 @@ public class DialogError
 		int width = Application.Top.Frame.Width;
 		int height = Application.Top.Frame.Height;
 
-		var dialog = new Dialog (" *** Error *** ", 110, height - 10, cancel);
+		var dialog = new Dialog (" Message ", 110, height - 10, cancel);
 		
 		dialog.Border.BorderStyle = BorderStyle.Double;
 		dialog.ColorScheme = Colors.Base;
