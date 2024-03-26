@@ -45,6 +45,7 @@ public class DialogPack
 			
 			// report on progress and execute
 			int result = await Pack.Execute(opts, progress);
+			new DialogMessage(progressLabel.Text.ToString(), "Packing Complete");
 			
 		};
 
@@ -56,6 +57,7 @@ public class DialogPack
 			
 			// report on progress and execute
 			int result = await Pack.Execute(opts, progress);
+			new DialogMessage(progressLabel.Text.ToString(), "Packing Complete");
 		};
 
 		var cancel = new Button("Close");

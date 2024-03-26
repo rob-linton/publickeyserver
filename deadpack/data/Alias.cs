@@ -13,9 +13,15 @@ public class Alias
     [JsonPropertyName("timestamp")]
     public required long Timestamp { get; set; }
 
+	[JsonPropertyName("email")]
+    public string? Email { get; set; }
+
+
 	public override string ToString()
-	{	
-		return $"{Name}"; 
+	{	if (String.IsNullOrEmpty(Email))
+			return $"{Name}";
+		else
+			return $"{Name} ({Email})";
 	}
 
 }

@@ -26,6 +26,7 @@ using Org.BouncyCastle.Crypto.Digests;
 using System.Text.Json;
 using System.Collections;
 using deadrop.Verbs;
+using System.Data;
 
 namespace deadrop;
 
@@ -70,6 +71,25 @@ public class BouncyCastleHelper
 		}
 
 		return names;
+	}
+
+	public static (string email, string alias) GetEmailFromAltNames(List<string> altNames)
+	{
+		string email = "";
+		string alias = "";
+		foreach (string name in altNames)
+		{
+			if (name.Contains("@"))
+			{
+				email = name;
+			}
+			else
+			{
+				alias = name;
+			}
+		}
+
+		return (email, alias);
 	}
 
 	public static bool CheckIfCertificateAltNamesMatch(string alias, string email, string targetCertificatePem)

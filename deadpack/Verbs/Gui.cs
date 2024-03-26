@@ -72,7 +72,7 @@ class Gui
 			{
 				X = 0,
 				Y = 1,
-				Width = 60,
+				Width = 80,
 				Height = Dim.Fill() - 1,
 				ColorScheme = Globals.StandardColors
 			};
@@ -82,7 +82,7 @@ class Gui
 
 			Globals.ViewRight = new FrameView("DeadPacks")
 			{
-				X = 60,
+				X = 80,
 				Y = 1,
 				Width = Dim.Fill(),
 				Height = Dim.Fill() - 1,

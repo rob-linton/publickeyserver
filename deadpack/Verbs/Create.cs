@@ -107,7 +107,9 @@ class Create
 				throw new Exception("No certificate returned from simpleenroll");
 				//return 1;
 			}
-		
+
+			// store the certificate
+			Storage.StoreCert(alias, j?.Certificate);
 			
 			// store RSA private key
 			string privateKeyPem = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Private);

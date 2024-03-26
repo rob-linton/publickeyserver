@@ -5,6 +5,31 @@ namespace deadrop;
 
 public class Storage
 {
+	public static void StoreCert(string alias, string cert, string location = "aliases")
+	{
+		// get the users home userdata directoru
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", location);
+
+		Directory.CreateDirectory(deadDropFolder);
+
+		// save it as PEM format
+		File.WriteAllText(Path.Join(deadDropFolder, $"{alias}.pem"), cert);
+	}
+
+	public static string GetCert(string alias, string location = "aliases")
+	{
+		// get the users home userdata directoru
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack", location);
+
+		Directory.CreateDirectory(deadDropFolder);
+
+		return File.ReadAllText(Path.Join(deadDropFolder, $"{alias}.pem"));
+	}
+
 	/// <summary>
 	/// Stores the private key in encrypted form as a PEM file.
 	/// </summary>
@@ -36,7 +61,7 @@ public class Storage
 	/// Retrieves a list of aliases from the aliases directory.
 	/// </summary>
 	/// <returns>A list of aliases.</returns>
-	public static List<Alias> GetAliases(string location = "aliases", string type = "rsa")
+	public static List<Alias> GetAliases(string location = "aliases")
 	{
 		SortedList<string, Alias> aliases = new SortedList<string, Alias>();
 
@@ -45,18 +70,24 @@ public class Storage
 		Directory.CreateDirectory(Path.Join(localAppData, "deadpack", location));
 		string  deadDropFolder = Path.Join(localAppData, "deadpack", location);
 
-		foreach (string file in Directory.EnumerateFiles(deadDropFolder, $"*.{type}"))
+		foreach (string file in Directory.EnumerateFiles(deadDropFolder, $"*.pem"))
 		{
-			string sAlias = Path.GetFileNameWithoutExtension(file).Replace($".{type}", "");
-			
+			string sAlias = Path.GetFileNameWithoutExtension(file).Replace($".pem", "");
+
+			// load the alias into a x.509 
+			string x509Pem = GetCert(sAlias, location);
+			List<string> names = BouncyCastleHelper.GetAltNames(x509Pem);
+			(string email, string aliasInternal) = BouncyCastleHelper.GetEmailFromAltNames(names);
+
 			// get the unix timestamp of the file in seconds
 			long timestamp = (long)(File.GetCreationTime(file) - new DateTime(1970, 1, 1)).TotalSeconds;
 			
 			Alias alias = new Alias 
 			{ 
-				Name = sAlias, 
+				Name = aliasInternal, 
 				Timestamp = timestamp,
-				Filename = file 
+				Filename = file,
+				Email = email
 			};
 
 			aliases.Add(sAlias, alias);
@@ -79,6 +110,7 @@ public class Storage
 			File.Move(Path.Join(deadDropFolder, $"{alias}.dilithium"), Path.Join(deadDropDeletedFolder, $"{alias}.dilithium"));
 			File.Move(Path.Join(deadDropFolder, $"{alias}.kyber"), Path.Join(deadDropDeletedFolder, $"{alias}.kyber"));
 			File.Move(Path.Join(deadDropFolder, $"{alias}.root"), Path.Join(deadDropDeletedFolder, $"{alias}.root"));
+			File.Move(Path.Join(deadDropFolder, $"{alias}.pem"), Path.Join(deadDropDeletedFolder, $"{alias}.pem"));
 		}
 		catch { }
 	}

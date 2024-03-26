@@ -25,7 +25,7 @@ public class ViewAliases : Window
 			Globals.ViewDeadPacks.RemoveAll();
 		}
 		catch { }
-		
+
 		// get the aliases
 		List<Alias> aliases = Storage.GetAliases();
 
@@ -33,7 +33,10 @@ public class ViewAliases : Window
 		//source.Add("[all]");
 		foreach (var a in aliases)
 		{
-			source.Add(a.Name);
+			if (String.IsNullOrEmpty(a.Email))
+				source.Add(a.Name);
+			else
+				source.Add(a.Name + " (" + a.Email + ")");
 		}
 
 		// create the list view
@@ -69,13 +72,13 @@ public class ViewAliases : Window
 
 
 		var received = new Label("Received") { X = 0, Y = Pos.Bottom(addAlias) + 1, Width = Dim.Fill(), Height = 1 };
-		var listViewReceived = new ListView(source) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
+		var listViewReceived = new ListView(aliases) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
 		listViewReceived.ColorScheme = Globals.StandardColors;
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
 		listViewReceived.SelectedItemChanged += (args) => { Globals.Alias = args.Value.ToString(); };
 
 		var sent = new Label("Sent") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
-		var listViewSent = new ListView(source) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
+		var listViewSent = new ListView(aliases) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
 		listViewSent.ColorScheme = Globals.StandardColors;
 		listViewSent.OpenSelectedItem += listView_OpenSent;
 		listViewSent.SelectedItemChanged += (args) => { Globals.Alias = args.Value.ToString(); };
@@ -91,7 +94,8 @@ public class ViewAliases : Window
 
 	private void listView_OpenInbox(ListViewItemEventArgs e)
 	{
-		Globals.Alias = e.Value.ToString();
+		Alias a = e.Value as Alias;
+		Globals.Alias = a.Name;
 		Globals.Location = "inbox";
 		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
 		Globals.ViewRight.FocusFirst();
@@ -99,7 +103,8 @@ public class ViewAliases : Window
 
 	private void listView_OpenSent(ListViewItemEventArgs e)
 	{
-		Globals.Alias = e.Value.ToString();
+		Alias a = e.Value as Alias;
+		Globals.Alias = a.Name;
 		Globals.Location = "sent";
 		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
 		Globals.ViewRight.FocusFirst();

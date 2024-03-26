@@ -11,7 +11,7 @@ public class DialogError
 {
 	public DialogError(string message)
 	{
-		MessageBox.ErrorQuery("Error", message, "Ok");
+		MessageBox.ErrorQuery("Error", "\n    " + message + "    \n", "Ok");
 		//Build(message);
 	}
 	

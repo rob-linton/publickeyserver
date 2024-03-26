@@ -24,7 +24,7 @@ public class DialogSelectAliases
 		//
 
 		// create a label
-		var label = new Label("Enter alias, (partial ok)") { X = 1, Y = 1, Width = Dim.Fill() - 2, Height = 1 };
+		var label = new Label("Enter alias (partial ok), or enter full email") { X = 1, Y = 1, Width = Dim.Fill() - 2, Height = 1 };
 	
 		// create the listView
 		var listView = new ListView(source) 
@@ -110,7 +110,7 @@ public class DialogSelectAliases
 		//
 
 		// get a list of history aliases sorted by date (earliest first)
-		List<Alias> history = Storage.GetAliases("history", "pem");
+		List<Alias> history = Storage.GetAliases("history");
 
 		SortedList<long, Alias> sorted = new SortedList<long, Alias>();
 		Random random = new Random();

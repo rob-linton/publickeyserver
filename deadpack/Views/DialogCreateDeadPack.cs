@@ -50,7 +50,7 @@ public class DialogCreateDeadPack
 			
 			new DialogPack().Build(opts); 
 
-			//Application.RequestStop (); 
+			Application.RequestStop (); 
 		};
 
 		int width = Application.Top.Frame.Width;

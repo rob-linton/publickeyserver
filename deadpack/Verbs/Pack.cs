@@ -66,7 +66,9 @@ class Pack
 				s = SearchOption.AllDirectories;
 
 			// get a list of files from the wildcard returning relative paths only
-			string[] fullPaths = Directory.GetFiles(currentDirectory, opts.File, s);
+			string[] fullPaths = new string[0];
+			if (!String.IsNullOrEmpty(opts.File))
+				fullPaths = Directory.GetFiles(currentDirectory, opts.File, s);
 
 			// Convert full paths to relative paths
         	string[] relativePaths = fullPaths.Select(fullPath => fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();

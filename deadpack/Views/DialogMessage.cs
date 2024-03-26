@@ -11,6 +11,9 @@ public class DialogMessage
 {
 	public DialogMessage(string message, string title = "Message")
 	{
+		if (String.IsNullOrEmpty(message))
+			message = "OK";
+
 		MessageBox.ErrorQuery(title, "\n    " + message + "    \n", "Ok");
 		//Build(message);
 	}

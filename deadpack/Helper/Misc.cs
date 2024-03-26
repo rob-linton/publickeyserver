@@ -444,7 +444,11 @@ public class Misc
 		{
 			if (!pre)
 			{
-				if (index == count)
+				if (index == 0 && count == 0)
+				{
+					return $"{action}...";
+				}
+				else if (index == count)
 				{
 					return $"{action} complete";
 				}
