@@ -15,7 +15,7 @@ namespace deadrop.Verbs;
 [Verb("pack", HelpText = "Create a package.")]
 public class PackOptions : Options
 {
-	[Option('i', "input", Required = true, HelpText = "Input file to be processed, (use wildcards for multiple)")]
+	[Option('i', "input file name or wildcard", Required = true, HelpText = "Input file to be processed, (use wildcards for multiple)")]
     public required string File { get; set; }
 
 	[Option('r', "Recurse subdirectories", HelpText = "Recurse sub directories")]
@@ -66,12 +66,8 @@ class Pack
 				s = SearchOption.AllDirectories;
 
 			// get a list of files from the wildcard returning relative paths only
-			string[] fullPaths = new string[0];
-			if (!String.IsNullOrEmpty(opts.File))
-				fullPaths = Directory.GetFiles(currentDirectory, opts.File, s);
-
-			// Convert full paths to relative paths
-        	string[] relativePaths = fullPaths.Select(fullPath => fullPath.Substring(currentDirectory.Length).TrimStart(Path.DirectorySeparatorChar)).ToArray();
+			
+			string[] relativePaths = Misc.GetFiles(opts.File, opts.Recurse);
 
 			Misc.LogHeader();
 

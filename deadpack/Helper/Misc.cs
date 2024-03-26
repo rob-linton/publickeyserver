@@ -438,6 +438,37 @@ public class Misc
 		return s.Substring(0, length);
 	}
 
+	// method to take a path and possible wildcard and create two parameters to Directory.GetFiles
+	public static string[] GetFiles(string path, bool recursive = false)
+	{
+
+		// if the path does not start with a directory seperator, add "./" to the front
+		if (!path.StartsWith(Path.DirectorySeparatorChar.ToString()) && !path.StartsWith(".") && !path.StartsWith(".."))
+		{
+			path = $".{Path.DirectorySeparatorChar}" + path;
+		}
+
+		string[] files;
+		// check if the path contains a wildcard
+		if (path.Contains("*"))
+		{
+			// get the directory from the path
+			string directory = Path.GetDirectoryName(path);
+			// get the search pattern from the path
+			string searchPattern = Path.GetFileName(path);
+			// get the files
+			files = Directory.GetFiles(directory, searchPattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+		}
+		else
+		{
+			// get the files
+			files = Directory.GetFiles(path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+		}
+
+		return files;
+	}
+
+
 	public static string UpdateProgressBarLabel(float index, float count, string action, bool pre = false)
 	{
 		try
