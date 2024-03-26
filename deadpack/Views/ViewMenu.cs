@@ -107,7 +107,7 @@ class ViewMenu
 	{
 		string message = 
 @"
-    DeadPack is a secure messaging system that uses the DeadDrop protocol.    
+    DeadPack is a secure (and optionally anonymous) package delivery service that uses the DeadDrop protocol.    
 Written by Rob Linton, 2024.
 Version 1.0.0
 

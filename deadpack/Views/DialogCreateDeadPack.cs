@@ -73,7 +73,7 @@ public class DialogCreateDeadPack
 			Height = Dim.Fill(),
 			TabStop = false,
 			ReadOnly = true,
-			ColorScheme = Globals.BlueOnWhite
+			ColorScheme = Globals.WhiteOnBlue
 		};
 		
 		if (string.IsNullOrEmpty(alias))
@@ -147,7 +147,7 @@ public class DialogCreateDeadPack
 			TabStop = false,
 			Text = dt,
 			ReadOnly = true,
-			ColorScheme = Globals.BlueOnWhite
+			ColorScheme = Globals.WhiteOnBlue
 		};
 
 
