@@ -25,10 +25,13 @@ class ViewMenu
 					openDialog.AllowedFileTypes = new string[] { "deadpack" };
 
 					Application.Run (openDialog);
-					var filePaths = openDialog.FilePaths;
+					if (!openDialog.Canceled)
+					{
+						var filePaths = openDialog.FilePaths;
 
-					string file = filePaths[0];
-					OpenDeadpack(file); 
+						string file = filePaths[0];
+						OpenDeadpack(file);
+					}
                     
                 },null,null,Key.CtrlMask | Key.O),
 				new MenuItem ("--------------------------------", "", () => {  

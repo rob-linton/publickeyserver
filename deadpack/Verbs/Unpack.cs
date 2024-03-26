@@ -341,6 +341,9 @@ class Unpack
 				throw new Exception("Unable to unpack package", ex);
 			}
 
+			progress?.Report(new StatusUpdate { Status = "Unpacked OK" });
+			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
+
 			return 0;
 		}
 		catch (Exception ex)
