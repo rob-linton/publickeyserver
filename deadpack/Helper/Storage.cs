@@ -151,7 +151,7 @@ public class Storage
 		return plainText.FromBytes();
 	}
 
-	public static string GetDeadPackDirectoryInbox(string alias, string dir)
+	public static string GetDeadPackDirectoryInbox(string alias, string dir = "")
 	{
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
@@ -163,7 +163,7 @@ public class Storage
 			return Path.Join(deadDropFolder, dir);
 	}
 
-	public static string GetDeadPackDirectorySent(string alias, string dir)
+	public static string GetDeadPackDirectorySent(string alias, string dir = "")
 	{
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
@@ -175,7 +175,7 @@ public class Storage
 			return Path.Join(deadDropFolder, dir);
 	}
 
-	public static string GetDeadPackDirectoryOutbox(string dir)
+	public static string GetDeadPackDirectoryOutbox(string dir = "")
 	{
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
@@ -187,7 +187,7 @@ public class Storage
 			return Path.Join(deadDropFolder, dir);
 	}
 
-	public static string GetDeadPackDirectoryHistory(string dir)
+	public static string GetDeadPackDirectoryHistory(string dir = "")
 	{
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
@@ -287,5 +287,36 @@ public class Storage
 			return sorted.Values.ToList().Reverse<DeadPack>().ToList();
 		}
 	}
+	// ------------------------------------------------------------------------------------------------------------------
+	// count how many deadpacks are in the directory
+	public static long CountDeadPacks(string dir)
+	{
+		long count = 0;
+		foreach (string file in Directory.EnumerateFiles(dir, "*.deadpack"))
+		{
+			count++;
+		}
+		return count;
+	}
+	// ------------------------------------------------------------------------------------------------------------------
+	// count how many deadpacks are in the directory that are younger than hours
+	public static long CountNewDeadPacksHour(string dir, double hours)
+	{
+		long count = 0;
+		foreach (string file in Directory.EnumerateFiles(dir, "*.deadpack"))
+		{
+			Envelope envelope = Envelope.LoadFromFile(file);
+
+			// get current unix timestamp
+			long current = (long)(DateTime.Now.ToUniversalTime().AddHours(-hours) - new DateTime(1970, 1, 1)).TotalSeconds;
+			if (envelope.Created > current)
+			{
+				count++;
+			}
+		}
+		return count;
+	}
+	// ------------------------------------------------------------------------------------------------------------------
+
 	
 }

@@ -16,12 +16,35 @@ public class Alias
 	[JsonPropertyName("email")]
     public string? Email { get; set; }
 
+	[JsonPropertyName("total_deadpacks")]
+    public long? TotalDeadPacks { get; set; }
+
+	[JsonPropertyName("new_deadpacks_24hour")]
+    public long? NewDeadPacks24Hour { get; set; }
+
+	[JsonPropertyName("new_deadpacks_1hour")]
+    public long? NewDeadPacks1Hour { get; set; }
 
 	public override string ToString()
-	{	if (String.IsNullOrEmpty(Email))
-			return $"{Name}";
+	{	
+		string alert = "";
+
+		//calculate alerts
+		if (NewDeadPacks1Hour > 0)
+			alert =  $" ({NewDeadPacks1Hour}/{NewDeadPacks24Hour}/{TotalDeadPacks})";
+		else if (NewDeadPacks24Hour > 0)
+			alert =  $" ({NewDeadPacks24Hour}/{TotalDeadPacks})";
+		else if (TotalDeadPacks > 0)
+			alert =  $" ({TotalDeadPacks})";
 		else
-			return $"{Name} ({Email})";
+			alert = "";
+		
+		
+
+		if (String.IsNullOrEmpty(Email))
+			return $"{Name} {alert}";
+		else
+			return $"{Name} ({Email}) {alert}";
 	}
 
 }

@@ -27,16 +27,38 @@ public class ViewAliases : Window
 		catch { }
 
 		// get the aliases
-		List<Alias> aliases = Storage.GetAliases();
+		List<Alias> aliasesReceived = Storage.GetAliases();
+		List<Alias> aliasesSent = Storage.GetAliases();
 
-		List<string> source = new List<string>();
-		//source.Add("[all]");
-		foreach (var a in aliases)
+		// get the received directory
+		
+		// now count how many deadpacks are in each alias directory
+		foreach (var a in aliasesReceived)
 		{
-			if (String.IsNullOrEmpty(a.Email))
-				source.Add(a.Name);
-			else
-				source.Add(a.Name + " (" + a.Email + ")");
+			string receivedDir = Storage.GetDeadPackDirectoryInbox(a.Name);
+
+			// get the count of deadpacks
+			a.TotalDeadPacks = Storage.CountDeadPacks(receivedDir);
+
+			// get the count of deadpacks in the last 24 hours
+			a.NewDeadPacks24Hour = Storage.CountNewDeadPacksHour(receivedDir, 24);
+
+			// get the count of deadpacks in the last hour
+			a.NewDeadPacks1Hour = Storage.CountNewDeadPacksHour(receivedDir, 1);
+		}
+
+		foreach (var a in aliasesSent)
+		{
+			string sentDir = Storage.GetDeadPackDirectorySent(a.Name);
+
+			// get the count of deadpacks
+			a.TotalDeadPacks = Storage.CountDeadPacks(sentDir);
+
+			// get the count of deadpacks in the last 24 hours
+			a.NewDeadPacks24Hour = Storage.CountNewDeadPacksHour(sentDir, 24);
+
+			// get the count of deadpacks in the last hour
+			a.NewDeadPacks1Hour = Storage.CountNewDeadPacksHour(sentDir, 1);
 		}
 
 		// create the list view
@@ -72,13 +94,13 @@ public class ViewAliases : Window
 
 
 		var received = new Label("Received") { X = 0, Y = Pos.Bottom(addAlias) + 1, Width = Dim.Fill(), Height = 1 };
-		var listViewReceived = new ListView(aliases) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
+		var listViewReceived = new ListView(aliasesReceived) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
 		listViewReceived.ColorScheme = Globals.StandardColors;
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
 		listViewReceived.SelectedItemChanged += (args) => { Globals.Alias = args.Value.ToString(); };
 
 		var sent = new Label("Sent") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
-		var listViewSent = new ListView(aliases) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
+		var listViewSent = new ListView(aliasesSent) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
 		listViewSent.ColorScheme = Globals.StandardColors;
 		listViewSent.OpenSelectedItem += listView_OpenSent;
 		listViewSent.SelectedItemChanged += (args) => { Globals.Alias = args.Value.ToString(); };

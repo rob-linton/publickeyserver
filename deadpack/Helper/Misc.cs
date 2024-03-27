@@ -280,7 +280,7 @@ public class Misc
 			LogLine("=========================================================================================================================================================");
 			LogLine("DEADPACK v1.0 (deadrop.org)");
 			LogLine("[D]eadrop's [E]ncrypted [A]rchive and [D]istribution [PACK]age (DEADPACK)");
-			LogLine("Copyright Rob Linton, 2023");
+			LogLine("Rob Linton, 2021");
 			LogLine("Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms");
 			LogLine("Acknowledgement to the BouncyCastle C# Crypto library");
 			LogLine("========================================================================================================================================================\n");

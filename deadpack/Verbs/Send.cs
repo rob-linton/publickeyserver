@@ -95,12 +95,18 @@ class Send
 			List<string> toAliases = envelope.To.Select(r => r.Alias).ToList();
 
 			// loop through each toAlias
+			bool skippedOnce = false;
 			foreach (string toAlias in toAliases)
 			{
 				if (toAlias == fromAlias)
 				{
-					//Misc.LogLine($"Skipping self {toAlias}");
-					continue;
+					if (!skippedOnce)
+					{
+						// only skip the to alias once if it is the same as the from alias
+						skippedOnce = true;
+						//Misc.LogLine($"Skipping self {toAlias}");
+						continue;
+					}
 				}
 				try
 				{
