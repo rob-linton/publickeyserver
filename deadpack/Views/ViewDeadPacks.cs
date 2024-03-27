@@ -123,7 +123,8 @@ public class ViewDeadPacks : Window
 		}
 		catch (Exception ex)
 		{
-			new DialogError(ex.Message);
+			if (!String.IsNullOrEmpty(ex.Message))
+				new DialogError(ex.Message);
 		}
 	}
 

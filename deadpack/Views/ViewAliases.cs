@@ -74,6 +74,11 @@ public class ViewAliases : Window
 		var addAlias = new Button("+ Alias") { X = Pos.Right(refresh) + 1, Y = 0, Width = 11, Height = 1 };
 		addAlias.Clicked += () => 
 		{ 
+			//if (String.IsNullOrEmpty(Globals.Password))
+			//{
+				new DialogPassword();
+				//return;
+			//}
 			new DialogCreateAlias().Build(); 
 		};
 
@@ -149,6 +154,4 @@ public class ViewAliases : Window
 		}
 		return base.ProcessKey (keyEvent);
 	}
-
-	
 }

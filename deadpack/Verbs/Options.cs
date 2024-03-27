@@ -24,7 +24,7 @@ public class Options
 		}
 	}
 
-	[Option('p', "passphrase", Default = "", HelpText = "Enter password")]
+	[Option('p', "passphrase", HelpText = "Enter password")]
 	public string Password
 	{
 		get { return Globals.Password; }

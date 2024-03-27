@@ -1,10 +1,48 @@
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Text.Json;
+using deadrop.Verbs;
 
 namespace deadrop;
 
 public class Storage
 {
+	// save the settings
+	public static void SaveSettings(Settings settings)
+	{
+		// get the users home userdata directoru
+		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		Directory.CreateDirectory(Path.Join(localAppData, "deadpack"));
+		string  deadDropFolder = Path.Join(localAppData, "deadpack");
+
+		Directory.CreateDirectory(deadDropFolder);
+
+		string s = JsonSerializer.Serialize(settings);
+
+		// save it in json format
+		File.WriteAllText(Path.Join(deadDropFolder, "settings.json"), s);
+	}
+	// get the settings
+	public static Settings GetSettings()
+	{
+		try
+		{
+			// get the users home userdata directoru
+			string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+			Directory.CreateDirectory(Path.Join(localAppData, "deadpack"));
+			string deadDropFolder = Path.Join(localAppData, "deadpack");
+
+			Directory.CreateDirectory(deadDropFolder);
+
+			string settings = File.ReadAllText(Path.Join(deadDropFolder, "settings.json"));
+			return JsonSerializer.Deserialize<Settings>(settings);
+		}
+		catch
+		{
+			return new Settings();
+		}
+
+	}
 	public static void StoreCert(string alias, string cert, string location = "aliases")
 	{
 		// get the users home userdata directoru
@@ -136,17 +174,17 @@ public class Storage
 		
 		byte[] cipherText = File.ReadAllBytes(Path.Join(deadDropFolder, $"{alias}"));
 
-		byte[] key = password.ToBytes();
+		byte[] key = password?.ToBytes();
 
 		byte[] plainText;
 		try
 		{
 			plainText = BouncyCastleHelper.DecryptWithKey(cipherText, key, nonce);
 		}
-		catch (Exception ex)
+		catch 
 		{
-			Console.WriteLine($"\n*** Invalid passphrase ***\n");
-			throw new Exception($"Unable to decrypt private key for {alias}", ex);
+			new DialogPassword();
+			throw new Exception($"");
 		}
 		return plainText.FromBytes();
 	}

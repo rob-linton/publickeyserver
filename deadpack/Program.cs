@@ -13,6 +13,11 @@ public class Program
 	
 	public static async Task<int> ParseOptions(string[] args)
 	{
+		// load up the settings file
+		Settings settings = Storage.GetSettings();
+		Globals.Domain = settings.Domain;
+		Globals.Password = settings.Password;
+		
 
 		// if the first parameter does not have a - then insert the word "gui"
 		// this is a hack to allow the gui to be run without the word "gui"
