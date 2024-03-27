@@ -106,13 +106,13 @@ public class ViewAliases : Window
 		var listViewReceived = new ListView(aliasesReceived) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
 		listViewReceived.ColorScheme = Globals.StandardColors;
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
-		listViewReceived.SelectedItemChanged += (args) => { Globals.Alias = args.Value.ToString(); };
+		listViewReceived.SelectedItemChanged += (args) => { Globals.Alias = (args.Value as Alias).Name.ToString(); };
 
 		var sent = new Label("Sent") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
 		var listViewSent = new ListView(aliasesSent) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
 		listViewSent.ColorScheme = Globals.StandardColors;
 		listViewSent.OpenSelectedItem += listView_OpenSent;
-		listViewSent.SelectedItemChanged += (args) => { Globals.Alias = args.Value.ToString(); };
+		listViewSent.SelectedItemChanged += (args) => { Globals.Alias = (args.Value as Alias).ToString(); };
 
 		var outbox = new ListView(new List<string>() { "Outbox" }) { X = 0, Y = Pos.Bottom(listViewSent) + 1, Width = Dim.Fill(), Height = 1 };
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
