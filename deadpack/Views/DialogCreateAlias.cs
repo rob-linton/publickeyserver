@@ -64,24 +64,36 @@ public class DialogCreateAlias
 		//
 		// add the domain 
 		//
-		domain = new TextField() 
+		Label serverInfo = new Label() 
 		{ 
 			X = 1, 
 			Y = 1, 
+			Width = Dim.Fill()-1, 
+			Height = 1, 
+			ColorScheme = Globals.WhiteOnBlue
+		};
+		serverInfo.Text = "Instructions for setting up your own Deadrop server located at https://github/rob-linton/publickeyserver/wiki/Deadrop-Server-Setup";
+
+		domain = new TextField() 
+		{ 
+			X = 1, 
+			Y = 4, 
 			Width = Dim.Fill()-1, 
 			Height = Dim.Fill(),
 			ColorScheme = Globals.BlueOnWhite
 		};
 		domain.Text = Misc.GetDomain("");
 
-		FrameView viewDomain = new FrameView ("Key Server") {
+		
+
+		FrameView viewDomain = new FrameView ("Deadrop Server (defaults to deadrop.org)") {
         	X = 1,
             Y = 1,
             Width = Dim.Fill () - 1,
-            Height = 4,
+            Height = 7,
         };
 		viewDomain.Border.BorderStyle = BorderStyle.Single;
-		viewDomain.Add(domain);
+		viewDomain.Add(domain, serverInfo);
 
 		//
 		// add the optional email
@@ -178,7 +190,7 @@ public class DialogCreateAlias
 		//
 		// add the progress view list
 		//
-		FrameView viewProgress = new FrameView ("Alias Creation Verification") {
+		FrameView viewProgress = new FrameView ("Alias Creation Log") {
 			X = 1,
 			Y = Pos.Bottom(progressLabel) + 1,
 			Width = Dim.Fill () - 1,

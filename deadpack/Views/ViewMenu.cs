@@ -112,7 +112,7 @@ Written by Rob Linton, 2024.
 Version 1.0.0
 
 More information can be found at:
-https://github/rob-linton/deadrop
+https://github/rob-linton/publickeyserver/wiki/About-DeadPack
 ";
 
 		MessageBox.ErrorQuery("About", message, "Ok");
