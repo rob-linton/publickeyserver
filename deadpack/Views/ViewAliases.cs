@@ -8,16 +8,20 @@ namespace deadrop.Verbs;
 
 public class ViewAliases : Window
 {
+	
 	public ViewAliases()
 	{	
 		// set the border style
 		Border.BorderStyle = BorderStyle.None;
 
 		Build();
+
 	}
 
 	public void Build()
 	{
+		
+
 		// remove all of the existing widgets from this view
 		RemoveAll();
 		try
@@ -117,6 +121,7 @@ public class ViewAliases : Window
 		Add(received, listViewReceived, sent, listViewSent, outbox, addAlias, delete, refresh);		
 		
 		
+		
 	}
 
 	private void listView_OpenInbox(ListViewItemEventArgs e)
@@ -154,4 +159,6 @@ public class ViewAliases : Window
 		}
 		return base.ProcessKey (keyEvent);
 	}
+
+	
 }

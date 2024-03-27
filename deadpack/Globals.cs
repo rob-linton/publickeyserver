@@ -29,6 +29,7 @@ public static class Globals
 	public static string Domain;
 	public static int Verbose;
 
+
 	//
 	// colour schemes
 	//

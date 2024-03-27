@@ -181,12 +181,26 @@
 			},
 		},
 		{
+			"name": "deadpack (Action)", 
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build_deadpack",
+			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
+			"args": ["test.deadpack"],
+			"cwd": "${workspaceFolder}/deadpack/test",
+			"stopAtEntry": false,
+			"console":"integratedTerminal",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+		},
+		{
 			"name": "deadpack (Gui)", 
 			"type": "coreclr",
 			"request": "launch",
 			"preLaunchTask": "build_deadpack",
 			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
-			"args": [],
+			"args": ["test.deadpack"],
 			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",

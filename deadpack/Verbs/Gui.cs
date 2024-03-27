@@ -15,21 +15,34 @@ namespace deadrop.Verbs;
 [Verb("gui", HelpText = "Run the Gui")]
 public class GuiOptions : Options
 {
-  
+  	[Option('i', "input", HelpText = "Input deadrop file to be opened")]
+    public string? File { get; set; }
 }
 class Gui 
 {
 	public static async Task<int> Execute(GuiOptions opts)
 	{
-		Build();
+		Build(opts);
 		return 0;
 	}
-	public static async void Build()
+	public static async void Build(GuiOptions opts = null)
 	{
 		try
 		{
 			// start the Gui
 			Application.Init();
+
+			// Open the deadpack if a file is passed in
+			Application.MainLoop.AddIdle(() => 
+			{ 
+				if (!String.IsNullOrEmpty(opts.File))
+				{
+					ViewMenu.OpenDeadpack(opts.File);
+					Application.RequestStop();
+				}
+				return false; // cancel the idle so it only runs once
+			});
+
 			Application.Top.ColorScheme = new ColorScheme()
 			{
 				Normal = Application.Driver.MakeAttribute(Color.White, Color.Blue),
@@ -77,9 +90,6 @@ class Gui
 				ColorScheme = Globals.StandardColors
 			};
 
-
-
-
 			Globals.ViewRight = new FrameView("DeadPacks")
 			{
 				X = 80,
@@ -90,6 +100,7 @@ class Gui
 			};
 
 			Globals.ViewAliases = new ViewAliases();
+
 			Globals.ViewLeft.Add(Globals.ViewAliases);
 
 
@@ -102,7 +113,11 @@ class Gui
 			Application.Top.RemoveAll();
 			Application.Top.Add(menu.Menu, statusBar.StatusBar, Globals.ViewRight);
 			Application.Top.Add(Globals.ViewLeft);
+			
+			
+
 			Application.Run();
+			
 			Application.Shutdown();
 
 			return;

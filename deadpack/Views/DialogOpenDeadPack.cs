@@ -17,7 +17,14 @@ public class DialogOpenDeadPack
 		Enums.DialogReturn result = Enums.DialogReturn.Cancel;
 
 		var cancel = new Button("Close");
-		cancel.Clicked += () => Application.RequestStop ();
+		cancel.Clicked += () =>
+		{
+			try
+			{
+				Application.RequestStop();
+			}
+			catch { }
+		};
 
 		var extract = new Button("Extract");
 		extract.Clicked += () => 
