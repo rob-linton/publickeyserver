@@ -51,7 +51,7 @@ public class DialogPassword : Dialog
 		};
 
 		//var dialog = new Dialog ("Enter Passphrase", 80, 6, cancel, ok);
-		Title = "Enter Passphrase";
+		Title = "Enter Alias Passphrase";
 		Width = 80;
 		Height = 6;
 		
