@@ -10,7 +10,7 @@ namespace deadrop.Verbs;
 public class DialogCreateDeadPack
 {
 	// build
-	public Enums.DialogReturn Build(string alias = "")
+	public Enums.DialogReturn Build(string alias = "", string filename = "")
 	{
 
 
@@ -21,7 +21,7 @@ public class DialogCreateDeadPack
 		List<string> deadPackRecipients = new List<string>();
 		string[] deadPackFiles = new string[0];
 		bool recursive = false;
-		string filename = "";
+		//string filename = "";
 
 
 		Enums.DialogReturn result = Enums.DialogReturn.Cancel;
@@ -244,9 +244,11 @@ public class DialogCreateDeadPack
 		};
 		addFiles.Clicked += () => 
 		{
-			(filename, recursive, deadPackFiles) = new DialogSelectFiles().Build("Select Files");
-			files.SetSource(deadPackFiles);
+			(filename, recursive, deadPackFiles) = new DialogSelectFiles().Build("Select Files", filename);
+			string[] listFiles = Misc.GetFiles(filename, false);
+			files.SetSource(listFiles);
 		};
+
 
 		//
 		// add the list of recipients
@@ -294,6 +296,15 @@ public class DialogCreateDeadPack
 			recipients.SetSource(deadPackRecipients);
 			
 			
+		};
+
+		dialog.Ready += () => 
+		{
+			if (!String.IsNullOrEmpty(filename))
+			{
+				string[] listFiles = Misc.GetFiles(filename, false);
+				files.SetSource(listFiles);
+			}
 		};
 	
 		dialog.Add (viewFrom, addAlias, viewCreated, viewSubject, viewMessage, viewRight, viewLeft, addFiles, addRecipient);

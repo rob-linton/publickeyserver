@@ -15,7 +15,10 @@ namespace deadrop.Verbs;
 [Verb("gui", HelpText = "Run the Gui")]
 public class GuiOptions : Options
 {
-  	[Option('i', "input", HelpText = "Input deadrop file to be opened")]
+  	[Option('u', "unpack", HelpText = "Unpack deadrop file")]
+    public string? UnpackFile { get; set; }
+
+	[Option('i', "input", HelpText = "Input file for packing")]
     public string? File { get; set; }
 }
 class Gui 
@@ -35,9 +38,14 @@ class Gui
 			// Open the deadpack if a file is passed in
 			Application.MainLoop.AddIdle(() => 
 			{ 
-				if (!String.IsNullOrEmpty(opts.File))
+				if (!String.IsNullOrEmpty(opts.UnpackFile))
 				{
-					ViewMenu.OpenDeadpack(opts.File);
+					ViewMenu.OpenDeadpack(opts.UnpackFile);
+					Application.RequestStop();
+				}
+				else if (!String.IsNullOrEmpty(opts.File))
+				{
+					new DialogCreateDeadPack().Build("", opts.File); 
 					Application.RequestStop();
 				}
 				return false; // cancel the idle so it only runs once

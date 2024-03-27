@@ -10,8 +10,13 @@ namespace deadrop.Verbs;
 public class DialogSelectFiles
 {
 	// build
-	public (string, bool, string[] source) Build(string title)
+	public (string, bool, string[] source) Build(string title, string filename = "")
 	{	
+		if (String.IsNullOrEmpty(filename))
+		{
+			filename = "*";
+		}
+		
 		string[] source = new string[0];
 		TextField textBoxPath = new TextField("");
 		TextField textBoxPattern = new TextField("");
@@ -75,7 +80,7 @@ public class DialogSelectFiles
 		
 		
 		// create a textbox
-		textBoxPath = new TextField("*") 
+		textBoxPath = new TextField(filename) 
 		{ 
 			X = 1, 
 			Y = Pos.Bottom(label), 
@@ -147,9 +152,9 @@ public class DialogSelectFiles
 			string[] fullPaths = Misc.GetFiles(textBoxPath.Text.ToString(), recursive);
 			
 			// remove the "./" from the front of the path
-			source = fullPaths.Select(fullPath => fullPath.Replace($".{Path.DirectorySeparatorChar}", "")).ToArray();
+			//source = fullPaths.Select(fullPath => fullPath.Replace($".{Path.DirectorySeparatorChar}", "")).ToArray();
 
-			listView.SetSource(source);
+			listView.SetSource(fullPaths);
 		}
 		catch (Exception ex)
 		{

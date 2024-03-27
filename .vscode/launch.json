@@ -200,7 +200,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadpack",
 			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
-			"args": ["test.deadpack"],
+			"args": ["*.jpg"],
 			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",

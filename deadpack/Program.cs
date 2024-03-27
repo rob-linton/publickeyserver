@@ -37,6 +37,14 @@ public class Program
 			{
 				List<string> newArgs = new();
 				newArgs.Add("gui");
+				newArgs.Add("-u");
+				newArgs.AddRange(args);
+				args = newArgs.ToArray();
+			}
+			else if (args[0].Contains('.') || args[0].Contains('/') || args[0].Contains('\\'))
+			{
+				List<string> newArgs = new();
+				newArgs.Add("gui");
 				newArgs.Add("-i");
 				newArgs.AddRange(args);
 				args = newArgs.ToArray();
