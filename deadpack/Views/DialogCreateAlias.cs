@@ -26,7 +26,18 @@ public class DialogCreateAlias
 		{
 			progressLabel.Text = "Creating Alias...";
 			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX UPDATE
-			
+
+			if (string.IsNullOrEmpty(domain.Text.ToString()))
+			{
+				progressLabel.Text = "Please enter a domain.";
+				new DialogMessage(progressLabel.Text.ToString(), "Alias Creation");
+				return;
+			}
+
+			// save the last domain
+			Settings settings = Storage.GetSettings();
+			settings.Domain = domain.Text.ToString();
+			Storage.SaveSettings(settings);
 
 			var progress = new Progress<StatusUpdate>(StatusUpdate =>
 			{
