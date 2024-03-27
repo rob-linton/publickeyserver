@@ -42,8 +42,6 @@ public class DialogCreateAlias
 
 			int result = await Create.Execute(opts, progress);
 			new DialogMessage(progressLabel.Text.ToString(), "Alias Created");
-
-			Gui.Build();
 		};
 
 		var cancel = new Button("Close");
@@ -163,7 +161,7 @@ public class DialogCreateAlias
 				Domain = domain.Text.ToString()	
 			};
 			int result = await Verify.Execute(verifyOpts, progress);
-			new DialogMessage("Email verification code sent. Please check your email.", "Email Verification");
+			new DialogMessage(progressLabel.Text.ToString(), "Email Verification");
 		};
 
 		FrameView viewEmail = new FrameView ("Email (Optional)") {

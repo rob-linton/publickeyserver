@@ -1,0 +1,1 @@
+dotnet publish -c Release -p:PublishSingleFile=true -r osx-x64 --self-contained -p:IncludeNativeLibrariesForSelfExtract=true

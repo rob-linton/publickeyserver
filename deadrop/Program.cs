@@ -36,6 +36,10 @@ namespace publickeyserver
 					GLOBALS.MaxBucketFiles = envVars["MAX_BUCKET_FILES"];
 				if (envVars.ContainsKey("MAX_PACKAGE_SIZE"))
 					GLOBALS.MaxPackageSize = envVars["MAX_PACKAGE_SIZE"];
+				if (envVars.ContainsKey("ANONYMOUS"))
+					GLOBALS.Anonymous = Convert.ToBoolean(envVars["ANONYMOUS"]);
+				if (envVars.ContainsKey("ALLOWED_EMAIL_DOMAINS"))
+					GLOBALS.AllowedEmailDomains = envVars["ALLOWED_EMAIL_DOMAINS"];
 
                 try
                 {

@@ -20,7 +20,9 @@ namespace publickeyserver
 		public static string MaxBucketFiles = "100";
 		public static string MaxPackageSize = "100000000"; //100Mb
 
+		public static bool Anonymous = true;
 
+		public static string AllowedEmailDomains = "*";
 
 
         public static int status_certs_enrolled = 0;

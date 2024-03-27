@@ -133,6 +133,43 @@ namespace publickeyserver
 			}
 			return res.ToString();
 		}
+
+		// ---------------------------------------------------------------------
+		internal static bool IsAllowedEmail(string email)
+		{
+			if (String.IsNullOrEmpty(email))
+				return false;
+				
+			string allowedEmailDomains = GLOBALS.AllowedEmailDomains;
+
+			if (allowedEmailDomains == "*")
+				return true;
+			
+			string[] allowedDomains = allowedEmailDomains.Split(',');
+			
+			string[] emailParts = email.Split('@');
+
+			if (emailParts.Length != 2)
+				return false;
+			
+			foreach (string domain in allowedDomains)
+			{
+				if (emailParts[1].Equals(domain.Trim(), StringComparison.OrdinalIgnoreCase))
+					return true;
+				
+				// do a case insensitive compare between domain and email and igbore spaces
+				if (email.Equals(domain, StringComparison.OrdinalIgnoreCase))
+					return true;
+			}	
+
+			return false;
+		}
+		// ---------------------------------------------------------------------
+		// is anontymous allowed
+		internal static bool IsAnonymousAllowed()
+		{
+			return GLOBALS.Anonymous;
+		}
 		// ---------------------------------------------------------------------
 	}
 }

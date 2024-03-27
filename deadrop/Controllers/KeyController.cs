@@ -78,6 +78,10 @@ namespace publickeyserver
 			ret["certs_served"] = GLOBALS.status_certs_served;
 			ret["certs_enrolled"] = GLOBALS.status_certs_enrolled;
 
+			// return email allowed
+			ret["anonymous"] = GLOBALS.Anonymous.ToString();
+			//ret["allowed_email_domains"] = GLOBALS.AllowedEmailDomains;
+
 			// lets check to see if we have a cacert
 			Org.BouncyCastle.X509.X509Certificate ca;
 			string certPEM = "";
@@ -387,6 +391,17 @@ namespace publickeyserver
 
 				string email = emailTokenData.Email ?? "";
 				string token = emailTokenData.Token ?? "";
+
+				// check if this email is allowed
+				if (GLOBALS.Anonymous == false && String.IsNullOrEmpty(email))
+				{
+					return Misc.err(Response, "Anonymous aliases not allowed on this server", Help.simpleenroll);
+				}
+				if (GLOBALS.Anonymous == false)
+				{
+					if (Misc.IsAllowedEmail(email) == false)
+						return Misc.err(Response, "Invalid email address", Help.simpleenroll);
+				}
 
 				if (email.Length > 0 && token.Length > 0)
 				{

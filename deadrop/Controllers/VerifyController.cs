@@ -51,6 +51,11 @@ namespace publickeyserver
 		{
 			try
 			{
+
+				// check if the email is valid
+				if (Misc.IsAllowedEmail(email) == false)
+					return Misc.err(Response, "Invalid email address", Help.simpleenroll);
+
 				// need to generate the token and email to the email address
 				// generate a token
 				string tokenFile = $"tokens/{email}.token";
