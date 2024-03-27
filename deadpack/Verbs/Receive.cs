@@ -86,7 +86,7 @@ class Receive
 			alias = cert.Alias;
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", Globals.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root");
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// verify the alias
@@ -112,7 +112,7 @@ class Receive
 			AsymmetricCipherKeyPair privateKey;
 			try
 			{
-				string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa", Globals.Password);
+				string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa");
 				privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 			}
 			catch (Exception ex)
@@ -127,7 +127,7 @@ class Receive
 			AsymmetricKeyParameter kyberPrivateKey;
 			try
 			{
-				string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", Globals.Password);
+				string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber");
 				byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
 				kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
 			}

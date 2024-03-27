@@ -159,8 +159,11 @@ public class Storage
 	/// <param name="alias">The alias of the private key.</param>
 	/// <param name="password">The password used to decrypt the private key.</param>
 	/// <returns>The decrypted private key as a string.</returns>
-	public static string GetPrivateKey(string alias, string password)
+	public static string GetPrivateKey(string alias, bool first = true)
 	{
+		// we get the password from the globals to avoid thread sync issues
+		string password = Globals.Password;
+
 		string sNonce = Misc.GetDomainFromAlias(alias);
 		byte[] nonce = sNonce.ToBytes();
 
@@ -183,8 +186,17 @@ public class Storage
 		}
 		catch 
 		{
-			new DialogPassword();
-			throw new Exception($"");
+			if (first)
+			{
+				new DialogPassword();
+
+				// now try again
+				return GetPrivateKey(alias, false);
+			}
+			else
+			{
+				throw new Exception($"Incorrect password");
+			}
 		}
 		return plainText.FromBytes();
 	}
@@ -237,7 +249,7 @@ public class Storage
 			return Path.Join(deadDropFolder, dir);
 	}
 
-	public static List<DeadPack> ListDeadPacks(string useAlias, string location, string password)
+	public static List<DeadPack> ListDeadPacks(string useAlias, string location)
 	{
 		string alias = useAlias;
 		SortedList<long, DeadPack> sorted = new SortedList<long, DeadPack>();
@@ -274,7 +286,7 @@ public class Storage
 					alias = envelope.From;
 				}
 
-				Manifest manifest = Manifest.LoadFromFile(file, alias, password);
+				Manifest manifest = Manifest.LoadFromFile(file, alias);
 
 				// convert the manifest base64
 				byte[] base64Subject = Convert.FromBase64String(manifest.Subject);

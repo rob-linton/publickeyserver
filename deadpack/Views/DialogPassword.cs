@@ -92,7 +92,6 @@ public class DialogPassword : Dialog
 		Add (password, cancel, ok, show);
 		Application.Run (this);
 
-		
 
 		return password.Text.ToString(); 
 	}

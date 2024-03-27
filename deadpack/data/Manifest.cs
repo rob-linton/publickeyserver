@@ -18,7 +18,7 @@ public class Manifest
 	[JsonPropertyName("files")]
 	public required List<FileItem> Files { get; set; }
 
-	public static Manifest LoadFromFile(string file, string alias, string password)
+	public static Manifest LoadFromFile(string file, string alias)
 	{
 		// open the zip file
 		using (ZipArchive archive = ZipFile.OpenRead(file))
@@ -43,7 +43,7 @@ public class Manifest
 						string encryptedKyberKeyBase64 = recipient.KyberKey;
 						byte[] encryptedKyberKey = Convert.FromBase64String(encryptedKyberKeyBase64);
 
-						string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa", password);
+						string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa");
 
 						AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 
@@ -54,7 +54,7 @@ public class Manifest
 						// get the kyber private key
 						KyberKeyParameters kyberPrivateKey;
 						
-						string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber", password);
+						string privateKeyKyber = Storage.GetPrivateKey($"{alias}.kyber");
 						byte[] privateKeyKyberBytes = Convert.FromBase64String(privateKeyKyber);
 						kyberPrivateKey = BouncyCastleQuantumHelper.WriteKyberPrivateKey(privateKeyKyberBytes);
 						

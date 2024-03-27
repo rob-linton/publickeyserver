@@ -128,7 +128,7 @@ class Pack
 			}
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.From}.root", Globals.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.From}.root");
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// 
@@ -249,7 +249,7 @@ class Pack
 				AsymmetricCipherKeyPair privateKey;
 				try
 				{
-					string privateKeyPem = Storage.GetPrivateKey($"{opts.From}.rsa", Globals.Password);
+					string privateKeyPem = Storage.GetPrivateKey($"{opts.From}.rsa");
 					privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 				}
 				catch (Exception ex)

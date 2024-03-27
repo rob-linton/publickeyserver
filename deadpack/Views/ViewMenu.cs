@@ -130,7 +130,7 @@ https://github/rob-linton/publickeyserver/wiki/About-DeadPack
 
 				Envelope envelope = Envelope.LoadFromFile(file);
 
-				Manifest manifest = Manifest.LoadFromFile(file, alias.Name, Globals.Password);
+				Manifest manifest = Manifest.LoadFromFile(file, alias.Name);
 
 				// convert the manifest base64
 				byte[] base64Subject = Convert.FromBase64String(manifest.Subject);

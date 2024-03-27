@@ -59,7 +59,7 @@ class Delete
 			string shortAlias = Misc.GetAliasFromAlias(alias);
 			
 			// sign it with the sender
-			string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa", Globals.Password);
+			string privateKeyPem = Storage.GetPrivateKey($"{alias}.rsa");
 			AsymmetricCipherKeyPair privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 			string serverDomain = Misc.GetDomain(alias);
 			string domain = Misc.GetDomainFromAlias(alias);

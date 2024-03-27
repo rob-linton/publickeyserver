@@ -228,7 +228,7 @@ public class DialogSelectAliases
 		// sign it with the sender
 		long unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-		string privateKeyPem = Storage.GetPrivateKey($"{fromAlias}.rsa", Globals.Password);
+		string privateKeyPem = Storage.GetPrivateKey($"{fromAlias}.rsa");
 		AsymmetricCipherKeyPair privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 
 		string domain = Misc.GetDomainFromAlias(fromAlias);

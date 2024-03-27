@@ -42,7 +42,7 @@ public class ViewDeadPacks : Window
 			RemoveAll();
 
 			// get a list of deadpacks
-			List<DeadPack> deadPacks = Storage.ListDeadPacks(alias, location, Globals.Password);
+			List<DeadPack> deadPacks = Storage.ListDeadPacks(alias, location);
 
 			// add the delete button
 			Button delete = new Button("Delete") 

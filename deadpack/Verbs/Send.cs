@@ -34,7 +34,7 @@ class Send
 		}
 		else
 		{
-			var deadpacks = Storage.ListDeadPacks("","outbox", Globals.Password);
+			var deadpacks = Storage.ListDeadPacks("","outbox");
 			int i = 0;
 			foreach (var file in deadpacks)
 			{
@@ -70,7 +70,7 @@ class Send
 			Misc.LogLine($"Sending from {fromAlias}...\n");
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{fromAlias}.root", Globals.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{fromAlias}.root");
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// validate the from alias
@@ -147,7 +147,7 @@ class Send
 					AsymmetricCipherKeyPair privateKey;
 					try
 					{
-						string privateKeyPem = Storage.GetPrivateKey($"{fromAlias}.rsa", Globals.Password);
+						string privateKeyPem = Storage.GetPrivateKey($"{fromAlias}.rsa");
 						privateKey = BouncyCastleHelper.ReadKeyPairFromPemString(privateKeyPem);
 					}
 					catch (Exception ex)

@@ -54,7 +54,7 @@ class Certify
 			(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, email);
 
 			// now load the root fingerprint from a file
-			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root", Globals.Password);
+			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root");
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
 			// and compare it to the rootfingerprint
