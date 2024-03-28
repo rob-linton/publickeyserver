@@ -20,4 +20,4 @@ While this project is simple and opinionated, some effort has been made to ensur
 
 CA certificate storage is protected with AES-GCM encryption, server security makes use of standard Amazon AWS standards, with the source code publicly available here in Github.
 
-This source code runs in production at https://publickeyserver.org.
+This source code runs in production at https://deadrop.org.
