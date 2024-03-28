@@ -2,119 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Deadrop.org</title>
+    <title>Deadrop.org</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
-            margin: 0;
-            padding: 0;
+            background-color: #0e0e0e;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+        }
+        a {
+            color: #0f0;
         }
         .container {
             width: 80%;
-            margin: 0 auto;
+            margin: auto;
             padding: 20px;
-            background-color: #fff;
-            border-radius: 0.25rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
-        h1, h2 {
-            color: #007bff;
-        }
-        p, a, ul, li {
-            font-size: 1rem;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            margin-bottom: 10px;
-        }
-        .alias-example {
-            display: block;
-            padding: 0.5rem;
-            background-color: #e9ecef;
-            border-left: 5px solid #007bff;
-            color: #212529;
-            margin-bottom: 1rem;
-        }
-        .btn {
-            display: inline-block;
-            font-weight: 400;
-            color: #212529;
+        .header {
             text-align: center;
-            vertical-align: middle;
-            user-select: none;
-            background-color: #007bff;
-            border: 1px solid #007bff;
-            padding: 0.375rem 0.75rem;
-            font-size: 1rem;
-            line-height: 1.5;
-            border-radius: 0.25rem;
-            text-decoration: none;
-            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-        .btn:hover {
-            color: #fff;
-            background-color: #0056b3;
-            border-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to Deadrop.org</h1>
-        <p>Dead drop is a command line way to send post quantum end-to-end encrypted files to a person without having to know their identity. If you choose however you can link your alias to your email address to make it easier for people to send file to you.</p>
-        <p>This site is a thought experiment by Rob Linton, a Developer based in Melbourne and uses Post Quantum Cryptography, specifically Crystal Kyber.</p>
-        <p>Use this site at your own risk.</p>
-        <p>The source for this site is available at: <a href="https://github/rob-linton" target="_blank">https://github/rob-linton</a></p>
-        
-        <h2>About Dead Drop</h2>
-        <p>Sounds impossible, but not really, the internet is already built around arbitrary addresses such as IP addresses, we add identity and a framework on top of these to identify people or organisations with artefacts such as domain names and email addresses.</p>
-
-        <p>Instead Dead Drop relies on something called an alias. An Alias looks a bit like this:</p>
-        <p class="alias-example">missouri-precise-samsung.deadrop.org</p>
-
-        <p>An alias is a randomly selected combination of three words which are unique, separated with a hyphen and appended with the deadrop.org domain. The words are selected from a list of 1000 English words, giving a total pool of 1000 x 1000 x 1000 unique combinations, or 1,000,000,000 (1 billion combinations). There are no duplicates allowed.</p>
-
-        <h2>Key Features</h2>
-        <p>Every alias has a set of private keys which are generated on your computer and encrypted with a pass phrase of your own choosing.</p>
-        <p>As well, every alias has a certificate containing your public keys which is stored here on deadrop.org.</p>
-        <p>Very elegantly, anyone can get your certificate containing your public keys by browsing to your alias name.</p>
-        <p>So for the alias above, the following URL will return information on your certificate with your public keys for anyone requiring them.</p>
-        <a href="https://missouri-precise-samsung.deadrop.org" target="_blank">https://missouri-precise-samsung.deadrop.org</a>
-
-        <h2>Using Dead Drop</h2>
-        <p>To send someone a Dead Drop Package (or a deadpack as it is called), all you need is their alias and the deadpack executable. 
-			How you get their alias is completely up to the both of you.
-			You can download the deadpack executable from <a href="">here</a>.</p>
-		<p>Importantly deadpack is a standalone executable and does not need to be installed and there are versions for MacOS, Windows, Linux and Arm (Rasberry Pi)</p>
-		<p>Once you have the deadpack executable, you can send a file to someone by running the following command:</p>
-		<p><code>deadpack -a missouri-precise-samsung.deadrop.org -f "my file.txt"</code></p>
-		<p>Where <code>missouri-precise-samsung.deadrop.org</code> is the alias of the person you are sending the file to, and <code>my file.txt</code> is the file you are sending.</p>
-		<p>When you run the command, you will be prompted for your pass phrase, which will decrypt your private keys and sign the file. The file will then be encrypted with the recipients public keys and sent to deadrop.org.</p>
-		<p>When the recipient wants to pick up the file, they run the following command:</p>
-		<p><code>deadpack recieve -a missouri-precise-samsung.deadrop.org -p</code></p>
-		<p>Where <code>missouri-precise-samsung.deadrop.org</code> is the alias of the person you are sending the file to.</p>
-		<p>When you run the command, you will be prompted for your pass phrase, which will decrypt your private keys and decrypt the file. The file will then be saved to your computer.</p>
-		<p>That's it, you can now send files to anyone without them knowing who you are, and without you knowing who they are.
-		</p>
-
-
-        <h2>Responsibility and Security</h2>
-        <p>The use of Dead Drop is the responsibility of each individual. It is important to comply with applicable laws and regulations regarding communication and data privacy.</p>
-        <p>In case of misuse, there is not much I can do other than delete the alias on Dead Drop. I can't see what is being sent, I can't see who it is being sent from, I can't see who it is picking it up.</p>
-        <p>Please note, I don't log the IP addresses of http requests, and I have not implemented any capability to do so. That doesn't mean that other people or organisations can do so. If you are really worried about anonymity, don't use your own wifi, use someone else's, such as a cafe or hotspot.</p>
+        <div class="header">
+            <h1>Deadrop.org</h1>
+            <p>Transfer end-to-end post quantum encrypted digital packages comprising of messages and documents of unlimited size using anonymous aliases.</p>
+            <a href="https://github/rob-linton/deadrop/wiki/About">Learn More</a>
+        </div>
+        <p>Optionally associate an email address with an alias if you do want to be known and to make it easier for people to find you.</p>
+        <p>An alias looks like this: <code>missouri-precise-samsung.deadrop.org</code></p>
+        <p>However you can run your own Dead Drop server on your own domain, so an alias could look like this: <code>missouri-precise-samsung.yourowndomain.org</code></p>
+        <p>The only restriction is that both the sender alias and the recipient alias must share the same Dead Drop domain.</p>
+        <p>You can have as many aliases as you like, each one is associated with an encrypted private key on your computer and your public key listed on a Dead Drop server.</p>
+        <p>To send someone a digital package you need to know their alias only.</p>
+        <h2>Dead Pack's</h2>
+        <p>Dead Drop digital packages are called DeadPack's. A DeadPack is Post Quantum encrypted along with traditional asymmetric encryption methods.</p>
+        <a href="https://github/rob-linton/deadrop/wiki/Encryption">More about encryption</a>
+        <p>Only the recipient alias can decrypt and unpack a DeadPack.</p>
+        <p>Dead Drop also provides a method to transfer DeadPack's anonymously on your behalf, because how do you send a DeadPack if you don't know someone's email address?</p>
+        <p>You can also run your own private Dead Drop server in AWS, (you need an AWS account as Dead Drop uses AWS S3 and AWS Simple Mail Service)</p>
+        <a href="https://github/rob-linton/deadrop/wiki/Deadrop-Server-Setup">Server setup guide</a>
+        <h2>Downloads</h2>
+        <ul>
+            <li>Windows: <a href="https://s3.ap-southeast-2.amazonaws.com/download.deadrop.org/publish/windows-x64/deadpack.exe">deadpack.exe</a></li>
+            <li>Linux: <a href="https://s3.ap-southeast-2.amazonaws.com/download.deadrop.org/publish/linux-x64/deadpack">deadpack</a></li>
+            <li>MacOS: <a href="https://s3.ap-southeast-2.amazonaws.com/download.deadrop.org/publish/osx-x64/deadpack">deadpack</a></li>
+        </ul>
+        <p>This project is Open Source and is licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3</a>.</p>
+        <p>&copy; Rob Linton</p>
+        <a href="https://github/rob-linton">Rob Linton on GitHub</a>
     </div>
 </body>
 </html>

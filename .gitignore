@@ -20,3 +20,4 @@ deadpack/bin
 deadpack/obj
 deadpack/output
 deadpack/test
+deadpack/publish
