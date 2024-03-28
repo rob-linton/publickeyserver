@@ -144,7 +144,7 @@ class Create
 
 			Misc.LogCheckMark("Root certificate fingerprint saved");
 
-			Misc.LogLine($"\nAlias {alias} created\n");
+			Misc.WriteLine($"\nAlias {alias} created\n");
 
 			// update the progress bar if it is not null
 			StatusUpdate statusUpdate = new StatusUpdate

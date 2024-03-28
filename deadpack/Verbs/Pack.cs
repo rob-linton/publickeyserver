@@ -459,12 +459,12 @@ class Pack
 				zip.Comment = "This zip file was created by deadrop.org";
 			}
 
-			Misc.LogLine("\nDone. Only the following recipient aliases will be able to unpack this deadpack.\n");
+			Misc.WriteLine("\nDone. Only the following recipient aliases will be able to unpack this deadpack.\n");
 			if (opts.InputAliases != null)
 			{
 				foreach (var alias in opts.InputAliases)
 				{
-					Misc.LogLine($"Recipient Alias: {alias}");
+					Misc.WriteLine($"Recipient Alias: {alias}");
 				}
 			}
 			Misc.LogLine("");

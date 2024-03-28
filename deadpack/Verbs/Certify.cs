@@ -64,9 +64,9 @@ class Certify
 				Misc.LogLine($"Invalid: Root fingerprint does not match");
 
 			if (valid)
-				Misc.LogLine($"\nValid: {alias}\n");
+				Misc.WriteLine($"\nValid: {alias}\n");
 			else
-				Misc.LogLine($"\nInvalid: {alias}\n");
+				Misc.WriteLine($"\nInvalid: {alias}\n");
 
 		}
 		catch (Exception ex)

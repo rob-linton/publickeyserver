@@ -290,7 +290,7 @@ class Receive
 					await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 					ii++;
 
-					Misc.LogLine($"\nGetting deadpack {key}...");
+					Misc.WriteLine($"\nGetting deadpack {key}...");
 					await HttpHelper.GetFile($"https://{toDomain}/package/{alias}/{key}?timestamp={unixTimestamp}&signature={base64Signature}", opts, tmpOutputName, progressFile);
 
 					

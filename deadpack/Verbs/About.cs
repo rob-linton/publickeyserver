@@ -10,20 +10,17 @@ using Org.BouncyCastle.OpenSsl;
 
 namespace deadrop.Verbs;
 
-[Verb("action", false, HelpText = "Quick action to pack and unpack a file")]
-public class ActionOptions : Options
+[Verb("about", false, HelpText = "Quick About to pack and unpack a file")]
+public class AboutOptions : Options
 {
   
 }
-class Action 
+class About 
 {
-	public static async Task<int> Execute(ActionOptions opts)
+	public static async Task<int> Execute(AboutOptions opts)
 	{
+		opts.Verbose = "1";
 		Misc.LogHeader();
-		Misc.LogLine($"Actioning...");
-		Misc.LogLine($"");
-	
-		
 
 		return 0;
 	}

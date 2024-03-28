@@ -324,8 +324,8 @@ class Unpack
 							progress?.Report(statusUpdate);
 							await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR PROGRESS BAR
 						}
-						Misc.LogLine($"\n\nYour files are located in {opts.Output}");
-						Misc.LogLine("\nDone\n");
+						Misc.WriteLine($"\n\nYour files are located in {opts.Output}");
+						Misc.WriteLine("\nDone\n");
 					}
 				}
 

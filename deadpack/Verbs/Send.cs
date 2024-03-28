@@ -167,7 +167,7 @@ class Send
 					byte[] signature = BouncyCastleHelper.SignData(data, privateKey.Private);
 					string base64Signature = Convert.ToBase64String(signature);
 
-					Misc.LogLine($"\nSending deadpack to {toAlias}...\n");
+					Misc.WriteLine($"\nSending deadpack to {toAlias}...\n");
 					// UploadPackage(string sender, string recipient, string timestamp, string signature)
 					var result = await HttpHelper.PostFile($"https://{toDomain}/package/{toAlias}?sender={fromAlias}&timestamp={unixTimestamp}&signature={base64Signature}", 
 						file, progressFile);

@@ -37,7 +37,7 @@ class List
 				if (valid)
 				{
 					Misc.LogLine("");
-					Misc.LogLine($"{alias}");
+					Misc.WriteLine($"{alias}");
 					Misc.LogLine("");
 				}
 				else

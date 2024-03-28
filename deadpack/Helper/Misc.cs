@@ -157,6 +157,10 @@ public class Misc
 		if (Globals.Verbose > 0)
 			Console.WriteLine(message);
 	}
+	public static void WriteLine(string message)
+	{
+		Console.WriteLine(message);
+	}
 	public static void LogLine1(string message)
 	{
 		if (Globals.Verbose > 1)
@@ -227,7 +231,7 @@ public class Misc
 		message = "[ X ]  " + message;
 		Globals.UpdateProgressSource(message);
 	
-		if (Globals.Verbose > 0)
+		if (Globals.Verbose >= 0)
 		{
 			// print it in red
 			Console.ForegroundColor = ConsoleColor.Red;
@@ -283,6 +287,7 @@ public class Misc
 			LogLine("Rob Linton, 2021");
 			LogLine("Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms");
 			LogLine("Acknowledgement to the BouncyCastle C# Crypto library");
+			LogLine("https://github/rob-linton/deadpack/wiki/About-DeadPack");
 			LogLine("========================================================================================================================================================\n");
 		}
 	}
@@ -291,8 +296,13 @@ public class Misc
 	/// Displays the Dead Drop ASCII art logo in the console.
 	/// </summary>
 
-
 	public static void LogArt()
+	{
+		string art = GetArt();
+		Console.WriteLine(art);
+	}
+
+	public static string GetArt()
 	{
 		string art = @"[0;5;37;47m                                                                                                                        [0m
 [0;5;37;47m  .  . .  .  . .  .  . .  .  . .  .  . .  .  . .  . ;%%%:[0;1;30;47m:[0;5;37;40mS[0;5;35;40m [0;5;37;40mS[0;5;35;40m [0;5;37;40mS@[0;5;37;47m8;%%t . .  .  . .  .  . .  .  . .  .  . .  .  . .  .  . [0m
@@ -367,7 +377,7 @@ public class Misc
 [0;5;37;47m  . .      .       .   .        .   .  .   .   ..  .[0;1;37;47m8%S[0;5;30;40m8[0;1;30;47mX[0;5;34;40mX[0;32;40m:[0;34;40m:[0;30;44m8[0;32;40m8[0;34;40m8[0;1;30;40m@[0;5;37;40m8[0;5;36;40m [0;1;30;47m8[0;5;37;47m@[0;1;37;47m [0;5;37;47mt ..:.     .  .  .    .   .          .        .    [0m
 [0;5;37;47m       .      . .    .   .  .     .   .           .   t[0;1;37;47m8[0;5;37;47m:%[0;1;37;47m [0;5;36;40m@[0;1;30;40m8[0;5;34;40m@[0;5;37;40m8[0;5;37;47m8 X8.  .     .       .   .    .   .  . . .    .  .     . [0m
 ";
-		Console.WriteLine(art);
+		return art;
 	}
 
 	/// <summary>

@@ -49,7 +49,7 @@ class Verify
 			progress?.Report(statusUpdate);
 			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 
-			Misc.LogLine($"\n{result}\n");
+			Misc.WriteLine($"\n{result}\n");
 		}
 		catch (Exception ex)
 		{

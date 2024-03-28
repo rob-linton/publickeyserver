@@ -82,6 +82,8 @@ class Delete
 			// remove the alias from the local store
 			Storage.DeletePrivateKey($"{alias}");
 
+			Misc.WriteLine($"Deleted {alias}");
+
 			return 0;
 		}
 		catch (Exception ex)
