@@ -42,7 +42,7 @@ public class DialogPassword : Dialog
 		};
 		ok.Clicked += () =>
 		{	
-			if (password.Text.ToString().Length == 0)
+			if (String.IsNullOrEmpty(password.Text.ToString()))
 			{
 				return;
 			}
@@ -93,14 +93,14 @@ public class DialogPassword : Dialog
 		Application.Run (this);
 
 
-		return password.Text.ToString(); 
+		return password.Text.ToString()??""; 
 	}
 
 	public override bool ProcessKey (KeyEvent keyEvent)
 	{
 		if (keyEvent.Key == Key.Enter)
 		{
-			if (password.Text.ToString().Length == 0)
+			if (String.IsNullOrEmpty(password.Text.ToString()))
 			{
 				return true;
 			}

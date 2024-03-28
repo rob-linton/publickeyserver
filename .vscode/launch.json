@@ -46,7 +46,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_deadpack",
 			"program": "${workspaceFolder}/deadpack/bin/Debug/net8.0/deadpack.dll",
-			"args": ["create", "-v", "1", "-d", "localhost:5001", "-p","password"],
+			"args": ["create", "-v", "3", "-p","password"],
 			"cwd": "${workspaceFolder}/deadpack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",

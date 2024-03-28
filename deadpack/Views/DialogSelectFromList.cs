@@ -25,9 +25,9 @@ public class DialogSelectFromList
 		
 		var listView = new ListView(source) { X = 1, Y = 1, Width = Dim.Fill() - 2, Height = Dim.Fill() - 2};
 		// on select
-		listView.OpenSelectedItem += (e) => { Application.RequestStop (); selected = e.Value.ToString(); };
+		listView.OpenSelectedItem += (e) => { Application.RequestStop (); selected = e.Value.ToString()??""; };
 		// on selected item changed
-		listView.SelectedItemChanged += (e) => { selected = e.Value.ToString(); };
+		listView.SelectedItemChanged += (e) => { selected = e.Value.ToString()??""; };
 		
 
 		dialog.Add(listView);

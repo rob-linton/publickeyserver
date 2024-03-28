@@ -24,7 +24,7 @@ public class CreateOptions : Options
 }
 class Create 
 {
-	public static async Task<int> Execute(CreateOptions opts, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> Execute(CreateOptions opts, IProgress<StatusUpdate>? progress = null)
 	{
 		try
 		{
@@ -109,8 +109,16 @@ class Create
 			}
 
 			// store the certificate
-			Storage.StoreCert(alias, j?.Certificate);
-			
+			if (j?.Certificate != null)
+			{
+				Storage.StoreCert(alias, j.Certificate);
+			}
+			else
+			{
+				Misc.LogError("No certificate returned from simpleenroll");
+				throw new Exception("No certificate returned from simpleenroll");
+				//return 1;
+			}
 			// store RSA private key
 			string privateKeyPem = BouncyCastleHelper.ReadPemStringFromKey(keyPair.Private);
 			if (privateKeyPem == null)

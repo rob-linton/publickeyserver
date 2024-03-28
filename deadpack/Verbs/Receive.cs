@@ -31,9 +31,9 @@ public class ReceiveOptions : Options
 
 class Receive 
 {
-	public static async Task<int> Execute(ReceiveOptions opts, IProgress<StatusUpdate> progressFile = null,
-		IProgress<StatusUpdate> progressOverall = null,
-		IProgress<StatusUpdate> progressOverallAlias = null)
+	public static async Task<int> Execute(ReceiveOptions opts, IProgress<StatusUpdate>? progressFile = null,
+		IProgress<StatusUpdate>? progressOverall = null,
+		IProgress<StatusUpdate>? progressOverallAlias = null)
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Receiving packages...");
@@ -48,7 +48,7 @@ class Receive
 
 		if (!String.IsNullOrEmpty(opts.Alias))
 		{
-			return await ExecuteInternal(opts, opts.Alias, progressFile, progressOverall);
+			return await ExecuteInternal(opts, opts.Alias, progressFile ?? new Progress<StatusUpdate>(), progressOverall ?? new Progress<StatusUpdate>());
 		}
 		else
 		{
@@ -61,7 +61,7 @@ class Receive
 				progressOverallAlias?.Report(new StatusUpdate { Status = alias});
 				await System.Threading.Tasks.Task.Delay(10); // DO NOT REMOVE-REQUIRED FOR UX
 
-				int result = await ExecuteInternal(opts, alias, progressFile, progressOverall);
+				int result = await ExecuteInternal(opts, alias, progressFile ?? new Progress<StatusUpdate>(), progressOverall ?? new Progress<StatusUpdate>());
 			}
 
 			progressOverallAlias?.Report(new StatusUpdate { Status = ""});
@@ -69,8 +69,8 @@ class Receive
 			return 0;
 		}
 	}
-	public static async Task<int> ExecuteInternal(ReceiveOptions opts, string alias, IProgress<StatusUpdate> progressFile = null,
-		IProgress<StatusUpdate> progressOverall = null)
+	public static async Task<int> ExecuteInternal(ReceiveOptions opts, string? alias, IProgress<StatusUpdate>? progressFile = null,
+		IProgress<StatusUpdate>? progressOverall = null)
 	{
 		// get a tmp output directory
 		string tmpOutputDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -81,17 +81,21 @@ class Receive
 		{
 
 			// replace emails with actual aliases
-			CertResult cert = await EmailHelper.GetAliasOrEmailFromServer(alias, false);
-
-			alias = cert.Alias;
+			if (alias != null)
+			{
+				CertResult cert = await EmailHelper.GetAliasOrEmailFromServer(alias, false);
+				alias = cert?.Alias;
+			}
 
 			// now load the root fingerprint from a file
 			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{alias}.root");
 			byte[] rootFingerprintFromFile = Convert.FromBase64String(rootFingerprintFromFileString);
 
+			
 			// verify the alias
-			string toDomain = Misc.GetDomain(alias);
-			(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, alias, "");
+			string toDomain = Misc.GetDomain(alias!);
+
+			(bool fromValid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(toDomain, alias!, "");
 			
 			// verify the fingerprint
 			if (fromFingerprint.SequenceEqual(rootFingerprintFromFile))
@@ -101,7 +105,7 @@ class Receive
 
 			if (!fromValid)
 			{
-				Misc.LogError("Invalid alias", alias);
+				Misc.LogError("Invalid alias", alias!);
 				return 1;
 			}
 
@@ -149,7 +153,7 @@ class Receive
 			while (true)
 			{
 				// sign it with the sender
-				string domain = Misc.GetDomainFromAlias(alias);
+				string domain = Misc.GetDomainFromAlias(alias!);
 				byte[] data = $"{alias}{unixTimestamp.ToString()}{domain}".ToBytes();
 				byte[] signature = BouncyCastleHelper.SignData(data, privateKey.Private);
 				string base64Signature = Convert.ToBase64String(signature);
@@ -313,7 +317,7 @@ class Receive
 					long timestamp = envelope.Created;
 					string filename = $"{timestamp}-{Guid.NewGuid()}.deadpack";
 					
-					string destFilename = Storage.GetDeadPackDirectoryInbox(alias, filename);
+					string destFilename = Storage.GetDeadPackDirectoryInbox(alias!, filename);
 
 					// now move the deadpack to the destination filename
 					File.Move(tmpOutputName, destFilename);

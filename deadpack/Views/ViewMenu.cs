@@ -15,7 +15,7 @@ class ViewMenu
 		 Menu = new MenuBar (new MenuBarItem [] {
             new MenuBarItem ("_DeadPack", new MenuItem [] {
 				new MenuItem ("New _DeadPack", "", () => { 
-                    new DialogCreateDeadPack().Build(Globals.Alias); 
+                    new DialogCreateDeadPack().Build(Globals.Alias!); 
                 },null,null,Key.CtrlMask | Key.D),
 				new MenuItem ("_Open DeadPack From Disk", "", () => 
 				{
@@ -97,7 +97,7 @@ class ViewMenu
 
 	public async static void MenuDelete()
 	{
-		DeleteOptions deleteOptions = new DeleteOptions() {Alias = Globals.Alias};
+		DeleteOptions deleteOptions = new DeleteOptions() {Alias = Globals.Alias!};
 		await Delete.Execute(deleteOptions);
 		Gui.Build();
 	}
@@ -169,7 +169,7 @@ https://github/rob-linton/publickeyserver/wiki/About-DeadPack
 				new DialogOpenDeadPack().Build(deadpack);
 				return;
 			}
-			catch (Exception ex)
+			catch 
 			{
 				continue;
 			}

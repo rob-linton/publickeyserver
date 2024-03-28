@@ -14,7 +14,7 @@ public class DialogOpenDeadPack
 	{
 		//DeadPack deadPack = (DeadPack)e.Value;
 
-		Enums.DialogReturn result = Enums.DialogReturn.Cancel;
+		//Enums.DialogReturn result = Enums.DialogReturn.Cancel;
 
 		var cancel = new Button("Close");
 		cancel.Clicked += () =>

@@ -159,7 +159,8 @@ public class Misc
 	}
 	public static void WriteLine(string message)
 	{
-		Console.WriteLine(message);
+		if (Globals.Verbose >= 0)
+			Console.WriteLine(message);
 	}
 	public static void LogLine1(string message)
 	{
@@ -463,7 +464,7 @@ public class Misc
 		if (path.Contains("*"))
 		{
 			// get the directory from the path
-			string directory = Path.GetDirectoryName(path);
+			string directory = Path.GetDirectoryName(path) ?? string.Empty;
 			// get the search pattern from the path
 			string searchPattern = Path.GetFileName(path);
 			// get the files

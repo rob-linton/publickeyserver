@@ -23,7 +23,7 @@ public class UnpackOptions : Options
 
 class Unpack 
 {
-	public static async Task<int> Execute(UnpackOptions opts, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> Execute(UnpackOptions opts, IProgress<StatusUpdate>? progress = null)
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Unpacking deadpack...");
@@ -55,7 +55,7 @@ class Unpack
 		}
 	}
 
-	public static async Task<int> ExecuteInternal(UnpackOptions opts, string alias, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> ExecuteInternal(UnpackOptions opts, string alias, IProgress<StatusUpdate>? progress = null)
 	{
 		try
 		{

@@ -14,10 +14,10 @@ public class DialogCreateDeadPack
 	{
 
 
-		TextView from = null;
-		TextView subject = null;
-		TextView message = null;
-		string deadPackMessage = "";
+		TextView from = new TextView();
+		TextView subject = new TextView();
+		TextView message = new TextView();
+		//string deadPackMessage = "";
 		List<string> deadPackRecipients = new List<string>();
 		string[] deadPackFiles = new string[0];
 		bool recursive = false;
@@ -45,7 +45,7 @@ public class DialogCreateDeadPack
 				Output = "",
 				Message = message.Text.ToString(),
 				Subject = subject.Text.ToString(),
-				From = from.Text.ToString(),
+				From = from.Text.ToString()??"",
 			};
 			
 			new DialogPack().Build(opts); 
@@ -283,7 +283,7 @@ public class DialogCreateDeadPack
 		};
 		addRecipient.Clicked += async () => 
 		{
-			List<string> lookupAlias = await new DialogSelectAliases().Build("Select Alias", from.Text.ToString());
+			List<string> lookupAlias = await new DialogSelectAliases().Build("Select Alias", from.Text.ToString()??"");
 			foreach (var a in lookupAlias)
 			{
 				// if it does not already exist then add it

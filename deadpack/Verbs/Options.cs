@@ -27,14 +27,14 @@ public class Options
 	[Option('p', "passphrase", HelpText = "Enter password")]
 	public string Password
 	{
-		get { return Globals.Password; }
+		get { return Globals.Password!; }
 		set { Globals.Password = value; }
 	}
 
 	[Option('d', "domain", HelpText = "Domain name")]
 	public string Domain
 	{
-		get { return Globals.Domain; }
+		get { return Globals.Domain??""; }
 		set { Globals.Domain = value; }
 	}
 

@@ -23,7 +23,7 @@ public class CertifyOptions : Options
 }
 class Certify 
 {
-	public static async Task<int> Execute(CertifyOptions opts, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> Execute(CertifyOptions opts, IProgress<StatusUpdate>? progress = null)
 	{
 		try
 		{

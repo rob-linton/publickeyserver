@@ -35,7 +35,8 @@ public class Storage
 			Directory.CreateDirectory(deadDropFolder);
 
 			string settings = File.ReadAllText(Path.Join(deadDropFolder, "settings.json"));
-			return JsonSerializer.Deserialize<Settings>(settings);
+			var deserializedSettings = JsonSerializer.Deserialize<Settings>(settings);
+			return deserializedSettings ?? new Settings();
 		}
 		catch
 		{
@@ -162,7 +163,7 @@ public class Storage
 	public static string GetPrivateKey(string alias, bool first = true)
 	{
 		// we get the password from the globals to avoid thread sync issues
-		string password = Globals.Password;
+		string password = Globals.Password??"";
 
 		string sNonce = Misc.GetDomainFromAlias(alias);
 		byte[] nonce = sNonce.ToBytes();
@@ -177,12 +178,19 @@ public class Storage
 		
 		byte[] cipherText = File.ReadAllBytes(Path.Join(deadDropFolder, $"{alias}"));
 
-		byte[] key = password?.ToBytes();
+		byte[]? key = password?.ToBytes();
 
 		byte[] plainText;
 		try
 		{
-			plainText = BouncyCastleHelper.DecryptWithKey(cipherText, key, nonce);
+			if (key != null)
+			{
+				plainText = BouncyCastleHelper.DecryptWithKey(cipherText, key, nonce);
+			}
+			else
+			{
+				throw new ArgumentNullException(nameof(key), "Key cannot be null.");
+			}
 		}
 		catch 
 		{

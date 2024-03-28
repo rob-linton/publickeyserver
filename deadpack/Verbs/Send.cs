@@ -19,8 +19,8 @@ public class SendOptions : Options
 
 class Send 
 {
-	public static async Task<int> Execute(SendOptions opts, IProgress<StatusUpdate> progressFile = null,
-		IProgress<StatusUpdate> progressOverall = null)
+	public static async Task<int> Execute(SendOptions opts, IProgress<StatusUpdate>? progressFile = null,
+		IProgress<StatusUpdate>? progressOverall = null)
 	{
 		Misc.LogHeader();
 		Misc.LogLine($"Sending...");
@@ -54,7 +54,7 @@ class Send
 	}
 
 	public static async Task<int> ExecuteInternal(SendOptions opts, string file, bool move, 
-		IProgress<StatusUpdate> progressFile = null, IProgress<StatusUpdate> progressOverall = null)
+		IProgress<StatusUpdate>? progressFile = null, IProgress<StatusUpdate>? progressOverall = null)
 	{
 		try
 		{

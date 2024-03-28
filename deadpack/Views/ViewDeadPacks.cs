@@ -8,7 +8,7 @@ namespace deadrop.Verbs;
 
 public class ViewDeadPacks : Window
 {
-	string _location;
+	
 
 	public ViewDeadPacks(string alias, string location)
 	{	try
@@ -35,7 +35,7 @@ public class ViewDeadPacks : Window
 	{
 		try
 		{
-			_location = location;
+			
 			ListView listView = new ListView();
 
 			// remove all of the existing widgets from this view
@@ -52,7 +52,7 @@ public class ViewDeadPacks : Window
 				Width = 8, 
 				Height = 1 
 			};
-			delete.Clicked += async () => 
+			delete.Clicked += () => 
 			{
 				if (listView.Source.Count == 0)
 				{
@@ -104,7 +104,7 @@ public class ViewDeadPacks : Window
 			};
 
 			Button addDeadPack = new Button("+ DeadPack") { X = Pos.Right(refresh) + 1, Y = 0, Width = 8, Height = 1 };
-			addDeadPack.Clicked += () => { new DialogCreateDeadPack().Build(Globals.Alias); };
+			addDeadPack.Clicked += () => { new DialogCreateDeadPack().Build(Globals.Alias??""); };
 
 			// add the heding
 			var heading = new Label("") { X = 0, Y = 2, Width = Dim.Fill(), Height = 1 };
@@ -130,20 +130,21 @@ public class ViewDeadPacks : Window
 
 	private void listView_OpenSelectedItem(ListViewItemEventArgs e)
 	{
-		new DialogOpenDeadPack().Build(e.Value as DeadPack);
+		DeadPack deadPack = (DeadPack)e.Value;
+		new DialogOpenDeadPack().Build(deadPack!);
 	}
 
 	private void listView_LeftArrow(ListViewItemEventArgs e)
 	{
-		Globals.ViewLeft.Remove(Globals.ViewAliases);
-		Globals.ViewLeft.Add(Globals.ViewAliases);
+		Globals.ViewLeft?.Remove(Globals.ViewAliases);
+		Globals.ViewLeft?.Add(Globals.ViewAliases);
 	}
 
 	public override bool ProcessKey (KeyEvent keyEvent)
 	{
 		if (keyEvent.Key == Key.CursorLeft)
 		{
-			Globals.ViewAliases.FocusFirst();
+			Globals.ViewAliases?.FocusFirst();
 			return true;
 		}
 		return base.ProcessKey (keyEvent);

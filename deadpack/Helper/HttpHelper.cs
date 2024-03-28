@@ -17,7 +17,7 @@ public class HttpHelper
 	public static async Task<string> Get(string url)
 	{
 #if DEBUG
-		url = url.Replace("https://", "http://");	
+		url = url.Replace("https://localhost", "http://localhost");	
 #endif
 
 		Misc.LogLine2($"- GET: {url}");
@@ -38,7 +38,7 @@ public class HttpHelper
 	public static async Task<string> Post(string url, string json)
 	{
 #if DEBUG
-		url = url.Replace("https://", "http://");	
+		url = url.Replace("https://localhost", "http://localhost");	
 #endif
 
 		Misc.LogLine2($"- POST: {url}");
@@ -66,7 +66,7 @@ public class HttpHelper
 	public static async Task<string> Put(string url, string json, Options opts)
 	{
 #if DEBUG
-		url = url.Replace("https://", "http://");	
+		url = url.Replace("https://localhost", "http://localhost");	
 #endif
 
 		Misc.LogLine2($"- PUT: {url}");
@@ -94,7 +94,7 @@ public class HttpHelper
 	public static async Task<string> Delete(string url)
 	{
 #if DEBUG
-		url = url.Replace("https://", "http://");	
+		url = url.Replace("https://localhost", "http://localhost");	
 #endif
 		
 		Misc.LogLine2($"- DELETE: {url}");
@@ -118,12 +118,12 @@ public class HttpHelper
 	/// <param name="opts">The options for the request.</param>
 	/// <param name="filePath">The path of the file to be posted.</param>
 	/// <returns>A task that represents the asynchronous operation. The task result contains the response data as a string.</returns>
-	public static async Task<string> PostFile(string url, string filePath, IProgress<StatusUpdate> progressFile)
+	public static async Task<string> PostFile(string url, string filePath, IProgress<StatusUpdate>? progressFile)
     {
 
 
 #if DEBUG
-		url = url.Replace("https://", "http://");	
+		url = url.Replace("https://localhost", "http://localhost");	
 #endif
 		Misc.LogLine2($"- POSTFILE: {url}");
 
@@ -164,7 +164,7 @@ public class HttpHelper
 	/// <param name="opts">The options for retrieving the file.</param>
 	/// <param name="saveFilePath">The file path where the retrieved file will be saved.</param>
 	/// <returns>A task representing the asynchronous operation.</returns>
-	public static async Task GetFile(string url, Options opts, string saveFilePath, IProgress<StatusUpdate> progress = null)
+	public static async Task GetFile(string url, Options opts, string saveFilePath, IProgress<StatusUpdate>? progress = null)
 	{
 		const int OneMB = 1024 * 1024;
 		int bytesDownloaded = 0;
@@ -172,7 +172,7 @@ public class HttpHelper
 		int hashesPrinted = 0;
 
 	#if DEBUG
-		url = url.Replace("https://", "http://");
+		url = url.Replace("https://localhost", "http://localhost");	
 	#endif
 
 		using (var client = new HttpClient())
@@ -189,7 +189,7 @@ public class HttpHelper
 			using (var responseStream = await response.Content.ReadAsStreamAsync())
 			{
 				// get the contentlength header
-				long contentLength = response.Content.Headers.ContentLength.Value;
+				long? contentLength = response.Content.Headers.ContentLength;
 
 				var buffer = new byte[4096];
 				int bytesRead;
@@ -204,10 +204,13 @@ public class HttpHelper
 					{
 						hashesPrinted++;
 						Misc.LogChar("#");
-						
+
 						bytesDownloaded++;
 
-						progress?.Report(new StatusUpdate { Index = totalBytesDownloaded, Count = contentLength});
+						if (contentLength.HasValue)
+						{
+							progress?.Report(new StatusUpdate { Index = totalBytesDownloaded, Count = (float)contentLength });
+						}
 						await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 					}
 
@@ -217,8 +220,11 @@ public class HttpHelper
 						Misc.LogLine("");
 					}
 				}
-				progress?.Report(new StatusUpdate { Index = totalBytesDownloaded, Count = contentLength});
-						await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
+				if (contentLength.HasValue)
+				{
+					progress?.Report(new StatusUpdate { Index = totalBytesDownloaded, Count = (float)contentLength });
+				}
+				await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 			}
 		}
 	}
@@ -236,7 +242,7 @@ public class ProgressContent : HttpContent
     private readonly Stream _content;
     private readonly int _bufferSize;
 
-	private IProgress<StatusUpdate> _progress;
+	private IProgress<StatusUpdate>? _progress;
 	long _length;
 
 /// <summary>
@@ -244,7 +250,7 @@ public class ProgressContent : HttpContent
 /// </summary>
 /// <param name="content">The stream content.</param>
 /// <param name="bufferSize">The size of the buffer used for reading the content. The default value is 4096.</param>
-    public ProgressContent(FileStream content, IProgress<StatusUpdate> progress, int bufferSize = 4096)
+    public ProgressContent(FileStream content, IProgress<StatusUpdate>? progress, int bufferSize = 4096)
     {
 		_progress = progress;
 		_length = content.Length;

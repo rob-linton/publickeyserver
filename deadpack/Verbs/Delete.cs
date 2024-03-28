@@ -20,7 +20,7 @@ public class DeleteOptions : Options
 }
 class Delete 
 {
-	public static async Task<int> Execute(DeleteOptions opts, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> Execute(DeleteOptions opts, IProgress<StatusUpdate>? progress = null)
 	{
 		try
 		{
@@ -38,7 +38,7 @@ class Delete
 
 			string alias = aliasOrEmail;
 			CertResult cert = await EmailHelper.GetAliasOrEmailFromServer(alias, false);
-			List<string> names  = BouncyCastleHelper.GetAltNames(cert?.Certificate);
+			List<string> names = BouncyCastleHelper.GetAltNames(cert?.Certificate ?? string.Empty);
 			string email = "";
 
 			foreach (string name in names)

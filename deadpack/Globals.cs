@@ -7,37 +7,37 @@ public static class Globals
 	// 
 	// current alias & location
 	//
-	public static string Alias;
-	public static string Location;
+	public static string? Alias;
+	public static string? Location;
 
 	//
 	// main views
 	//
-	public static ViewAliases ViewAliases;
-	public static ViewDeadPacks ViewDeadPacks;
+	public static ViewAliases? ViewAliases;
+	public static ViewDeadPacks? ViewDeadPacks;
 
 	//
 	// left & right views
 	//
-	public static FrameView ViewLeft;
-	public static FrameView ViewRight;
+	public static FrameView? ViewLeft;
+	public static FrameView? ViewRight;
 
 	//
 	// global options
 	//
-	public static string Password;
-	public static string Domain;
+	public static string? Password;
+	public static string? Domain;
 	public static int Verbose;
 
 
 	//
 	// colour schemes
 	//
-	public static ColorScheme StandardColors; 
+	public static ColorScheme? StandardColors; 
 
-	public static ColorScheme WhiteOnBlue;
+	public static ColorScheme? WhiteOnBlue;
 
-	public static ColorScheme BlueOnWhite;
+	public static ColorScheme? BlueOnWhite;
 	
 
 	//
@@ -47,9 +47,9 @@ public static class Globals
 	{
 		try
 		{
-			lock (ProgressSource)
+			lock (ProgressSource??[])
 			{
-				ProgressSource.Add(message);
+				ProgressSource?.Add(message);
 			}
 		}
 		catch { }
@@ -57,9 +57,9 @@ public static class Globals
 
 	public static void ClearProgressSource()
 	{
-		lock (ProgressSource)
+		lock (ProgressSource??[])
 		{
-			ProgressSource.Clear();
+			ProgressSource?.Clear();
 		}
 	}
 
@@ -68,7 +68,7 @@ public static class Globals
 	public static List<string> GetProgressSource()
 	{
 		// no lock as it is read only
-		return ProgressSource;
+		return ProgressSource??[];
 	}
 
 	public static void SetProgressSource(List<string> value)
@@ -77,7 +77,7 @@ public static class Globals
 		ProgressSource = value;
 	}
 
-	private static List<string> ProgressSource;
+	private static List<string>? ProgressSource;
 
     public const string Test = "test123";
 }

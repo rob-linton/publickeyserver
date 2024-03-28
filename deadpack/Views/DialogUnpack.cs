@@ -56,7 +56,7 @@ public class DialogUnpack
 				await Unpack.ExecuteInternal(opts, alias, progress);
 
 			// pop up a message box
-			new DialogMessage(progressLabel.Text.ToString(), "Unpacking Complete");
+			new DialogMessage(progressLabel.Text.ToString()??"", "Unpacking Complete");
 			
 		};
 

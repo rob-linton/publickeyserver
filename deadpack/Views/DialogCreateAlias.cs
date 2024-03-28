@@ -30,7 +30,7 @@ public class DialogCreateAlias
 			if (string.IsNullOrEmpty(domain.Text.ToString()))
 			{
 				progressLabel.Text = "Please enter a domain.";
-				new DialogMessage(progressLabel.Text.ToString(), "Alias Creation");
+				_ = new DialogMessage(progressLabel.Text.ToString()??"", "Alias Creation");
 				return;
 			}
 
@@ -46,13 +46,13 @@ public class DialogCreateAlias
 
 			CreateOptions opts = new CreateOptions()
 			{
-				Domain = domain.Text.ToString(),
+				Domain = domain.Text.ToString()??"",
 				Email = email.Text.ToString(),
 				Token = emailVerificationCode.Text.ToString()
 			};
 
 			int result = await Create.Execute(opts, progress);
-			new DialogMessage(progressLabel.Text.ToString(), "Alias Created");
+			new DialogMessage(progressLabel.Text.ToString()??"", "Alias Created");
 		};
 
 		var cancel = new Button("Close");
@@ -81,7 +81,7 @@ public class DialogCreateAlias
 			Height = 1, 
 			ColorScheme = Globals.WhiteOnBlue
 		};
-		serverInfo.Text = "Instructions for setting up your own Deadrop server located at https://github/rob-linton/publickeyserver/wiki/Deadrop-Server-Setup";
+		serverInfo.Text = "Instructions for setting up your own Deadrop server located at https://github.com/rob-linton/deadrop/wiki/Deadrop-Server-Setup";
 
 		domain = new TextField() 
 		{ 
@@ -168,11 +168,11 @@ public class DialogCreateAlias
 			// verify the email
 			VerifyOptions verifyOpts = new VerifyOptions()
 			{
-				Email = email.Text.ToString(),
-				Domain = domain.Text.ToString()	
+				Email = email.Text.ToString()??"",
+				Domain = domain.Text.ToString()??""	
 			};
 			int result = await Verify.Execute(verifyOpts, progress);
-			new DialogMessage(progressLabel.Text.ToString(), "Email Verification");
+			new DialogMessage(progressLabel.Text.ToString()??"", "Email Verification");
 		};
 
 		FrameView viewEmail = new FrameView ("Email (Optional)") {

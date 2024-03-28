@@ -14,10 +14,14 @@ public class EmailHelper
 			string domain = Misc.GetDomain("");
 
 		// if there is no @ then just return the email as it will be an alias
-		if (!emailOrAlias.Contains("@"))
+		if (!emailOrAlias.Contains('@'))
 		{
 			var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(emailOrAlias)}");
 			var c = JsonSerializer.Deserialize<CertResult>(result);
+			if (c == null)
+			{
+				throw new Exception("Unable to deserialize CertResult.");
+			}
 			return c;
 		}
 
@@ -32,7 +36,7 @@ public class EmailHelper
 				result = await HttpHelper.Get($"https://{domain}/email/{emailOrAlias}");
 				Misc.LogCheckMark($"Email found {emailOrAlias}");
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{ 
 
 				if (create)
@@ -55,6 +59,11 @@ public class EmailHelper
 			}
 
 			var c = JsonSerializer.Deserialize<CertResult>(result);
+
+			if (c == null)
+			{
+				throw new Exception("Unable to deserialize CertResult.");
+			}
 
 			return c;
 		}

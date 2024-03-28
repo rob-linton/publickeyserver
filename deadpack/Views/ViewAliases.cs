@@ -26,7 +26,7 @@ public class ViewAliases : Window
 		RemoveAll();
 		try
 		{
-			Globals.ViewDeadPacks.RemoveAll();
+			Globals.ViewDeadPacks?.RemoveAll();
 		}
 		catch { }
 
@@ -71,7 +71,7 @@ public class ViewAliases : Window
 		var refresh = new Button("Refresh") { X = 0, Y = 0, Width = 8, Height = 1 };
 		refresh.Clicked += () => 
 		{ 
-			Globals.ViewDeadPacks.RemoveAll();
+			Globals.ViewDeadPacks?.RemoveAll();
 			Build();
 		};
 
@@ -97,7 +97,7 @@ public class ViewAliases : Window
 			}
 			DeleteOptions deleteOptions = new DeleteOptions() {Alias = Globals.Alias};
 			await Delete.Execute(deleteOptions);
-			Globals.ViewDeadPacks.RemoveAll();
+			Globals.ViewDeadPacks?.RemoveAll();
 			Build();
 		};
 
@@ -106,13 +106,13 @@ public class ViewAliases : Window
 		var listViewReceived = new ListView(aliasesReceived) { X = 2, Y = Pos.Bottom(received), Width = Dim.Fill(), Height = Dim.Percent(45)};
 		listViewReceived.ColorScheme = Globals.StandardColors;
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
-		listViewReceived.SelectedItemChanged += (args) => { Globals.Alias = (args.Value as Alias).Name.ToString(); };
+		listViewReceived.SelectedItemChanged += (args) => { Globals.Alias = (args.Value as Alias)?.Name.ToString(); };
 
 		var sent = new Label("Sent") { X = 0, Y = Pos.Bottom(listViewReceived) + 1, Width = Dim.Fill(), Height = 1 };
 		var listViewSent = new ListView(aliasesSent) { X = 2, Y = Pos.Bottom(sent), Width = Dim.Fill(), Height = Dim.Fill() - 2 };
 		listViewSent.ColorScheme = Globals.StandardColors;
 		listViewSent.OpenSelectedItem += listView_OpenSent;
-		listViewSent.SelectedItemChanged += (args) => { Globals.Alias = (args.Value as Alias).ToString(); };
+		listViewSent.SelectedItemChanged += (args) => { Globals.Alias = (args.Value as Alias)?.ToString(); };
 
 		var outbox = new ListView(new List<string>() { "Outbox" }) { X = 0, Y = Pos.Bottom(listViewSent) + 1, Width = Dim.Fill(), Height = 1 };
 		listViewReceived.OpenSelectedItem += listView_OpenInbox;
@@ -126,35 +126,35 @@ public class ViewAliases : Window
 
 	private void listView_OpenInbox(ListViewItemEventArgs e)
 	{
-		Alias a = e.Value as Alias;
-		Globals.Alias = a.Name;
+		Alias? a = e.Value as Alias;
+		Globals.Alias = a!.Name;
 		Globals.Location = "inbox";
-		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
-		Globals.ViewRight.FocusFirst();
+		Globals.ViewDeadPacks?.Build(Globals.Alias, Globals.Location);
+		Globals.ViewRight?.FocusFirst();
 	}
 
 	private void listView_OpenSent(ListViewItemEventArgs e)
 	{
-		Alias a = e.Value as Alias;
-		Globals.Alias = a.Name;
+		Alias? a = e.Value as Alias;
+		Globals.Alias = a!.Name;
 		Globals.Location = "sent";
-		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
-		Globals.ViewRight.FocusFirst();
+		Globals.ViewDeadPacks?.Build(Globals.Alias, Globals.Location);
+		Globals.ViewRight?.FocusFirst();
 	}
 
 	private void listView_OpenOutbox(ListViewItemEventArgs e)
 	{
 		Globals.Alias = "";
 		Globals.Location = "outbox";
-		Globals.ViewDeadPacks.Build(Globals.Alias, Globals.Location);
-		Globals.ViewRight.FocusFirst();
+		Globals.ViewDeadPacks?.Build(Globals.Alias, Globals.Location);
+		Globals.ViewRight?.FocusFirst();
 	}
 
 	public override bool ProcessKey (KeyEvent keyEvent)
 	{
 		if (keyEvent.Key == Key.CursorRight)
 		{
-			Globals.ViewDeadPacks.FocusFirst();
+			Globals.ViewDeadPacks?.FocusFirst();
 			return true;
 		}
 		return base.ProcessKey (keyEvent);

@@ -39,7 +39,7 @@ public class PackOptions : Options
 }
 class Pack 
 {
-	public static async Task<int> Execute(PackOptions opts, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> Execute(PackOptions opts, IProgress<StatusUpdate>? progress = null)
 	{
 		try
 		{
@@ -53,17 +53,13 @@ class Pack
 			byte[] key = BouncyCastleHelper.Generate256BitRandom();
 
 			// create the manifest
-			List<FileItem> fileList = new List<FileItem>();
+			List<FileItem> fileList = [];
 
 			// create the envelope
-			List<Recipient> recipients = new List<Recipient>();
+			List<Recipient> recipients = [];
 
 			// get the current directory
 			string currentDirectory = Directory.GetCurrentDirectory();
-
-			SearchOption s = SearchOption.TopDirectoryOnly;
-			if (opts.Recurse)
-				s = SearchOption.AllDirectories;
 
 			// get a list of files from the wildcard returning relative paths only
 			
@@ -81,12 +77,14 @@ class Pack
 			List<string> aliases = [opts.From];
 			
 			List<Task<CertResult>> tasks = new List<Task<CertResult>>();
-			foreach (string aliasOrEmail in opts.InputAliases)
+			if (opts.InputAliases != null)
 			{
-				//CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
-				tasks.Add(EmailHelper.GetAliasOrEmailFromServer(aliasOrEmail, true));	
+				foreach (string aliasOrEmail in opts.InputAliases)
+				{
+					//CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
+					tasks.Add(EmailHelper.GetAliasOrEmailFromServer(aliasOrEmail, true));	
+				}
 			}
-			
 			// when all of the tasks have completed
 			await Task.WhenAll(tasks);
 			foreach (var task in tasks)
@@ -161,14 +159,8 @@ class Pack
 			//
 
 			// set the output directory depending if it has been passed in in opts.output
-			string outputFile = opts.Output;
-			if (String.IsNullOrEmpty(opts.Output))
-			{
-				// get a unix timestamp in seconds
-				string date = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds().ToString();
-				//opts.Output = date + " " + opts.Output;
-				outputFile = Storage.GetDeadPackDirectoryOutbox($"{date}-{Guid.NewGuid()}.deadpack");
-			}
+			
+			string outputFile = string.IsNullOrEmpty(opts.Output) ? Storage.GetDeadPackDirectoryOutbox($"{((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds()}-{Guid.NewGuid()}.deadpack") : opts.Output;
 			
 
 			// create an empty zip stream 

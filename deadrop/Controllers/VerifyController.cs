@@ -68,8 +68,9 @@ namespace publickeyserver
 					{
 						raw = await AwsHelper.Get(client, tokenFile);
 					};
-					EmailToken emailTokenFile = JsonConvert.DeserializeObject<EmailToken>(Encoding.UTF8.GetString(raw ?? throw new Exception("Token file not found")));
-					long timestamp = Convert.ToInt64(emailTokenFile.Timestamp);
+					var t = Encoding.UTF8.GetString(raw ?? throw new Exception("Token file not found"));
+					EmailToken? emailTokenFile = JsonConvert.DeserializeObject<EmailToken>(t);
+					long timestamp = Convert.ToInt64(emailTokenFile!.Timestamp);
 
 					// get the current timestamp
 					long unixTimestampFile = DateTimeOffset.UtcNow.ToUnixTimeSeconds();

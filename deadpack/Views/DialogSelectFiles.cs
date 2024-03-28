@@ -16,7 +16,7 @@ public class DialogSelectFiles
 		{
 			filename = "*";
 		}
-		
+
 		string[] source = new string[0];
 		TextField textBoxPath = new TextField("");
 		TextField textBoxPattern = new TextField("");
@@ -141,7 +141,7 @@ public class DialogSelectFiles
 		dialog.Add(textBoxPath, label, search, checkBox, frame, selectFolder);
 		Application.Run (dialog);
 
-		return (textBoxPath.Text.ToString(), recursive, source);
+		return (textBoxPath.Text.ToString()??"", recursive, source);
 
 	}
 	private static void GetFiles(bool recursive, TextField textBoxPath, ListView listView, ref string[] source)
@@ -149,7 +149,7 @@ public class DialogSelectFiles
 		try
 		{
 			// get a list of files from the wildcard returning relative paths only
-			string[] fullPaths = Misc.GetFiles(textBoxPath.Text.ToString(), recursive);
+			string[] fullPaths = Misc.GetFiles(textBoxPath.Text.ToString()??"", recursive);
 			
 			// remove the "./" from the front of the path
 			//source = fullPaths.Select(fullPath => fullPath.Replace($".{Path.DirectorySeparatorChar}", "")).ToArray();

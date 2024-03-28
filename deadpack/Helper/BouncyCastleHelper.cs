@@ -67,7 +67,10 @@ public class BouncyCastleHelper
 		// check if the alias is in the alt names
 		foreach (var altName in altNames)
 		{
-			names.Add(altName[1].ToString());
+			if (altName[1] != null)
+			{
+				names.Add(altName[1]?.ToString()!);
+			}
 		}
 
 		return names;
@@ -669,7 +672,7 @@ public class BouncyCastleHelper
 				(valid, fingerprint) = BouncyCastleHelper.ValidateCertificateChain(certificate, cacerts, domain);
 			}
 
-			bool validAltName = CheckIfCertificateAltNamesMatch(alias, email, certificate);
+			bool validAltName = CheckIfCertificateAltNamesMatch(alias, email, certificate!);
 
 		if (valid)
 		{

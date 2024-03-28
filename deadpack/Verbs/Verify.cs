@@ -18,7 +18,7 @@ public class VerifyOptions : Options
 }
 class Verify 
 {
-	public static async Task<int> Execute(VerifyOptions opts, IProgress<StatusUpdate> progress = null)
+	public static async Task<int> Execute(VerifyOptions opts, IProgress<StatusUpdate>? progress = null)
 	{
 		StatusUpdate statusUpdate = new StatusUpdate();
 		try

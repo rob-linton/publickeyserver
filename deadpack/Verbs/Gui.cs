@@ -28,7 +28,7 @@ class Gui
 		Build(opts);
 		return 0;
 	}
-	public static async void Build(GuiOptions opts = null)
+	public static async void Build(GuiOptions? opts = null)
 	{
 		try
 		{
@@ -36,16 +36,16 @@ class Gui
 			Application.Init();
 
 			// Open the deadpack if a file is passed in
-			Application.MainLoop.AddIdle(() => 
-			{ 
-				if (!String.IsNullOrEmpty(opts.UnpackFile))
+			_ = Application.MainLoop.AddIdle(() =>
+			{
+				if (!String.IsNullOrEmpty(opts?.UnpackFile))
 				{
 					ViewMenu.OpenDeadpack(opts.UnpackFile);
 					Application.RequestStop();
 				}
-				else if (!String.IsNullOrEmpty(opts.File))
+				else if (!String.IsNullOrEmpty(opts?.File))
 				{
-					new DialogCreateDeadPack().Build("", opts.File); 
+					new DialogCreateDeadPack().Build("", opts.File);
 					Application.RequestStop();
 				}
 				return false; // cancel the idle so it only runs once
@@ -84,7 +84,7 @@ class Gui
 			};
 
 			Globals.SetProgressSource(new List<string>());
-			Globals.Verbose = 0;
+			Globals.Verbose = -1;
 
 			ViewMenu menu = new ViewMenu();
 			ViewStatusBar statusBar = new ViewStatusBar();
@@ -113,7 +113,7 @@ class Gui
 
 
 			// add the list of deadpacks
-			Globals.ViewDeadPacks = new ViewDeadPacks(Globals.Alias, Globals.Location);
+			Globals.ViewDeadPacks = new ViewDeadPacks(Globals.Alias??"", Globals.Location??"");
 			Globals.ViewRight.Add(Globals.ViewDeadPacks);
 
 

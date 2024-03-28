@@ -1,3 +1,4 @@
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 using System;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
@@ -13,7 +14,9 @@ public class DialogSelectAliases
 {
 	// build
 	// public static async Task<int> Execute(PackOptions opts)
+
 	public async Task<List<string>> Build(string title, string fromAlias)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 	{	
 		List<string> selected = new List<string>();
 		List<string> source = new List<string>();
@@ -59,7 +62,7 @@ public class DialogSelectAliases
 		};
 		// on press enter
 		
-		textBox.KeyDown += async (e) => 
+		textBox.KeyDown += (e) => 
 		{
 			if (e.KeyEvent.Key == Key.Enter)
 			{
@@ -67,14 +70,14 @@ public class DialogSelectAliases
 				{
 					return;
 				}
-				lastSearch = textBox.Text.ToString();
+				lastSearch = textBox.Text.ToString()??"";
 
 				string toDomain = Misc.GetDomain(fromAlias);
 
 				//
 				// get a list of deadpacks from the server
 				//
-				string lookup = textBox.Text.ToString();
+				string lookup = textBox.Text.ToString()??"";
 				LookupAlias(fromAlias, lookup, source, listView, lastSearch); 
 			}
 		};
@@ -87,10 +90,10 @@ public class DialogSelectAliases
 			Width = 8,
 			Height = 1
 		};
-		search.Clicked += async () => 
+		search.Clicked += () => 
 		{ 
 			string toDomain = Misc.GetDomain(fromAlias);
-			string search = textBox.Text.ToString();
+			string search = textBox.Text.ToString()??"";
 			if (string.IsNullOrEmpty(search))
 			{
 				return;
@@ -99,7 +102,7 @@ public class DialogSelectAliases
 			//
 			// get a list of deadpacks from the server
 			//
-			string lookup = textBox.Text.ToString();
+			string lookup = textBox.Text.ToString()??"";
 
 			LookupAlias(fromAlias, lookup, source, listView, lastSearch); 
 						
