@@ -287,7 +287,7 @@ public class Misc
 			LogLine("Rob Linton, 2021");
 			LogLine("Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms");
 			LogLine("Acknowledgement to the BouncyCastle C# Crypto library");
-			LogLine("https://github/rob-linton/deadpack/wiki/About-DeadPack");
+			LogLine("https://github.com/rob-linton/deadrop/wiki/About-DeadPack");
 			LogLine("========================================================================================================================================================\n");
 		}
 	}
