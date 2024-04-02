@@ -10065,6 +10065,11 @@ namespace publickeyserver
 				return "common";
 		}
 
+		public string GetWord(int index)
+		{
+			return words[index];
+		}
+		
 		public string GetAlias(string origin)
 		{
 			

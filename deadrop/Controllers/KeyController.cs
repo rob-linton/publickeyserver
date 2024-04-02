@@ -288,9 +288,11 @@ namespace publickeyserver
 				string[] bits = host.ToString().Replace(GLOBALS.origin, "").Split('.');
 
 				// take the host name if it was passed in at the front
+				string shortAlias = "";
 				if (bits.Length == 2)
 				{
 					alias = bits[0] + "." + GLOBALS.origin;
+					shortAlias = bits[0];
 				}
 				else if (aliasIn != "index.html")
 				{
@@ -302,6 +304,7 @@ namespace publickeyserver
 				if (aliasIn == "index.html" && alias == "")
 				{
 					string index = System.IO.File.ReadAllText("wwwroot/index.html");
+					index = index.Replace("{CERTIFICATE}", "");
 					return new ContentResult()
 					{
 						Content = index,
@@ -309,8 +312,6 @@ namespace publickeyserver
 					};
 
 				}
-
-				
 
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
@@ -320,7 +321,79 @@ namespace publickeyserver
 
 				string cert = raw.FromBytes();
 
+				//
+				// we now return the info page
+				//
 
+				List<string> certificate = new List<string>();
+				certificate.Add("<br>");
+				certificate.Add("<br>");
+				certificate.Add($"Alias: {alias}");
+				certificate.Add("<br>");
+
+				// convert the cert to an x.509 bouncy castle
+				Org.BouncyCastle.X509.X509Certificate x509 = (Org.BouncyCastle.X509.X509Certificate)BouncyCastleHelper.fromPEM(cert);
+
+				// get the subject
+				string subject = x509.SubjectDN.ToString();
+				certificate.Add($"Subject: {subject}");
+
+				// get the issuer
+				string issuer = x509.IssuerDN.ToString();
+				certificate.Add($"Issuer: {issuer}");
+
+				// get the expiry
+				string expiry = x509.NotAfter.ToString("dd-MMM-yyyy hh.mmtt");
+				certificate.Add($"Not After: {expiry}");
+
+				// not before
+				string notbefore = x509.NotBefore.ToString("dd-MMM-yyyy hh.mmtt");
+				certificate.Add($"Not Before: {notbefore}");
+
+				// get the serial number
+				string serial = x509.SerialNumber.ToString();
+				certificate.Add($"Serial: {serial}");
+
+				// get the subject alternative names
+				List<string> san = BouncyCastleHelper.GetAltNames(cert);
+				foreach (var s in san)
+				{
+					certificate.Add($"Subject Alternative Name: {s.ToString()}");
+				}
+
+				(bool recipientValid, byte[] recipientRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(GLOBALS.origin + ":5001", alias);
+
+				List<string> sig = Misc.GenerateSignature(recipientRootFingerprint);
+
+
+				// create a string from the list
+				string certInfo = "";
+				foreach (string line in certificate)
+				{
+					certInfo += line + "<br>";
+				}
+
+				certInfo = certInfo + $"<br><a href=\"https://{host}/cert/{shortAlias}\">Full Certificate</a>";
+
+				certInfo = certInfo + $"<br><br>Certificate Valid: {recipientValid}<br>";
+
+				certInfo = certInfo + $"<br><br>Root Signature:<br>----------------<br>";
+				// add the signature
+				foreach (string line in sig)
+				{
+					certInfo += line + "<br>";
+				}
+				
+				string index2 = System.IO.File.ReadAllText("wwwroot/index.html");
+				index2 = index2.Replace("{CERTIFICATE}", certInfo);
+				return new ContentResult()
+				{
+					Content = index2,
+					ContentType = "text/html",
+				};
+
+
+				/*
 				Response.StatusCode = StatusCodes.Status200OK;
 				Dictionary<string, string> ret = new Dictionary<string, string>();
 
@@ -331,7 +404,7 @@ namespace publickeyserver
 
 				GLOBALS.status_certs_served++;
 				return new JsonResult(ret);
-
+				*/
 			}
 			catch (Exception e)
 			{

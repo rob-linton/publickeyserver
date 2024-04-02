@@ -139,7 +139,7 @@ namespace publickeyserver
 		{
 			if (String.IsNullOrEmpty(email))
 				return false;
-				
+
 			string allowedEmailDomains = GLOBALS.AllowedEmailDomains;
 
 			if (allowedEmailDomains == "*")
@@ -169,6 +169,45 @@ namespace publickeyserver
 		internal static bool IsAnonymousAllowed()
 		{
 			return GLOBALS.Anonymous;
+		}
+		// ---------------------------------------------------------------------
+		public static List<string> GenerateSignature(byte[] data)
+		{
+			if (data == null || data.Length == 0)
+			{
+				throw new ArgumentException("Data cannot be null or empty");
+			}
+
+			List<int> signature = new List<int>();
+			int sum = 0;
+
+			// Loop through the byte array, adding up the values
+			for (int i = 0; i < data.Length; i++)
+			{
+				sum += data[i];
+
+				// Every few bytes, calculate a signature number and reset the sum
+				if ((i + 1) % (data.Length / 10) == 0)
+				{
+					signature.Add(sum % 1000 + 1); // Ensure the number is between 1 and 1000
+					sum = 0;
+				}
+			}
+
+			// If the signature has less than 10 numbers, fill in the rest
+			while (signature.Count < 10)
+			{
+				sum += sum; // Arbitrary operation to change the sum
+				signature.Add(sum % 1000 + 1);
+			}
+			List<string> sig = new List<string>();
+			Words words = new Words();
+			foreach (int i in signature)
+			{
+				sig.Add(words.GetWord(i));
+			}
+			
+			return sig;
 		}
 		// ---------------------------------------------------------------------
 	}

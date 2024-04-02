@@ -319,6 +319,28 @@ namespace publickeyserver
 
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static List<string> GetAltNames(string targetCertificatePem)
+		{
+			List<string> names = new List<string>();
+
+			// get the certificate
+			Org.BouncyCastle.X509.X509Certificate cert = ReadCertificateFromPemString(targetCertificatePem);
+
+			// get the alt names
+			var altNames = cert.GetSubjectAlternativeNames();
+
+			// check if the alias is in the alt names
+			foreach (var altName in altNames)
+			{
+				if (altName[1] != null)
+				{
+					names.Add(altName[1]?.ToString()!);
+				}
+			}
+
+			return names;
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		public static GeneralName CreateGeneralName(DerObjectIdentifier customExtensionOid, string data)
 		{
 			// Create an OID for the custom extension
@@ -335,7 +357,6 @@ namespace publickeyserver
 			return new GeneralName(GeneralName.OtherName, otherName.ToAsn1Object());
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
-		/*
 		public static string GetCustomExtensionData(Org.BouncyCastle.X509.X509Certificate cert, string oid)
 		{
 			// Get the custom extension
@@ -350,22 +371,28 @@ namespace publickeyserver
 			{
 				if (generalName.TagNo == GeneralName.OtherName)
 				{
-					Asn1Sequence otherNameSeq = (Asn1Sequence)generalName.Name.ToAsn1Object();
-					OtherName otherName = OtherName.GetInstance(otherNameSeq);
+					OtherName otherName = OtherName.GetInstance(generalName.Name.ToAsn1Object());
 
 					if (otherName.TypeID.ToString() == oid)
 					{
 						Asn1Encodable otherNameValue = otherName.Value;
-						// Assuming the data is a DER UTF8String
-						DerUtf8String utf8String = DerUtf8String.GetInstance((Asn1TaggedObject)otherNameValue, false);
-						return utf8String.GetString();
+
+						// Check if the value is an instance of DerUtf8String
+						if (otherNameValue is DerUtf8String utf8String)
+						{
+							return utf8String.GetString();
+						}
+						else
+						{
+							// Handle other types of encodable values as necessary
+							// For instance, if it's a tagged object or another ASN.1 type
+						}
 					}
 				}
 			}
 
 			return ""; // Data not found or format not as expected
 		}
-		*/
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
 		// create a self signed CA certificate
