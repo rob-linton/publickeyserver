@@ -361,7 +361,13 @@ namespace publickeyserver
 					certificate.Add($"Subject Alternative Name: {s.ToString()}");
 				}
 
-				(bool recipientValid, byte[] recipientRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(GLOBALS.origin + ":5001", alias);
+				bool recipientValid = false;
+				byte[] recipientRootFingerprint = new byte[32];
+				try
+				{
+					(recipientValid, recipientRootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(GLOBALS.origin, alias);
+				}
+				catch { }
 
 				List<string> sig = Misc.GenerateSignature(recipientRootFingerprint);
 

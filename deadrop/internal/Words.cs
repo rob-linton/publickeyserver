@@ -29,7 +29,7 @@ namespace publickeyserver
 			words = new List<string>();
 
 			words.Add("the");
-			words.Add("of");
+			words.Add("none");
 			words.Add("and");
 			words.Add("to");
 			words.Add("a");
