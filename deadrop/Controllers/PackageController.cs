@@ -60,7 +60,10 @@ namespace publickeyserver
 				// host is bare eg. publickeyserver.org
 
 				// get the url host header
-				string host = Request.Host.Host + ":" + Request.Host.Port;
+				string port = "";
+				if (Request.Host.Port != null)
+					port = ":" + Request.Host.Port;
+				string host = Request.Host.Host + port;
 
 				// create a unique package name
 				string packageName = Guid.NewGuid().ToString();
@@ -166,7 +169,10 @@ namespace publickeyserver
 				signature = signature.Replace(" ", "+");
 
 				// get the url host header
-				string host = Request.Host.Host + ":" + Request.Host.Port;
+				string port = "";
+				if (Request.Host.Port != null)
+					port = ":" + Request.Host.Port;
+				string host = Request.Host.Host + port;
 				
 				string result = await PackageHelper.ValidateRecipient(recipient, host, signature, timestamp);
 				if (!String.IsNullOrEmpty(result))

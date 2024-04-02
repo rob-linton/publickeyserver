@@ -597,7 +597,10 @@ namespace publickeyserver
 				signature = signature.Replace(" ", "+");
 
 				// get the url host header
-				string host = Request.Host.Host + ":" + Request.Host.Port;
+				string port = "";
+				if (Request.Host.Port != null)
+					port = ":" + Request.Host.Port;
+				string host = Request.Host.Host + port;
 				
 				string result = await PackageHelper.ValidateRecipient(alias, host, signature, timestamp);
 				if (!String.IsNullOrEmpty(result))
@@ -644,7 +647,10 @@ namespace publickeyserver
 				signature = signature.Replace(" ", "+");
 
 				// get the url host header
-				string host = Request.Host.Host + ":" + Request.Host.Port;
+				string port = "";
+				if (Request.Host.Port != null)
+					port = ":" + Request.Host.Port;
+				string host = Request.Host.Host + port;
 				
 				string result = await PackageHelper.ValidateRecipient(longAlias, host, signature, timestamp);
 				if (!String.IsNullOrEmpty(result))

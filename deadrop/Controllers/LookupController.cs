@@ -51,8 +51,11 @@ namespace publickeyserver
 			try
 			{
 				signature = signature.Replace(" ", "+");
-				
-				string host = Request.Host.Host + ":" + Request.Host.Port;
+
+				string port = "";
+				if (Request.Host.Port != null)
+					port = ":" + Request.Host.Port;
+				string host = Request.Host.Host + port;
 
 				string result = await PackageHelper.ValidateRecipient(alias, host, signature, timestamp);
 				if (!String.IsNullOrEmpty(result))
