@@ -52,6 +52,7 @@ public class DialogSelectAliases
 			//selected = e.Value.ToString();  
 		};
 
+		
 
 		// create a textbox
 		var textBox = new TextField("") { 

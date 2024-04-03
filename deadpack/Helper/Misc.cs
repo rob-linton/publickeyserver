@@ -282,14 +282,14 @@ public class Misc
 		{
 			LogArt();
 
-			LogLine("=========================================================================================================================================================");
-			LogLine("DEADPACK v1.0 (deadrop.org)");
+			LogLine("===================================================================================================");
+			LogLine($"DEADPACK {Globals.version} (deadrop.org)");
 			LogLine("[D]eadrop's [E]ncrypted [A]rchive and [D]istribution [PACK]age (DEADPACK)");
 			LogLine("Rob Linton, 2021");
 			LogLine("Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms");
 			LogLine("Acknowledgement to the BouncyCastle C# Crypto library");
 			LogLine("https://github.com/rob-linton/deadrop/wiki/About-DeadPack");
-			LogLine("========================================================================================================================================================\n");
+			LogLine("===================================================================================================\n");
 		}
 	}
 	// --------------------------------------------------------------------------------------------------------
@@ -365,10 +365,10 @@ public class Misc
 		string[] sizes = { "B", "KB", "MB", "GB", "TB" };
 		double len = receiveSize;
 		int order = 0;
-		while (len >= 1024 && order < sizes.Length - 1)
+		while (len >= 1000 && order < sizes.Length - 1)
 		{
 			order++;
-			len = len / 1024;
+			len = len / 1000;
 		}
 		string result = String.Format("{0:0.##} {1}", len, sizes[order]);
 		return result;

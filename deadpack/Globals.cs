@@ -4,6 +4,8 @@ using Terminal.Gui;
 namespace deadrop;
 public static class Globals
 {
+	// Current version
+	public const string version = "1.0.0";
 	// 
 	// current alias & location
 	//

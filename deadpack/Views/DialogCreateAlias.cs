@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using System.Text.Json;
 using CommandLine;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
@@ -87,11 +88,79 @@ public class DialogCreateAlias
 		{ 
 			X = 1, 
 			Y = 4, 
-			Width = Dim.Fill()-1, 
+			Width = Dim.Fill() - 18, 
 			Height = Dim.Fill(),
 			ColorScheme = Globals.BlueOnWhite
 		};
 		domain.Text = Misc.GetDomain("");
+
+		// add a button
+		Button getDomain = new Button("Check Domain")
+		{
+			X = Pos.Right(domain) + 1,
+			Y = 4,
+			Width = 10,
+			Height = 1	
+		};
+		getDomain.Clicked += async () => {
+
+			try
+			{
+				string domainName = domain.Text.ToString() ?? "";
+				// get the status from the server
+				string result = await HttpHelper.Get($"https://{domainName}/status");
+
+				var s = JsonSerializer.Deserialize<Status>(result);
+				
+				string application = s?.Application ?? "";
+				if (application == "deadrop")
+				{
+					string output = "Deadrop Server found. Version: " + s.Version;
+					progressLabel.Text = output;
+					/*
+						ret["MaxBucketFiles"] = GLOBALS.MaxBucketFiles;
+						ret["MaxBucketSize"] = GLOBALS.MaxBucketSize;
+						ret["MaxPackageSize"] = GLOBALS.MaxPackageSize;
+					*/
+					output = output + $"\nOrigin: {s.Origin}";
+					output = output + $"\nUptime: {s.Uptime} seconds";
+					output = output + $"\nCerts Served: {s.CertsServed}";
+					output = output + $"\nCerts Enrolled: {s.CertsEnrolled}";
+					output = output + $"\n";
+					output = output + $"\nAnonymous Aliases Allowed: {s.anonymous}";
+					output = output + $"\nMaximum Deadrop size: {Misc.FormatBytes(s?.MaxBucketSize ?? 0)}";
+					output = output + $"\nMaximum Deadpacks allowed in your Deadrop: {s?.MaxBucketFiles ?? 0}";
+					output = output + $"\nMaximum DeadPack size: {Misc.FormatBytes(s?.MaxPackageSize ?? 0)}";
+					output = output + $"\n";
+					output = output + $"\nRoot CA Signature:";
+					output = output + $"\n                 {s.RootCaSignature[0]}";
+					output = output + $"\n                 {s.RootCaSignature[1]}";
+					output = output + $"\n                 {s.RootCaSignature[2]}";
+					output = output + $"\n                 {s.RootCaSignature[3]}";
+					output = output + $"\n                 {s.RootCaSignature[4]}";
+					output = output + $"\n                 {s.RootCaSignature[5]}";
+					output = output + $"\n                 {s.RootCaSignature[6]}";
+					output = output + $"\n                 {s.RootCaSignature[7]}";
+					output = output + $"\n                 {s.RootCaSignature[8]}";
+					output = output + $"\n                 {s.RootCaSignature[9]}";
+
+					new DialogMessage(output, "Domain Information");
+
+				}
+				else
+				{
+					progressLabel.Text = "Domain not found.";
+					new DialogMessage(progressLabel.Text.ToString()??"", "Alias Creation");
+					return;
+				}
+			}
+			catch (Exception ex)
+			{ 
+				progressLabel.Text = "Domain not found.";
+				new DialogMessage(progressLabel.Text.ToString()??"", "Alias Creation");
+				return;
+			}
+		};
 
 		
 
@@ -102,7 +171,7 @@ public class DialogCreateAlias
             Height = 7,
         };
 		viewDomain.Border.BorderStyle = BorderStyle.Single;
-		viewDomain.Add(domain, serverInfo);
+		viewDomain.Add(domain, getDomain, serverInfo);
 
 		//
 		// add the optional email

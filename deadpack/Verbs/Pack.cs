@@ -81,12 +81,21 @@ class Pack
 			{
 				foreach (string aliasOrEmail in opts.InputAliases)
 				{
-					//CertResult cert = await EmailHelper.GetAliasFromEmail(aliasOrEmail, opts);
-					tasks.Add(EmailHelper.GetAliasOrEmailFromServer(aliasOrEmail, true));	
+					tasks.Add(EmailHelper.GetAliasOrEmailFromServer(aliasOrEmail, true));
 				}
 			}
+			
 			// when all of the tasks have completed
-			await Task.WhenAll(tasks);
+			try
+			{
+				await Task.WhenAll(tasks);
+			}
+			catch (Exception ex)
+			{
+				Misc.LogError($"Error: could not find alias", ex.Message);
+				throw;
+			}
+
 			foreach (var task in tasks)
 			{
 				CertResult cert = task.Result;

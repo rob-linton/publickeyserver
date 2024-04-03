@@ -76,8 +76,13 @@ namespace publickeyserver
 			ret["version"] = GLOBALS.version;
 			ret["origin"] = GLOBALS.origin;
 			ret["uptime"] = Math.Round(runtime.TotalSeconds);
-			ret["certs_served"] = GLOBALS.status_certs_served;
-			ret["certs_enrolled"] = GLOBALS.status_certs_enrolled;
+			ret["certs-served"] = GLOBALS.status_certs_served;
+			ret["certs-enrolled"] = GLOBALS.status_certs_enrolled;
+
+			ret["max-bucket-files"] = Convert.ToInt64(GLOBALS.MaxBucketFiles);
+			ret["max-bucket-size"] = Convert.ToInt64(GLOBALS.MaxBucketSize);
+			ret["max-package-size"] = Convert.ToInt64(GLOBALS.MaxPackageSize);
+
 
 			// return email allowed
 			ret["anonymous"] = GLOBALS.Anonymous.ToString();
@@ -104,7 +109,7 @@ namespace publickeyserver
 				List<string> sig = Misc.GenerateSignature(fingerprint);
 
 				// serialise sig to a json string
-				ret["root_ca_signature"] = sig;
+				ret["root-ca-signature"] = sig;
 
 				ret["status"] = "OK";
 
