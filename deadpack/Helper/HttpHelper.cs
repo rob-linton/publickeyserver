@@ -23,7 +23,12 @@ public class HttpHelper
 		Misc.LogLine2($"- GET: {url}");
 
 		using var client = new HttpClient();
-		string ret = await client.GetStringAsync(url);
+		var response = await client.GetAsync(url);
+		if (response.StatusCode != System.Net.HttpStatusCode.OK)
+		{
+			throw new Exception($"{response.Content.ReadAsStringAsync().Result}}}");
+		}
+		string ret = await response.Content.ReadAsStringAsync();
 		Misc.LogLine2($"RESPONSE: {ret}");
 		return ret;
 	}
