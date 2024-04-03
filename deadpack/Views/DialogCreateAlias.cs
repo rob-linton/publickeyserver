@@ -95,7 +95,7 @@ public class DialogCreateAlias
 		domain.Text = Misc.GetDomain("");
 
 		// add a button
-		Button getDomain = new Button("Check Domain")
+		Button getDomain = new Button("Check Server")
 		{
 			X = Pos.Right(domain) + 1,
 			Y = 4,
@@ -115,49 +115,50 @@ public class DialogCreateAlias
 				string application = s?.Application ?? "";
 				if (application == "deadrop")
 				{
-					string output = "Deadrop Server found. Version: " + s.Version;
+					string output = "Deadrop server found. Version: " + s.Version;
 					progressLabel.Text = output;
 					/*
 						ret["MaxBucketFiles"] = GLOBALS.MaxBucketFiles;
 						ret["MaxBucketSize"] = GLOBALS.MaxBucketSize;
 						ret["MaxPackageSize"] = GLOBALS.MaxPackageSize;
 					*/
-					output = output + $"\nOrigin: {s.Origin}";
-					output = output + $"\nUptime: {s.Uptime} seconds";
-					output = output + $"\nCerts Served: {s.CertsServed}";
-					output = output + $"\nCerts Enrolled: {s.CertsEnrolled}";
+					output = output + $"\nOrigin: {s.Origin}\n";
+					output = output + $"\nUptime: {Misc.FormatSeconds(s.Uptime??0)}";
+					output = output + $"\nCerts served since up: {s.CertsServed}";
+					output = output + $"\nCerts Enrolled since up: {s.CertsEnrolled}";
 					output = output + $"\n";
-					output = output + $"\nAnonymous Aliases Allowed: {s.anonymous}";
-					output = output + $"\nMaximum Deadrop size: {Misc.FormatBytes(s?.MaxBucketSize ?? 0)}";
-					output = output + $"\nMaximum Deadpacks allowed in your Deadrop: {s?.MaxBucketFiles ?? 0}";
-					output = output + $"\nMaximum DeadPack size: {Misc.FormatBytes(s?.MaxPackageSize ?? 0)}";
+					output = output + $"\nAnonymous aliases allowed: {s.anonymous}";
+					output = output + $"\nMaximum deadrop size: {Misc.FormatBytes(s?.MaxBucketSize ?? 0)}";
+					output = output + $"\nMaximum deadpacks allowed in a deadrop: {s?.MaxBucketFiles ?? 0}";
+					output = output + $"\nMaximum deadPack size: {Misc.FormatBytes(s?.MaxPackageSize ?? 0)}";
 					output = output + $"\n";
-					output = output + $"\nRoot CA Signature:";
-					output = output + $"\n                 {s.RootCaSignature[0]}";
-					output = output + $"\n                 {s.RootCaSignature[1]}";
-					output = output + $"\n                 {s.RootCaSignature[2]}";
-					output = output + $"\n                 {s.RootCaSignature[3]}";
-					output = output + $"\n                 {s.RootCaSignature[4]}";
-					output = output + $"\n                 {s.RootCaSignature[5]}";
-					output = output + $"\n                 {s.RootCaSignature[6]}";
-					output = output + $"\n                 {s.RootCaSignature[7]}";
-					output = output + $"\n                 {s.RootCaSignature[8]}";
-					output = output + $"\n                 {s.RootCaSignature[9]}";
+					output = output + $"\nRoot CA signature";
+					output = output + $"\n-----------------";
+					output = output + $"\n{s.RootCaSignature[0]}";
+					output = output + $"\n{s.RootCaSignature[1]}";
+					output = output + $"\n{s.RootCaSignature[2]}";
+					output = output + $"\n{s.RootCaSignature[3]}";
+					output = output + $"\n{s.RootCaSignature[4]}";
+					output = output + $"\n{s.RootCaSignature[5]}";
+					output = output + $"\n{s.RootCaSignature[6]}";
+					output = output + $"\n{s.RootCaSignature[7]}";
+					output = output + $"\n{s.RootCaSignature[8]}";
+					output = output + $"\n{s.RootCaSignature[9]}\n";
 
-					new DialogMessage(output, "Domain Information");
+					new DialogMessage(output, "Server Information");
 
 				}
 				else
 				{
-					progressLabel.Text = "Domain not found.";
-					new DialogMessage(progressLabel.Text.ToString()??"", "Alias Creation");
+					progressLabel.Text = "Deadrop server not found.";
+					new DialogMessage(progressLabel.Text.ToString()??"", "Check Server");
 					return;
 				}
 			}
 			catch (Exception ex)
 			{ 
-				progressLabel.Text = "Domain not found.";
-				new DialogMessage(progressLabel.Text.ToString()??"", "Alias Creation");
+				progressLabel.Text = "Deadrop server not found.";
+				new DialogMessage(progressLabel.Text.ToString()??"", "Check Server");
 				return;
 			}
 		};

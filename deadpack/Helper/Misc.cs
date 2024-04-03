@@ -374,6 +374,15 @@ public class Misc
 		return result;
 	}
 
+	// function to format seconds
+	public static string FormatSeconds(long seconds)
+	{
+		// format the seconds to a pretty string
+		TimeSpan t = TimeSpan.FromSeconds(seconds);
+		string result = t.ToString(@"hh") + " Hours," + t.ToString(@"mm") + " Minutes & " + t.ToString(@"ss") + " Seconds";
+		return result;
+	}
+
 	// fuction to request a password from the console
 	public static string GetPassword()
 	{
