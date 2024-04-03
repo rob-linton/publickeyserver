@@ -15,8 +15,9 @@ public class DialogSelectAliases
 	// build
 	// public static async Task<int> Execute(PackOptions opts)
 
+	private List<Alias> sortedList = new List<Alias>();
+
 	public async Task<List<string>> Build(string title, string fromAlias)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 	{	
 		List<string> selected = new List<string>();
 		List<string> source = new List<string>();
@@ -107,28 +108,13 @@ public class DialogSelectAliases
 			LookupAlias(fromAlias, lookup, source, listView, lastSearch); 
 						
 		};
-		
+
 		//
 		// history
 		//
 
-		// get a list of history aliases sorted by date (earliest first)
-		List<Alias> history = Storage.GetAliases("history");
 
-		SortedList<long, Alias> sorted = new SortedList<long, Alias>();
-		Random random = new Random();
-		foreach (Alias a in history)
-		{
-			long timestamp = a.Timestamp;
-			try
-			{
-				string randomTimestamp = timestamp.ToString() + random.Next(1, 1000).ToString().PadLeft(3, '0');
-				sorted.Add(Convert.ToInt64(randomTimestamp), a);
-			}
-			catch { }
-		}
-		
-		var sortedList = sorted.Values.ToList().Reverse<Alias>().ToList();
+		sortedList = GetAliasHistory();
 
 		// create the listView
 		var historyListView = new ListView(sortedList) 
@@ -149,6 +135,30 @@ public class DialogSelectAliases
 		historyListView.SelectedItemChanged += (e) => 
 		{ 
 			//selected = e.Value.ToString();  
+		};
+
+		var historyDelete = new Button("Delete")
+		{
+			X = 1,
+			Y = Pos.Bottom(historyListView) + 1,
+			Width = 8,
+			Height = 1
+		};
+		historyDelete.Clicked += async () => 
+		{
+			int i = 0;
+			foreach (Alias item in sortedList)
+			{
+				if (historyListView.Source.IsMarked(i))
+				{
+					string historyItem = Storage.GetDeadPackDirectoryHistory(item.Name + ".pem");
+					File.Delete(historyItem);
+				}
+				i++;
+			}
+			// refresh the list
+			sortedList = GetAliasHistory();
+			historyListView.SetSource(sortedList);
 		};
 
 		//
@@ -211,7 +221,7 @@ public class DialogSelectAliases
 			Height = Dim.Fill() - 2
 		};
 		historyAlias.Border.BorderStyle = BorderStyle.Single;
-		historyAlias.Add(historyListView);
+		historyAlias.Add(historyListView, historyDelete);
 
 		dialog.Add(searchAlias, historyAlias);
 		Application.Run (dialog);
@@ -259,5 +269,28 @@ public class DialogSelectAliases
 		listView.SetFocus();
 
 		lastSearch = lookup;
+	}
+
+	private static List<Alias> GetAliasHistory()
+	{
+		// get a list of history aliases sorted by date (earliest first)
+		List<Alias> history = Storage.GetAliases("history");
+
+		SortedList<long, Alias> sorted = new SortedList<long, Alias>();
+		Random random = new Random();
+		foreach (Alias a in history)
+		{
+			long timestamp = a.Timestamp;
+			try
+			{
+				string randomTimestamp = timestamp.ToString() + random.Next(1, 1000).ToString().PadLeft(3, '0');
+				sorted.Add(Convert.ToInt64(randomTimestamp), a);
+			}
+			catch { }
+		}
+		
+		var sortedList = sorted.Values.ToList().Reverse<Alias>().ToList();
+
+		return sortedList;
 	}
 }

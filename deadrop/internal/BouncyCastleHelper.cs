@@ -693,6 +693,17 @@ namespace publickeyserver
 				return (false, new byte[0]);
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		public static async Task<byte[]> GetCaRootFingerprint(string domain)
+		{
+			byte[] cacertBytes = System.IO.File.ReadAllBytes($"cacert.{GLOBALS.origin}.pem");
+			byte[] cacertDecrypted = BouncyCastleHelper.DecryptWithKey(cacertBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
+			string certPEM = cacertDecrypted.FromBytes();
+
+			byte[] fingerprint = GetFingerprint(certPEM);
+
+			return fingerprint;	
+		}
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		public static bool VerifySignature(byte[] message, byte[] signature, AsymmetricKeyParameter publicKey)
 		{
 			var signer = SignerUtilities.GetSigner("SHA512WITHRSA");

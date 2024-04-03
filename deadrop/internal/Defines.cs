@@ -6,7 +6,7 @@ namespace publickeyserver
 
     static class GLOBALS
     {
-		public static string version = "v1";
+		public static string version = "1.0.0";
         public static string s3key = "";
         public static string s3secret = "";
         public static string s3endpoint = "";

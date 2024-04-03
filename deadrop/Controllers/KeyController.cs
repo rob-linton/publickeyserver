@@ -72,8 +72,9 @@ namespace publickeyserver
 
 			Dictionary<string, dynamic> ret = new Dictionary<string, dynamic>();
 
+			ret["application"] = "deadrop";
+			ret["version"] = GLOBALS.version;
 			ret["origin"] = GLOBALS.origin;
-
 			ret["uptime"] = Math.Round(runtime.TotalSeconds);
 			ret["certs_served"] = GLOBALS.status_certs_served;
 			ret["certs_enrolled"] = GLOBALS.status_certs_enrolled;
@@ -97,6 +98,13 @@ namespace publickeyserver
 
 				// test to make sure we can read it
 				ca = (Org.BouncyCastle.X509.X509Certificate)BouncyCastleHelper.fromPEM(certPEM);
+
+				// get the signature
+				byte[] fingerprint = await BouncyCastleHelper.GetCaRootFingerprint(GLOBALS.origin);
+				List<string> sig = Misc.GenerateSignature(fingerprint);
+
+				// serialise sig to a json string
+				ret["root_ca_signature"] = sig;
 
 				ret["status"] = "OK";
 

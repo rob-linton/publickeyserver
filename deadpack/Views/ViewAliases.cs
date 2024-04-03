@@ -18,9 +18,10 @@ public class ViewAliases : Window
 
 	}
 
+	
+
 	public void Build()
 	{
-		
 
 		// remove all of the existing widgets from this view
 		RemoveAll();
@@ -119,9 +120,23 @@ public class ViewAliases : Window
 		outbox.OpenSelectedItem += listView_OpenOutbox;
 		outbox.ColorScheme = Globals.StandardColors;
 		Add(received, listViewReceived, sent, listViewSent, outbox, addAlias, delete, refresh);		
-		
-		
-		
+
+
+		// Open the first deadpack
+		_ = Application.MainLoop.AddIdle(() =>
+		{
+			try
+			{
+				Alias? a = aliasesReceived.FirstOrDefault();
+				Globals.Alias = a!.Name;
+				Globals.Location = "inbox";
+				Globals.ViewDeadPacks?.Build(Globals.Alias, Globals.Location);
+				Globals.ViewRight?.FocusFirst();
+			}
+			catch { }
+			return false; // cancel the idle so it only runs once
+		});
+
 	}
 
 	private void listView_OpenInbox(ListViewItemEventArgs e)
