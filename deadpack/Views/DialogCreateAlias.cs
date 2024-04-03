@@ -112,10 +112,10 @@ public class DialogCreateAlias
 
 				var s = JsonSerializer.Deserialize<Status>(result);
 				
-				string application = s?.Application ?? "";
+				string application = s!.Application ?? "";
 				if (application == "deadrop")
 				{
-					string output = "Deadrop server found. Version: " + s.Version;
+					string output = "Deadrop server found. Version: " + s.Version??"0.0.0";
 					progressLabel.Text = output;
 					/*
 						ret["MaxBucketFiles"] = GLOBALS.MaxBucketFiles;
@@ -128,9 +128,9 @@ public class DialogCreateAlias
 					output = output + $"\nCerts Enrolled since up: {s.CertsEnrolled}";
 					output = output + $"\n";
 					output = output + $"\nAnonymous aliases allowed: {s.anonymous}";
-					output = output + $"\nMaximum deadrop size: {Misc.FormatBytes(s?.MaxBucketSize ?? 0)}";
-					output = output + $"\nMaximum deadpacks allowed in a deadrop: {s?.MaxBucketFiles ?? 0}";
-					output = output + $"\nMaximum deadPack size: {Misc.FormatBytes(s?.MaxPackageSize ?? 0)}";
+					output = output + $"\nMaximum deadrop size: {Misc.FormatBytes(s.MaxBucketSize ?? 0)}";
+					output = output + $"\nMaximum deadpacks allowed in a deadrop: {s.MaxBucketFiles ?? 0}";
+					output = output + $"\nMaximum deadPack size: {Misc.FormatBytes(s.MaxPackageSize ?? 0)}";
 					output = output + $"\n";
 					output = output + $"\nRoot CA signature";
 					output = output + $"\n-----------------";
@@ -155,7 +155,7 @@ public class DialogCreateAlias
 					return;
 				}
 			}
-			catch (Exception ex)
+			catch
 			{ 
 				progressLabel.Text = "Deadrop server not found.";
 				new DialogMessage(progressLabel.Text.ToString()??"", "Check Server");
