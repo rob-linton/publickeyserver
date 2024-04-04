@@ -60,7 +60,7 @@ namespace publickeyserver
 				{
 					try
 					{
-						bool exists = await AwsHelper.Exists(client, $"{alias}.pem");
+						bool exists = await AwsHelper.Exists(client, $"{GLOBALS.origin}/{alias}.pem");
 
 						if (!exists)
 							break;

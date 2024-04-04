@@ -43,7 +43,7 @@ namespace publickeyserver
 		// ------------------------------------------------------------------------------------------------------------
 		public async Task<(int count, long totalSize)> SumPackages(string recipient)
 		{
-			string key = $"packages/{recipient}";
+			string key = $"{GLOBALS.origin}/packages/{recipient}";
 
 			using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 			{

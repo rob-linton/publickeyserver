@@ -82,7 +82,7 @@ namespace publickeyserver
 					return BadRequest("Package size is zero or less");
 				}
 
-				string keyLocation = $"packages/{recipient}/";
+				string keyLocation = $"{GLOBALS.origin}/packages/{recipient}/";
 				string keyFile = $"{package}";
 
 				string result = await PackageHelper.ValidateSenderAndRecipient(sender, recipient, host, signature, timestamp);
@@ -162,7 +162,7 @@ namespace publickeyserver
 		public async Task<IActionResult> DownloadPackage(string package, string recipient, string timestamp, string signature)
 		{
 			bool hasErrored = false;
-			string key = $"packages/{recipient}/{package}";
+			string key = $"{GLOBALS.origin}/packages/{recipient}/{package}";
 			try
 			{
 				// fix the signature

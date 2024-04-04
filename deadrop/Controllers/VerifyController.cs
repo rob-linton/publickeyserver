@@ -58,7 +58,7 @@ namespace publickeyserver
 
 				// need to generate the token and email to the email address
 				// generate a token
-				string tokenFile = $"tokens/{email}.token";
+				string tokenFile = $"{GLOBALS.origin}/tokens/{email}.token";
 				
 				bool generateToken = false;
 				try

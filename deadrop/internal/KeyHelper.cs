@@ -70,10 +70,10 @@ namespace publickeyserver
 				//
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					await AwsHelper.Put(client, $"cert/{alias}.pem", certPEM.ToBytes());
+					await AwsHelper.Put(client, $"{GLOBALS.origin}/cert/{alias}.pem", certPEM.ToBytes());
 					if (String.IsNullOrEmpty(email) == false)
 					{
-						await AwsHelper.Put(client, $"email/{email}/{alias}.pem", certPEM.ToBytes());
+						await AwsHelper.Put(client, $"{GLOBALS.origin}/email/{email}/{alias}.pem", certPEM.ToBytes());
 					}
 				}
 

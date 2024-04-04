@@ -57,7 +57,7 @@ namespace publickeyserver
 					port = ":" + Request.Host.Port;
 				string host = Request.Host.Host + port;
 				
-				string key = $"packages/{recipient}";
+				string key = $"{GLOBALS.origin}/packages/{recipient}";
 
 				string result = await PackageHelper.ValidateRecipient(recipient, host, signature, timestamp);
 				if (!String.IsNullOrEmpty(result))

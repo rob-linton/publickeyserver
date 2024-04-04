@@ -193,7 +193,7 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					raw = await AwsHelper.Get(client, $"cert/{alias}.pem");
+					raw = await AwsHelper.Get(client, $"{GLOBALS.origin}/cert/{alias}.pem");
 				};
 
 				string cert = raw.FromBytes();
@@ -231,7 +231,7 @@ namespace publickeyserver
 				List<S3File> aliasList;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					aliasList = await AwsHelper.List(client, $"email/{email}");
+					aliasList = await AwsHelper.List(client, $"{GLOBALS.origin}/email/{email}");
 				};
 
 				// loop through the list and get the newest s3file object
@@ -257,7 +257,7 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					raw = await AwsHelper.Get(client, $"email/{email}/{alias}.pem");
+					raw = await AwsHelper.Get(client, $"{GLOBALS.origin}/email/{email}/{alias}.pem");
 				};
 
 				string cert = raw.FromBytes();
@@ -329,7 +329,7 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					raw = await AwsHelper.Get(client, $"cert/{alias}.pem");
+					raw = await AwsHelper.Get(client, $"{GLOBALS.origin}/cert/{alias}.pem");
 				};
 
 				string cert = raw.FromBytes();
@@ -498,7 +498,7 @@ namespace publickeyserver
 				if (email.Length > 0 && token.Length > 0)
 				{
 					// validate the token
-					string tokenFile = $"tokens/{email}.token";
+					string tokenFile = $"{GLOBALS.origin}/tokens/{email}.token";
 					string tokenFileContents = "";
 					try
 					{
@@ -614,7 +614,7 @@ namespace publickeyserver
 				//
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					await AwsHelper.Put(client, $"cert/{alias}.pem", certPEM.ToBytes());
+					await AwsHelper.Put(client, $"{GLOBALS.origin}/cert/{alias}.pem", certPEM.ToBytes());
 				}
 
 
@@ -682,7 +682,7 @@ namespace publickeyserver
 		{
 			alias = alias + "." + GLOBALS.origin;
 
-			string key = $"cert/{alias}.pem";
+			string key = $"{GLOBALS.origin}/cert/{alias}.pem";
 			try
 			{
 				// fix the signature
@@ -748,7 +748,7 @@ namespace publickeyserver
 				if (!String.IsNullOrEmpty(result))
 					return BadRequest(result);
 
-				string key = $"email/{email}/{longAlias}.pem";
+				string key = $"{GLOBALS.origin}/email/{email}/{longAlias}.pem";
 				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
 					var request = new DeleteObjectRequest
