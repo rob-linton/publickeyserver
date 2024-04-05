@@ -469,9 +469,12 @@ public class BouncyCastleHelper
 			{
 				byte[] chunk = new byte[bytesRead];
 				Array.Copy(buffer, chunk, bytesRead);
+			
+				// compress the chunk
+				byte[] compressedChunk = Misc.CompressBytes(chunk);
 
 				// encrypt the chunk
-				byte[] encryptedChunk = EncryptWithKey(chunk, key, nonce);
+				byte[] encryptedChunk = EncryptWithKey(compressedChunk, key, nonce);
 
 				// save the chunk to a file
 				File.WriteAllBytes($"{filename}.deadrop{chunkNumber}", encryptedChunk);

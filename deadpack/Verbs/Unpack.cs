@@ -67,8 +67,6 @@ class Unpack
 			opts.File = opts.File.Replace(".deadpack", "") + ".deadpack";
 			string zipFile = opts.File;
 
-			
-
 			if (String.IsNullOrEmpty(Globals.Password))
 			Globals.Password = Misc.GetPassword();
 
@@ -85,10 +83,8 @@ class Unpack
 
 			string outputDirectory = opts.Output;
 			
-
 			if (String.IsNullOrEmpty(Globals.Password))
 				Globals.Password = Misc.GetPassword();
-
 
 			try
 			{
@@ -300,7 +296,10 @@ class Unpack
 
 									byte[] decryptedBlock = BouncyCastleHelper.DecryptWithKey(encryptedBlock, key, nonce);
 
-									fs.Write(decryptedBlock, 0, decryptedBlock.Length);
+									// decompress the block
+									byte[] decompressedBlock = decryptedBlock = Misc.DecompressBytes(decryptedBlock);
+									
+									fs.Write(decompressedBlock, 0, decompressedBlock.Length);
 									Misc.LogChar("#");
 								}
 							}
