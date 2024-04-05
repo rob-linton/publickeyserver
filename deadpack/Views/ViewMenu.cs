@@ -108,11 +108,7 @@ class ViewMenu
 		string message = 
 @"
     DeadPack is a secure (and optionally anonymous) package delivery service that uses the DeadDrop protocol.    
-Written by Rob Linton, 2024.
 Version 1.0.0
-
-More information can be found at:
-https://github/rob-linton/publickeyserver/wiki/About-DeadPack
 ";
 
 		MessageBox.ErrorQuery("About", message, "Ok");

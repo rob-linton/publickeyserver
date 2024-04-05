@@ -82,7 +82,7 @@ public class DialogCreateAlias
 			Height = 1, 
 			ColorScheme = Globals.WhiteOnBlue
 		};
-		serverInfo.Text = "Instructions for setting up your own Deadrop server located at https://github.com/rob-linton/deadrop/wiki/Deadrop-Server-Setup";
+		serverInfo.Text = "For instructions for setting up your own Deadrop server contact Senetas";
 
 		domain = new TextField() 
 		{ 
