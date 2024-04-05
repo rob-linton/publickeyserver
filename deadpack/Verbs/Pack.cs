@@ -198,7 +198,7 @@ class Pack
 							byte[] hash = BouncyCastleHelper.GetHashOfFile(chunk);
 							string sHash = BouncyCastleHelper.ConvertHashToString(hash);
 
-							zip.CreateEntryFromFile(chunk, sHash);
+							zip.CreateEntryFromFile(chunk, sHash, CompressionLevel.NoCompression);
 
 							// add the entry to the list
 							blockList.Add(sHash);
@@ -444,10 +444,10 @@ class Pack
 				File.WriteAllBytes("envelope.signature", envelopeSignature);
 
 				// add them to the zip file
-				zip.CreateEntryFromFile("manifest", "manifest");
-				zip.CreateEntryFromFile("envelope", "envelope");
-				zip.CreateEntryFromFile("manifest.signature", "manifest.signature");
-				zip.CreateEntryFromFile("envelope.signature", "envelope.signature");
+				zip.CreateEntryFromFile("manifest", "manifest", CompressionLevel.NoCompression);
+				zip.CreateEntryFromFile("envelope", "envelope", CompressionLevel.NoCompression);
+				zip.CreateEntryFromFile("manifest.signature", "manifest.signature", CompressionLevel.NoCompression);
+				zip.CreateEntryFromFile("envelope.signature", "envelope.signature", CompressionLevel.NoCompression);
 
 
 				// now delete them
