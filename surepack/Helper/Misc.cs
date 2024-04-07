@@ -300,7 +300,7 @@ public class Misc
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
-	/// Logs the header information for the DEADPACK application.
+	/// Logs the header information for the SUREPACK application.
 	/// </summary>
 	public static void LogHeader()
 	{
@@ -309,8 +309,8 @@ public class Misc
 			LogArt();
 
 			LogLine("===================================================================================================");
-			LogLine($"DEADPACK {Globals.version} (suredrop.org)");
-			LogLine("[D]eadrop's [E]ncrypted [A]rchive and [D]istribution [PACK]age (DEADPACK)");
+			LogLine($"SUREPACK {Globals.version} (suredrop.org)");
+			LogLine("[D]eadrop's [E]ncrypted [A]rchive and [D]istribution [PACK]age (SUREPACK)");
 			LogLine("Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms");
 			LogLine("Acknowledgement to the BouncyCastle C# Crypto library");
 			LogLine("===================================================================================================\n");
@@ -318,7 +318,7 @@ public class Misc
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
-	/// Displays the Dead Drop ASCII art logo in the console.
+	/// Displays the Sure Drop ASCII art logo in the console.
 	/// </summary>
 
 	public static void LogArt()

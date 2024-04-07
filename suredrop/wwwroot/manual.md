@@ -1,9 +1,9 @@
-# Deadpack Manual  
+# Surepack Manual  
 
 ```  
 =========================================================================================================================================================
-DEADPACK v1.0 (suredrop.org)
-[D]eadrop's [E]ncrypted [A]rchive and [D]istribution [PACK]age (DEADPACK)
+SUREPACK v1.0 (suredrop.org)
+[D]eadrop's [E]ncrypted [A]rchive and [D]istribution [PACK]age (SUREPACK)
 Copyright Rob Linton, 2023
 Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms
 Acknowledgement to the BouncyCastle C# Crypto library
@@ -11,11 +11,11 @@ Acknowledgement to the BouncyCastle C# Crypto library
 ```  
 
 
-Deadpack is a command line way to send post quantum end-to-end encrypted files to a person without having to know their identity. If you choose however, you can link your alias to your email address to make it easier for people to find and send files to you.  
+Surepack is a command line way to send post quantum end-to-end encrypted files to a person without having to know their identity. If you choose however, you can link your alias to your email address to make it easier for people to find and send files to you.  
 
 The executable surepack relies on its companion web service suredrop.org, and there are no restrictions or limits provided on creating and storing aliases.  
-There are however limits to how many surepacks can be sent and received via suredrop.org. (Mainly because I'm not made of money and the Dead Drop service is hosted at my own cost)  
-If this is a problem you can host your own instance of suredrop.org on your own domain. Deadpack will happily use your public key server instead. Instructions on how to do this *TBA*.  
+There are however limits to how many surepacks can be sent and received via suredrop.org. (Mainly because I'm not made of money and the Sure Drop service is hosted at my own cost)  
+If this is a problem you can host your own instance of suredrop.org on your own domain. Surepack will happily use your public key server instead. Instructions on how to do this *TBA*.  
 
 This site is a thought experiment by Rob Linton, a Developer based in Melbourne, Australia, on how to send an anonymous end-to-end encrypted files, and uses Post Quantum Cryptography, specifically Crystal-Kyber.  
 Acknowledgement to the BouncyCastle C# Crypto library.
@@ -173,10 +173,10 @@ Create a surepack for the users rob@some.email.com, if they don't have an alias 
 
 ## surepack send
 
-Send a surepack to an alias using Dead Drop.  
+Send a surepack to an alias using Sure Drop.  
 
-Please note there is no requirement to use Dead Drop to send a surepack to someone, once created a surepack can be sent using any traditional means such as email etc.
-Dead Drop currently limits 2 pending surepacks per alias, which means until they receive them they cannot receive any others.
+Please note there is no requirement to use Sure Drop to send a surepack to someone, once created a surepack can be sent using any traditional means such as email etc.
+Sure Drop currently limits 2 pending surepacks per alias, which means until they receive them they cannot receive any others.
 
 **-i -input [The surepack to send]**  
 
@@ -193,11 +193,11 @@ surepack send -i my.surepack
 
 ## surepack receive
 
-Download any pending surepacks from the Dead drop server.
+Download any pending surepacks from the Sure drop server.
 
 **-a -alias [alias to receive for]**
 
-Alias to use when checking for surepacks on the Dead Drop server. If no alias is specified, surepack will iterate through your aliases one at a time and check for waiting surepacks.  
+Alias to use when checking for surepacks on the Sure Drop server. If no alias is specified, surepack will iterate through your aliases one at a time and check for waiting surepacks.  
 Also if no alias is specified -force will for set to true.  
 
 **-f -force**
@@ -214,7 +214,7 @@ Check for surepacks every x seconds and don't exit
 surepack receive -s 60
 ```  
 
-Check for any incoming surepacks from the Dead Drop server from any of my aliases and download them automatically, checking every 60 seconds.
+Check for any incoming surepacks from the Sure Drop server from any of my aliases and download them automatically, checking every 60 seconds.
 
 ```bash
 surepack receive -a missouri-precise-samsung.suredrop.org
@@ -278,5 +278,5 @@ Certify that the alias is valid.
 surepack certify -a rob@some.email.com
 ```
 
-Certify that the email address has a Dead Drop alias associated with it
+Certify that the email address has a Sure Drop alias associated with it
 

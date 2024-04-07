@@ -30,7 +30,7 @@ class ViewMenu
 						var filePaths = openDialog.FilePaths;
 
 						string file = filePaths[0];
-						OpenDeadpack(file);
+						OpenSurepack(file);
 					}
                     
                 },null,null,Key.CtrlMask | Key.O),
@@ -107,14 +107,14 @@ class ViewMenu
 	{
 		string message = 
 @"
-    SurePack is a secure (and optionally anonymous) package delivery service that uses the DeadDrop protocol.    
+    SurePack is a secure (and optionally anonymous) package delivery service that uses the SureDrop protocol.    
 Version 1.0.0
 ";
 
 		MessageBox.ErrorQuery("About", message, "Ok");
 	}
 
-	public static void OpenDeadpack(string file)
+	public static void OpenSurepack(string file)
 	{
 		// get a list of private aliases
 		List<Alias> aliases = Storage.GetAliases();

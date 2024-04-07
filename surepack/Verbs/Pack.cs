@@ -30,7 +30,7 @@ public class PackOptions : Options
 	[Option('m', "message", HelpText = "Optional message")]
     public string? Message { get; set; }
 
-	[Option('s', "subject", HelpText = "Deadpack subject")]
+	[Option('s', "subject", HelpText = "Surepack subject")]
     public string? Subject { get; set; }
 
 	[Option('f', "from", Required = true, HelpText = "From alias")]
@@ -67,7 +67,7 @@ class Pack
 
 			Misc.LogHeader();
 
-			Misc.LogLine($"Deadpacking...");
+			Misc.LogLine($"Surepacking...");
 			Misc.LogLine($"Input: {opts.File}");
 			string r = opts.Recurse ? "Yes" : "No";
 			Misc.LogLine($"Search Subdirectories: {r}");

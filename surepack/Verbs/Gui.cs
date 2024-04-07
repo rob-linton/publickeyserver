@@ -40,7 +40,7 @@ class Gui
 			{
 				if (!String.IsNullOrEmpty(opts?.UnpackFile))
 				{
-					ViewMenu.OpenDeadpack(opts.UnpackFile);
+					ViewMenu.OpenSurepack(opts.UnpackFile);
 					Application.RequestStop();
 				}
 				else if (!String.IsNullOrEmpty(opts?.File))
