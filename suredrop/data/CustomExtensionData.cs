@@ -1,0 +1,19 @@
+using System.Text.Json.Serialization;
+
+namespace suredrop;
+
+class CustomExtensionData
+{
+	[JsonPropertyName("kyber_key")]
+	public string? KyberKey { get; set; }
+
+	[JsonPropertyName("dilithium_key")]
+	public string? DilithiumKey { get; set; }
+
+	[JsonPropertyName("email")]
+	public string? Email { get; set; }
+
+	[JsonPropertyName("token")]
+	public string? Token { get; set; }
+
+}

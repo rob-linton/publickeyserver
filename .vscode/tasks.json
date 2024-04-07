@@ -2,24 +2,24 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "build_deadrop",
+			"label": "build_suredrop",
 			"command": "dotnet",
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/deadrop/deadrop.csproj",
+				"${workspaceFolder}/suredrop/suredrop.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary;ForceNoAlign"
 			],
 			"problemMatcher": "$msCompile"
 		},
 		{
-			"label": "build_deadpack",
+			"label": "build_surepack",
 			"command": "dotnet",
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/deadpack/deadpack.csproj",
+				"${workspaceFolder}/surepack/surepack.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary;ForceNoAlign"
 			],
@@ -31,7 +31,7 @@
 			"type": "process",
 			"args": [
 				"publish",
-				"${workspaceFolder}/deadrop/deadrop.csproj",
+				"${workspaceFolder}/suredrop/suredrop.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary;ForceNoAlign"
 			],
@@ -45,7 +45,7 @@
 				"watch",
 				"run",
 				"--project",
-				"${workspaceFolder}/deadrop/deadrop.csproj"
+				"${workspaceFolder}/suredrop/suredrop.csproj"
 			],
 			"problemMatcher": "$msCompile"
 		},
