@@ -13,14 +13,14 @@ public class Storage
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack"));
-		string  deadDropFolder = Path.Join(localAppData, "surepack");
+		string  sureDropFolder = Path.Join(localAppData, "surepack");
 
-		Directory.CreateDirectory(deadDropFolder);
+		Directory.CreateDirectory(sureDropFolder);
 
 		string s = JsonSerializer.Serialize(settings);
 
 		// save it in json format
-		File.WriteAllText(Path.Join(deadDropFolder, "settings.json"), s);
+		File.WriteAllText(Path.Join(sureDropFolder, "settings.json"), s);
 	}
 	// get the settings
 	public static Settings GetSettings()
@@ -30,11 +30,11 @@ public class Storage
 			// get the users home userdata directoru
 			string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 			Directory.CreateDirectory(Path.Join(localAppData, "surepack"));
-			string deadDropFolder = Path.Join(localAppData, "surepack");
+			string sureDropFolder = Path.Join(localAppData, "surepack");
 
-			Directory.CreateDirectory(deadDropFolder);
+			Directory.CreateDirectory(sureDropFolder);
 
-			string settings = File.ReadAllText(Path.Join(deadDropFolder, "settings.json"));
+			string settings = File.ReadAllText(Path.Join(sureDropFolder, "settings.json"));
 			var deserializedSettings = JsonSerializer.Deserialize<Settings>(settings);
 			return deserializedSettings ?? new Settings();
 		}
@@ -49,12 +49,12 @@ public class Storage
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", location));
-		string  deadDropFolder = Path.Join(localAppData, "surepack", location);
+		string  sureDropFolder = Path.Join(localAppData, "surepack", location);
 
-		Directory.CreateDirectory(deadDropFolder);
+		Directory.CreateDirectory(sureDropFolder);
 
 		// save it as PEM format
-		File.WriteAllText(Path.Join(deadDropFolder, $"{alias}.pem"), cert);
+		File.WriteAllText(Path.Join(sureDropFolder, $"{alias}.pem"), cert);
 	}
 
 	public static string GetCert(string alias, string location = "aliases")
@@ -62,11 +62,11 @@ public class Storage
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", location));
-		string  deadDropFolder = Path.Join(localAppData, "surepack", location);
+		string  sureDropFolder = Path.Join(localAppData, "surepack", location);
 
-		Directory.CreateDirectory(deadDropFolder);
+		Directory.CreateDirectory(sureDropFolder);
 
-		return File.ReadAllText(Path.Join(deadDropFolder, $"{alias}.pem"));
+		return File.ReadAllText(Path.Join(sureDropFolder, $"{alias}.pem"));
 	}
 
 	/// <summary>
@@ -89,12 +89,12 @@ public class Storage
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "aliases"));
-		string  deadDropFolder = Path.Join(localAppData, "surepack", "aliases");
+		string  sureDropFolder = Path.Join(localAppData, "surepack", "aliases");
 
-		Directory.CreateDirectory(deadDropFolder);
+		Directory.CreateDirectory(sureDropFolder);
 
 		// save it as PEM format
-		File.WriteAllBytes(Path.Join(deadDropFolder, $"{alias}"), cipherText);
+		File.WriteAllBytes(Path.Join(sureDropFolder, $"{alias}"), cipherText);
 	}
 	/// <summary>
 	/// Retrieves a list of aliases from the aliases directory.
@@ -107,9 +107,9 @@ public class Storage
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", location));
-		string  deadDropFolder = Path.Join(localAppData, "surepack", location);
+		string  sureDropFolder = Path.Join(localAppData, "surepack", location);
 
-		foreach (string file in Directory.EnumerateFiles(deadDropFolder, $"*.pem"))
+		foreach (string file in Directory.EnumerateFiles(sureDropFolder, $"*.pem"))
 		{
 			string sAlias = Path.GetFileNameWithoutExtension(file).Replace($".pem", "");
 
@@ -142,14 +142,14 @@ public class Storage
 			// get the users home userdata directoru
 			string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 			Directory.CreateDirectory(Path.Join(localAppData, "surepack", "aliases", "deleted"));
-			string deadDropFolder = Path.Join(localAppData, "surepack", "aliases");
-			string deadDropDeletedFolder = Path.Join(localAppData, "surepack", "aliases", "deleted");
+			string sureDropFolder = Path.Join(localAppData, "surepack", "aliases");
+			string sureDropDeletedFolder = Path.Join(localAppData, "surepack", "aliases", "deleted");
 
-			File.Move(Path.Join(deadDropFolder, $"{alias}.rsa"), Path.Join(deadDropDeletedFolder, $"{alias}.rsa"));
-			File.Move(Path.Join(deadDropFolder, $"{alias}.dilithium"), Path.Join(deadDropDeletedFolder, $"{alias}.dilithium"));
-			File.Move(Path.Join(deadDropFolder, $"{alias}.kyber"), Path.Join(deadDropDeletedFolder, $"{alias}.kyber"));
-			File.Move(Path.Join(deadDropFolder, $"{alias}.root"), Path.Join(deadDropDeletedFolder, $"{alias}.root"));
-			File.Move(Path.Join(deadDropFolder, $"{alias}.pem"), Path.Join(deadDropDeletedFolder, $"{alias}.pem"));
+			File.Move(Path.Join(sureDropFolder, $"{alias}.rsa"), Path.Join(sureDropDeletedFolder, $"{alias}.rsa"));
+			File.Move(Path.Join(sureDropFolder, $"{alias}.dilithium"), Path.Join(sureDropDeletedFolder, $"{alias}.dilithium"));
+			File.Move(Path.Join(sureDropFolder, $"{alias}.kyber"), Path.Join(sureDropDeletedFolder, $"{alias}.kyber"));
+			File.Move(Path.Join(sureDropFolder, $"{alias}.root"), Path.Join(sureDropDeletedFolder, $"{alias}.root"));
+			File.Move(Path.Join(sureDropFolder, $"{alias}.pem"), Path.Join(sureDropDeletedFolder, $"{alias}.pem"));
 		}
 		catch { }
 	}
@@ -171,12 +171,12 @@ public class Storage
 		// get the users home userdata directoru
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "aliases"));
-		string  deadDropFolder = Path.Join(localAppData, "surepack", "aliases");
+		string  sureDropFolder = Path.Join(localAppData, "surepack", "aliases");
 
-		Directory.CreateDirectory(deadDropFolder);
+		Directory.CreateDirectory(sureDropFolder);
 
 		
-		byte[] cipherText = File.ReadAllBytes(Path.Join(deadDropFolder, $"{alias}"));
+		byte[] cipherText = File.ReadAllBytes(Path.Join(sureDropFolder, $"{alias}"));
 
 		byte[]? key = password?.ToBytes();
 
@@ -214,11 +214,11 @@ public class Storage
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "inbox", alias));
-		string  deadDropFolder = Path.Join(localAppData, "surepack", "inbox", alias);
+		string  sureDropFolder = Path.Join(localAppData, "surepack", "inbox", alias);
 		if (string.IsNullOrEmpty(dir))
-			return deadDropFolder;
+			return sureDropFolder;
 		else
-			return Path.Join(deadDropFolder, dir);
+			return Path.Join(sureDropFolder, dir);
 	}
 
 	public static string GetSurePackDirectorySent(string alias, string dir = "")
@@ -226,11 +226,11 @@ public class Storage
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "sent", alias));
-		string  deadDropFolder = Path.Join(localAppData, "surepack", "sent", alias);
+		string  sureDropFolder = Path.Join(localAppData, "surepack", "sent", alias);
 		if (string.IsNullOrEmpty(dir))
-			return deadDropFolder;
+			return sureDropFolder;
 		else
-			return Path.Join(deadDropFolder, dir);
+			return Path.Join(sureDropFolder, dir);
 	}
 
 	public static string GetSurePackDirectoryOutbox(string dir = "")
@@ -238,11 +238,11 @@ public class Storage
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "outbox"));
-		string  deadDropFolder = Path.Join(localAppData, "surepack", "outbox");
+		string  sureDropFolder = Path.Join(localAppData, "surepack", "outbox");
 		if (string.IsNullOrEmpty(dir))
-			return deadDropFolder;
+			return sureDropFolder;
 		else
-			return Path.Join(deadDropFolder, dir);
+			return Path.Join(sureDropFolder, dir);
 	}
 
 	public static string GetSurePackDirectoryHistory(string dir = "")
@@ -250,11 +250,11 @@ public class Storage
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "history"));
-		string  deadDropFolder = Path.Join(localAppData, "surepack", "history");
+		string  sureDropFolder = Path.Join(localAppData, "surepack", "history");
 		if (string.IsNullOrEmpty(dir))
-			return deadDropFolder;
+			return sureDropFolder;
 		else
-			return Path.Join(deadDropFolder, dir);
+			return Path.Join(sureDropFolder, dir);
 	}
 
 	public static List<SurePack> ListSurePacks(string useAlias, string location)
@@ -264,16 +264,16 @@ public class Storage
 
 		// get the users home userdata directory
 		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-		string deadDropFolder = "";
+		string sureDropFolder = "";
 		if (location == "outbox")
 		{
 			Directory.CreateDirectory(Path.Join(localAppData, "surepack", location));
-			deadDropFolder = Path.Join(localAppData, "surepack", location);
+			sureDropFolder = Path.Join(localAppData, "surepack", location);
 		}
 		else
 		{
 			Directory.CreateDirectory(Path.Join(localAppData, "surepack", location, alias));
-			deadDropFolder = Path.Join(localAppData, "surepack", location, alias);
+			sureDropFolder = Path.Join(localAppData, "surepack", location, alias);
 		}
 
 		// for the outbox we can't open the manifest, so only list the basic information
@@ -282,7 +282,7 @@ public class Storage
 			// get the private key for this alias
 			long i = 1;
 			Random random = new Random();
-			foreach (string file in Directory.EnumerateFiles(deadDropFolder, "*.surepack"))
+			foreach (string file in Directory.EnumerateFiles(sureDropFolder, "*.surepack"))
 			{
 				long size = new FileInfo(file).Length;
 

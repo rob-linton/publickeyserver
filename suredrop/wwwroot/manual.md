@@ -93,7 +93,7 @@ An alias looks like the following:
 `missouri-precise-samsung.suredrop.org`  
 
 An alias comprises of 3 random words drawn from a possible dictionary of 1000 words, which gives a total of 1000 x 1000 x 1000 alias combinations, or 1,000,000,000 (1 billion)
-The words are followed by the dead drop domain. By default it is `suredrop.org`, but as users can host their own dead drop servers, it may be another domain such as `publickeyserver.org`
+The words are followed by the sure drop domain. By default it is `suredrop.org`, but as users can host their own sure drop servers, it may be another domain such as `publickeyserver.org`
 
 You can create as many aliases as you like. This is how people address files to you unless you have optionally associated it with your email address.  
 If you associate multiple aliases with your email address, they can use your email address instead.

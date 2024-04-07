@@ -42,7 +42,7 @@ public class ViewSurePacks : Window
 			RemoveAll();
 
 			// get a list of surepacks
-			List<SurePack> deadPacks = Storage.ListSurePacks(alias, location);
+			List<SurePack> surePacks = Storage.ListSurePacks(alias, location);
 
 			// add the delete button
 			Button delete = new Button("Delete") 
@@ -58,13 +58,13 @@ public class ViewSurePacks : Window
 				{
 					return;
 				}
-				SurePack deadPack = deadPacks.ElementAt(listView.SelectedItem);
-				if (deadPack == null)
+				SurePack surePack = surePacks.ElementAt(listView.SelectedItem);
+				if (surePack == null)
 				{
 					return;
 				}
 				// get the surepack location
-				File.Delete(deadPack.Filename);
+				File.Delete(surePack.Filename);
 				Build(alias, location);
 			};
 
@@ -82,12 +82,12 @@ public class ViewSurePacks : Window
 				{
 					return;
 				}
-				SurePack deadPack = deadPacks.ElementAt(listView.SelectedItem);
-				if (deadPack == null)
+				SurePack surePack = surePacks.ElementAt(listView.SelectedItem);
+				if (surePack == null)
 				{
 					return;
 				}
-				new DialogOpenSurePack().Build(deadPack);
+				new DialogOpenSurePack().Build(surePack);
 			};
 
 			// create the refresh button
@@ -110,7 +110,7 @@ public class ViewSurePacks : Window
 			var heading = new Label("") { X = 0, Y = 2, Width = Dim.Fill(), Height = 1 };
 			heading.Text = SurePack.Headings();
 
-			listView = new ListView(deadPacks) 
+			listView = new ListView(surePacks) 
 			{ 
 				X = 0, 
 				Y = 3, 
@@ -130,8 +130,8 @@ public class ViewSurePacks : Window
 
 	private void listView_OpenSelectedItem(ListViewItemEventArgs e)
 	{
-		SurePack deadPack = (SurePack)e.Value;
-		new DialogOpenSurePack().Build(deadPack!);
+		SurePack surePack = (SurePack)e.Value;
+		new DialogOpenSurePack().Build(surePack!);
 	}
 
 	private void listView_LeftArrow(ListViewItemEventArgs e)

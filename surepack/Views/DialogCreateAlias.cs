@@ -130,7 +130,7 @@ public class DialogCreateAlias
 					output = output + $"\nAnonymous aliases allowed: {s.anonymous}";
 					output = output + $"\nMaximum suredrop size: {Misc.FormatBytes(s.MaxBucketSize ?? 0)}";
 					output = output + $"\nMaximum surepacks allowed in a suredrop: {s.MaxBucketFiles ?? 0}";
-					output = output + $"\nMaximum deadPack size: {Misc.FormatBytes(s.MaxPackageSize ?? 0)}";
+					output = output + $"\nMaximum surePack size: {Misc.FormatBytes(s.MaxPackageSize ?? 0)}";
 					output = output + $"\n";
 					output = output + $"\nRoot CA signature";
 					output = output + $"\n-----------------";

@@ -17,9 +17,9 @@ public class DialogCreateSurePack
 		TextView from = new TextView();
 		TextView subject = new TextView();
 		TextView message = new TextView();
-		//string deadPackMessage = "";
-		List<string> deadPackRecipients = new List<string>();
-		string[] deadPackFiles = new string[0];
+		//string surePackMessage = "";
+		List<string> surePackRecipients = new List<string>();
+		string[] surePackFiles = new string[0];
 		bool recursive = false;
 		//string filename = "";
 
@@ -41,7 +41,7 @@ public class DialogCreateSurePack
 			{
 				File = filename,
 				Recurse = recursive,
-				InputAliases = deadPackRecipients,
+				InputAliases = surePackRecipients,
 				Output = "",
 				Message = message.Text.ToString(),
 				Subject = subject.Text.ToString(),
@@ -221,7 +221,7 @@ public class DialogCreateSurePack
 			Width = Dim.Fill () - 61,
 			Height = Dim.Fill () - 2
 		};
-		var files = new ListView(deadPackFiles)
+		var files = new ListView(surePackFiles)
 		{
 			X = 1,
 			Y = 1,
@@ -244,7 +244,7 @@ public class DialogCreateSurePack
 		};
 		addFiles.Clicked += () => 
 		{
-			(filename, recursive, deadPackFiles) = new DialogSelectFiles().Build("Select Files", filename);
+			(filename, recursive, surePackFiles) = new DialogSelectFiles().Build("Select Files", filename);
 			string[] listFiles = Misc.GetFiles(filename, false);
 			files.SetSource(listFiles);
 		};
@@ -260,7 +260,7 @@ public class DialogCreateSurePack
             Height = Dim.Fill () - 2,
 			TabStop = false,
         };
-		var recipients = new ListView(deadPackRecipients) 
+		var recipients = new ListView(surePackRecipients) 
 		{ 
 			X = 1, 
 			Y = 1, 
@@ -287,13 +287,13 @@ public class DialogCreateSurePack
 			foreach (var a in lookupAlias)
 			{
 				// if it does not already exist then add it
-				if (!deadPackRecipients.Contains(a))
+				if (!surePackRecipients.Contains(a))
 				{
-					deadPackRecipients.Add(a);
+					surePackRecipients.Add(a);
 					extract.Enabled = true;
 				}
 			}
-			recipients.SetSource(deadPackRecipients);
+			recipients.SetSource(surePackRecipients);
 			
 			
 		};

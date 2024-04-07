@@ -10,9 +10,9 @@ namespace suredrop.Verbs;
 public class DialogOpenSurePack 
 {
 	// build
-	public void Build(SurePack deadPack)
+	public void Build(SurePack surePack)
 	{
-		//SurePack deadPack = (SurePack)e.Value;
+		//SurePack surePack = (SurePack)e.Value;
 
 		//Enums.DialogReturn result = Enums.DialogReturn.Cancel;
 
@@ -29,8 +29,8 @@ public class DialogOpenSurePack
 		var extract = new Button("Extract");
 		extract.Clicked += () => 
 		{
-			string input = deadPack.Filename;
-			new DialogUnpack().Build(input, deadPack.Alias); 
+			string input = surePack.Filename;
+			new DialogUnpack().Build(input, surePack.Alias); 
 
 			Application.RequestStop (); 
 		};
@@ -52,7 +52,7 @@ public class DialogOpenSurePack
 			Width = Dim.Fill() - 2,
 			Height = Dim.Fill(),
 			TabStop = false,
-			Text = deadPack.From,
+			Text = surePack.From,
 			ReadOnly = true,
 			ColorScheme = Globals.WhiteOnBlue
 		};
@@ -72,7 +72,7 @@ public class DialogOpenSurePack
 		// add the Date Time
 		//
 		DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-		dateTime = dateTime.AddSeconds(deadPack.Timestamp).ToLocalTime();
+		dateTime = dateTime.AddSeconds(surePack.Timestamp).ToLocalTime();
 		string dt = dateTime.ToString("dd-MMM-yyyy hh.mmtt");
 
 
@@ -109,7 +109,7 @@ public class DialogOpenSurePack
 			Y = 1,
 			Width = Dim.Fill() - 1,
 			Height = Dim.Fill(),
-			Text = deadPack.Subject,
+			Text = surePack.Subject,
 			ReadOnly = true,
 			TabStop = false,
 			ColorScheme = Globals.WhiteOnBlue
@@ -134,7 +134,7 @@ public class DialogOpenSurePack
 			Y = 1,
 			Width = Dim.Fill() - 2,
 			Height = Dim.Fill(),
-			Text = deadPack.Message,
+			Text = surePack.Message,
 			ReadOnly = true,
 			TabStop = false,
 			ColorScheme = Globals.WhiteOnBlue
@@ -161,7 +161,7 @@ public class DialogOpenSurePack
 			Height = Dim.Fill () - 2,
 			TabStop = false,
 		};
-		var files = new ListView(deadPack.Files)
+		var files = new ListView(surePack.Files)
 		{
 			X = 1,
 			Y = 1,
@@ -183,7 +183,7 @@ public class DialogOpenSurePack
             Height = Dim.Fill () - 2,
 			TabStop = false,
         };
-		var recipients = new ListView(deadPack.Recipients) 
+		var recipients = new ListView(surePack.Recipients) 
 		{ 
 			X = 1, 
 			Y = 1, 
