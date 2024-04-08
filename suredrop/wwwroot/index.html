@@ -5,60 +5,78 @@
     <title>SureDrop.org</title>
     <style>
         body {
-            background-color: #0e0e0e;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
+            background-color: #1a1a1a;
+            color: #f2f2f2;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
         }
         a {
-            color: #0f0;
+            color: #4a86e8;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
         .container {
             width: 80%;
-            margin: auto;
+            margin: 0 auto;
             padding: 20px;
         }
         .header {
             text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #e6e6e6;
+            margin: 0.5em 0;
+        }
+        p {
+            line-height: 1.6;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: #333;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        ul li a {
+            color: #ffffff;
+        }
+        ul li a:hover {
+            color: #ddd;
+        }
+		pre {
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-		<div style="display: flex; justify-content: center; align-items: center; height: 750px;">
-			<img src="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/skull.png" alt="SureDrop.org" width="800px" height="800px"/>
-		</div>
-
-		<div style="text-align: center;">
-			{CERTIFICATE}
-		</div>
-
-		<p>&nbsp;</p>
         <div class="header">
             <h1>SureDrop.org</h1>
-            <p>Transfer end-to-end post quantum encrypted digital packages comprising of messages and documents of unlimited size using anonymous aliases.</p>
+            <p>Transfer end-to-end post quantum encrypted digital packages comprising of messages and documents of unlimited size using aliases.</p>
             <a href="https://github.com/rob-linton/suredrop/wiki/About">Learn More</a>
         </div>
-        <p>Optionally associate an email address with an alias if you do want to be known and to make it easier for people to find you.</p>
-        <p>An alias looks like this: <code>missouri-precise-samsung.suredrop.org</code></p>
-        <p>However you can run your own Sure Drop server on your own domain, so an alias could look like this:</p> 
-		<p><code>missouri-precise-samsung.yourowndomain.org</code></p>
-        <p>The only restriction is that both the sender alias and the recipient alias must share the same Sure Drop domain.</p>
-        <p>You can have as many aliases as you like, each one is associated with an encrypted private key on your computer and your public key listed on a Sure Drop server.</p>
-        <p>To send someone a digital package you need to know their alias only.</p>
-        <h2>Sure Pack's</h2>
-        <p>Sure Drop digital packages are called SurePack's. A SurePack is Post Quantum encrypted along with traditional asymmetric encryption methods.</p>
-        <a href="https://github.com/rob-linton/suredrop/wiki/Encryption">More about how SurePack encryption works</a>
-        <p>Only the recipient alias can decrypt and unpack a SurePack.</p>
-        <p>Sure Drop also provides a method to transfer SurePack's anonymously on your behalf, mostly because how do you send a SurePack if you don't know who someone is?</p>
-        <p>You can also run your own private Sure Drop server in AWS, (you will need an AWS account as Sure Drop uses AWS S3 and AWS Simple Mail Service)</p>
-        <a href="https://github.com/rob-linton/suredrop/wiki/SureDrop-Server-Setup">Server setup guide</a>
+
+		
+		<div style="text-align: center;">
+			<br>
+			<pre>{CERTIFICATE}</pre>
+			<br>
+		</div>
+
+
         <h2>Download</h2>
         <ul>
-            <li>Windows: <a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/win-x64/surepack.exe">surepack.exe</a></li>
-            <li>Linux: <a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/linux-x64/surepack">surepack</a></li>
-            <li>MacOS: <a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/osx-x64/surepack">surepack</a></li>
+            <li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/win-x64/surepack.exe"><pre>(Windows)  surepack.exe</pre></a></li>
+            <li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/linux-x64/surepack">  <pre>(Linux)    surepack</pre></a></li>
+            <li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/osx-x64/surepack">    <pre>(Mac)      surepack</pre></a></li>
         </ul>
-       
     </div>
 </body>
 </html>

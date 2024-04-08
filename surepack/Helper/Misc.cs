@@ -99,7 +99,7 @@ public class Misc
 		else
 		{	if (String.IsNullOrEmpty(alias))
 			{
-				return "surepack.org";
+				return "suredrop.org";
 			}
 			else
 			{
@@ -310,7 +310,6 @@ public class Misc
 
 			LogLine("===================================================================================================");
 			LogLine($"SUREPACK {Globals.version} (suredrop.org)");
-			LogLine("[D]eadrop's [E]ncrypted [A]rchive and [D]istribution [PACK]age (SUREPACK)");
 			LogLine("Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms");
 			LogLine("Acknowledgement to the BouncyCastle C# Crypto library");
 			LogLine("===================================================================================================\n");
