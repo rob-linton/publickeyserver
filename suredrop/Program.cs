@@ -25,6 +25,7 @@ namespace publickeyserver
                 GLOBALS.s3key = envVars["S3KEY"];
                 GLOBALS.s3secret = envVars["S3SECRET"];
                 GLOBALS.s3endpoint = envVars["S3ENDPOINT"];
+				GLOBALS.sesendpoint = envVars["SESENDPOINT"];
                 GLOBALS.s3bucket = envVars["S3BUCKET"];
                 GLOBALS.origin = envVars["ORIGIN"];
 				GLOBALS.emailFrom = envVars["EMAILFROM"];

@@ -49,7 +49,7 @@ namespace publickeyserver
 
 
 			// Create an Amazon SES client
-			using (var client = new AmazonSimpleEmailServiceClient(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+			using (var client = new AmazonSimpleEmailServiceClient(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.sesendpoint)))
 			{
 				var sendRequest = new Amazon.SimpleEmail.Model.SendEmailRequest
 				{

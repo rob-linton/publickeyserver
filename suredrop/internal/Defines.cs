@@ -10,6 +10,7 @@ namespace publickeyserver
         public static string s3key = "";
         public static string s3secret = "";
         public static string s3endpoint = "";
+		 public static string sesendpoint = "";
         public static string s3bucket = "";
 		public static string s3packages = "";
         public static string origin = "";
