@@ -50,11 +50,12 @@ namespace publickeyserver
 
                 Console.WriteLine("------------------------------------------------------------------------------------------------------------");
                 Console.WriteLine("Reading configuration from env...");
-                Console.WriteLine("AWS region  : " + GLOBALS.s3endpoint);
-                Console.WriteLine("AWS bucket  : " + GLOBALS.s3bucket);
-                Console.WriteLine("AWS key     : " + GLOBALS.s3key);
-                Console.WriteLine("AWS secret  : " + GLOBALS.s3secret);
-                Console.WriteLine("Origin      : " + GLOBALS.origin);
+                Console.WriteLine("AWS region      : " + GLOBALS.s3endpoint);
+                Console.WriteLine("AWS bucket      : " + GLOBALS.s3bucket);
+                Console.WriteLine("AWS key         : " + GLOBALS.s3key);
+                Console.WriteLine("AWS secret      : " + GLOBALS.s3secret);
+                Console.WriteLine("Origin          : " + GLOBALS.origin);
+				Console.WriteLine("AWS SES region  : " + GLOBALS.sesendpoint);
                 Console.WriteLine("------------------------------------------------------------------------------------------------------------");
             }
             else
