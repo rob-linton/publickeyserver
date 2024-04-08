@@ -116,8 +116,8 @@
 			"request": "launch",
 			"preLaunchTask": "build_surepack",
 			"program": "${workspaceFolder}/surepack/bin/Debug/net8.0/surepack.dll",
-			"args": ["pack","-v","1","-d", "localhost:5001", "-p","password", "-f", "collectors-mining-pentium.suredrop.org", "-a","interracial-hurt-timeline.suredrop.org.dilithium","wells-spell-phantom.suredrop.org.kyber","-i","*.jpg", "-s","This is a subject","-m","This is a message"],
-			"cwd": "${workspaceFolder}/surepack/test",
+			"args": ["pack","-v","1","-p","password", "-f", "earn-eligibility-contained.suredrop.org", "-a","earn-eligibility-contained.suredrop.org","-i","*.pdf", "-s","This is a subject","-m","This is a message","-o","Rob Linton.surepack"],
+			"cwd": "~/Downloads",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {
@@ -201,7 +201,8 @@
 			"preLaunchTask": "build_surepack",
 			"program": "${workspaceFolder}/surepack/bin/Debug/net8.0/surepack.dll",
 			"args": [],
-			"cwd": "${workspaceFolder}/surepack/test",
+			//"cwd": "${workspaceFolder}/surepack/test",
+			"cwd": "~/Downloads",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {

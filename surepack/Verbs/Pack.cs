@@ -24,8 +24,8 @@ public class PackOptions : Options
 	[Option('a', "aliases", Required = true, HelpText = "Destination aliases/emails (comma delimited)")]
     public required IEnumerable<string>? InputAliases { get; set; }
 
-	[Option('o', "output", HelpText = "Output package file")]
-    public string? Output { get; set; }	
+	[Option('o', "output", Required = true, HelpText = "Output package file")]
+    public required string Output { get; set; }	
 
 	[Option('m', "message", HelpText = "Optional message")]
     public string? Message { get; set; }
@@ -115,24 +115,7 @@ class Pack
 				Misc.LogLine("  " + filePath);
 			}
 
-			// continue?
-			Misc.LogLine("\nContinue? (Y/n)");
-
-#if DEBUG
-			string? answer = "y";
-#else
-			string? answer = Console.ReadLine();
-#endif
-
-			if (answer == null || answer.ToLower() != "n")
-			{
-				Misc.LogLine($"\nCreating package {opts.Output}...\n");
-			}
-			else
-			{
-				Misc.LogLine("\nAborting...");
-				return 1;
-			}
+			Misc.LogLine($"\nCreating package {opts.Output}...\n");			
 
 			// now load the root fingerprint from a file
 			string rootFingerprintFromFileString = Storage.GetPrivateKey($"{opts.From}.root");

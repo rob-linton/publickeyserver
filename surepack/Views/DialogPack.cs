@@ -41,7 +41,7 @@ public class DialogPack
 		ok.Clicked += async () => {
 			progressBar.Fraction = 0.0F;
 			progressLabel.Text = Misc.UpdateProgressBarLabel(0, 0, "Packing");
-			opts.Output = output.Text.ToString();
+			opts.Output = output.Text.ToString() ?? "output.surepack";
 			
 			// report on progress and execute
 			int result = await Pack.Execute(opts, progress);
