@@ -452,7 +452,7 @@ public class Misc
 				}
 				else if (index == count)
 				{
-					return $"{action} complete";
+					return $"Complete";
 				}
 				else if (index == 0)
 				{
