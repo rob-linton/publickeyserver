@@ -38,6 +38,11 @@ class Gui
 			// Open the surepack if a file is passed in
 			_ = Application.MainLoop.AddIdle(() =>
 			{
+				if (String.IsNullOrEmpty(Globals.Password))
+				{
+					new DialogPassword();
+				}
+
 				if (!String.IsNullOrEmpty(opts?.UnpackFile))
 				{
 					ViewMenu.OpenSurepack(opts.UnpackFile);
