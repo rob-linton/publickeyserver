@@ -171,7 +171,7 @@ class Pack
 					{
 						// encrypt the file in chunks
 						
-						List<string> blockFileList = BouncyCastleHelper.EncryptFileInBlocks(filePath, key, nonce);
+						List<string> blockFileList = await BouncyCastleHelper.EncryptFileInBlocks(filePath, key, nonce, progress);
 
 						Misc.LogChar("  ");
 						// Add each chunk to the zip file

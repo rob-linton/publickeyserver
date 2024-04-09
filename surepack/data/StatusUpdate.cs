@@ -9,9 +9,14 @@ public class StatusUpdate
 
 	[JsonPropertyName("count")]
 	public float Count { get; set; } = 0;
+	
+	[JsonPropertyName("block-index")]
+	public float BlockIndex { get; set; } = 0;
+	
+	[JsonPropertyName("block-count")]
+	public float BlockCount { get; set; } = 0;
 
 	[JsonPropertyName("status")]
     public string? Status { get; set; }
-
 
 }

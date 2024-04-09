@@ -88,6 +88,14 @@ public class DialogSelectFiles
 			Height = 1,
 			ColorScheme = Globals.BlueOnWhite
 		};
+		// when enter is pressed
+		textBoxPath.KeyDown += (e) => 
+		{
+			if (e.KeyEvent.Key == Key.Enter)
+			{
+				GetFiles(recursive, textBoxPath, listView, ref source);
+			}
+		};
 		
 
 		// create a button at the end of the textbox

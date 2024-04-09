@@ -1,4 +1,5 @@
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using suredrop.Verbs;
@@ -7,11 +8,35 @@ namespace suredrop;
 
 public class Storage
 {
+	public static string EnvironmentGetFolderPathLocalApplicationData()
+	{
+		// linux
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+		{
+			// get the linux home directory
+			return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.local/share";
+		}
+		// mac
+		else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+		{
+			return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		}
+		// windows
+		else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+		{
+			return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		}
+		else
+		{
+			return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		}
+	}
+
 	// save the settings
 	public static void SaveSettings(Settings settings)
 	{
 		// get the users home userdata directoru
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack"));
 		string  sureDropFolder = Path.Join(localAppData, "surepack");
 
@@ -28,7 +53,7 @@ public class Storage
 		try
 		{
 			// get the users home userdata directoru
-			string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+			string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 			Directory.CreateDirectory(Path.Join(localAppData, "surepack"));
 			string sureDropFolder = Path.Join(localAppData, "surepack");
 
@@ -47,7 +72,7 @@ public class Storage
 	public static void StoreCert(string alias, string cert, string location = "aliases")
 	{
 		// get the users home userdata directoru
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", location));
 		string  sureDropFolder = Path.Join(localAppData, "surepack", location);
 
@@ -60,7 +85,7 @@ public class Storage
 	public static string GetCert(string alias, string location = "aliases")
 	{
 		// get the users home userdata directoru
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", location));
 		string  sureDropFolder = Path.Join(localAppData, "surepack", location);
 
@@ -87,7 +112,7 @@ public class Storage
 		byte[] cipherText = BouncyCastleHelper.EncryptWithKey(msg, key, nonce);
 
 		// get the users home userdata directoru
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "aliases"));
 		string  sureDropFolder = Path.Join(localAppData, "surepack", "aliases");
 
@@ -105,7 +130,7 @@ public class Storage
 		SortedList<string, Alias> aliases = new SortedList<string, Alias>();
 
 		// get the users home userdata directoru
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", location));
 		string  sureDropFolder = Path.Join(localAppData, "surepack", location);
 
@@ -140,7 +165,7 @@ public class Storage
 		try
 		{
 			// get the users home userdata directoru
-			string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+			string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 			Directory.CreateDirectory(Path.Join(localAppData, "surepack", "aliases", "deleted"));
 			string sureDropFolder = Path.Join(localAppData, "surepack", "aliases");
 			string sureDropDeletedFolder = Path.Join(localAppData, "surepack", "aliases", "deleted");
@@ -169,7 +194,7 @@ public class Storage
 		byte[] nonce = sNonce.ToBytes();
 
 		// get the users home userdata directoru
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "aliases"));
 		string  sureDropFolder = Path.Join(localAppData, "surepack", "aliases");
 
@@ -211,7 +236,7 @@ public class Storage
 
 	public static string GetSurePackDirectoryInbox(string alias, string dir = "")
 	{
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "inbox", alias));
 		string  sureDropFolder = Path.Join(localAppData, "surepack", "inbox", alias);
@@ -223,7 +248,7 @@ public class Storage
 
 	public static string GetSurePackDirectorySent(string alias, string dir = "")
 	{
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "sent", alias));
 		string  sureDropFolder = Path.Join(localAppData, "surepack", "sent", alias);
@@ -235,7 +260,7 @@ public class Storage
 
 	public static string GetSurePackDirectoryOutbox(string dir = "")
 	{
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "outbox"));
 		string  sureDropFolder = Path.Join(localAppData, "surepack", "outbox");
@@ -247,7 +272,7 @@ public class Storage
 
 	public static string GetSurePackDirectoryHistory(string dir = "")
 	{
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 
 		Directory.CreateDirectory(Path.Join(localAppData, "surepack", "history"));
 		string  sureDropFolder = Path.Join(localAppData, "surepack", "history");
@@ -263,7 +288,7 @@ public class Storage
 		SortedList<long, SurePack> sorted = new SortedList<long, SurePack>();
 
 		// get the users home userdata directory
-		string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+		string localAppData = EnvironmentGetFolderPathLocalApplicationData();
 		string sureDropFolder = "";
 		if (location == "outbox")
 		{

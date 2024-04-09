@@ -13,6 +13,7 @@ public class DialogPack
   	private TextField output = new TextField();
 	private Label progressLabel = new Label("");
 	private ProgressBar progressBar = new ProgressBar ();
+	private ProgressBar progressBarBlock = new ProgressBar ();
 	
 
 	// build
@@ -22,25 +23,32 @@ public class DialogPack
 
 		Globals.ClearProgressSource();
 		var progress = new Progress<StatusUpdate>(StatusUpdate =>
+		{
+			if (StatusUpdate.BlockCount != 0)
+			{
+				progressBarBlock.Fraction = StatusUpdate.BlockIndex / StatusUpdate.BlockCount;
+			}
+			else
 			{
 				progressBar.Fraction = StatusUpdate.Index / StatusUpdate.Count;
 				if (!error)
 				{
 					if (String.IsNullOrEmpty(StatusUpdate.Status))
-						progressLabel.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Packing");
+						progressLabel.Text = Misc.UpdateProgressBarLabel(StatusUpdate.Index, StatusUpdate.Count, "Packed");
 					else
 					{
 						error = true;
 						progressLabel.Text = StatusUpdate.Status;
 					}
 				}
-				
-			});
+			}		
+		});
 
 		var ok = new Button("Pack to a File");
 		ok.Clicked += async () => {
 			progressBar.Fraction = 0.0F;
 			progressLabel.Text = Misc.UpdateProgressBarLabel(0, 0, "Packing");
+			progressLabel.SetNeedsDisplay();
 			opts.Output = output.Text.ToString() ?? "output.surepack";
 			
 			// report on progress and execute
@@ -51,9 +59,13 @@ public class DialogPack
 
 		var outBox = new Button("Pack to Outbox");
 		outBox.Clicked += async () => {
+			progressBar.Fraction = 0.0F;
+			progressLabel.Text = Misc.UpdateProgressBarLabel(0, 0, "Packing");
+			progressLabel.SetNeedsDisplay();
+
 			string timestamp = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds().ToString();
 			string filename = $"{timestamp}-{Guid.NewGuid()}.surepack";
-			opts.Output = Path.Join(Storage.GetSurePackDirectoryOutbox(""), filename);
+			opts.Output = Storage.GetSurePackDirectoryOutbox(filename);
 			
 			// report on progress and execute
 			int result = await Pack.Execute(opts, progress);
@@ -99,9 +111,18 @@ public class DialogPack
 		//
 		// add the progress bar
 		//
-		progressBar = new ProgressBar () {
+		progressBarBlock = new ProgressBar () {
 			X = 2,
 			Y = 4,
+			Width = Dim.Fill () - 1,
+			Height = 1,
+			Fraction = 0.0F,
+			ColorScheme = Globals.WhiteOnBlue
+		};
+		
+		progressBar = new ProgressBar () {
+			X = 2,
+			Y = Pos.Bottom(progressBarBlock) + 1,
 			Width = Dim.Fill () - 1,
 			Height = 1,
 			Fraction = 0.0F,
@@ -112,7 +133,7 @@ public class DialogPack
 		{ 
 			X = 2, 
 			Y = Pos.Bottom(progressBar) + 1, 
-			Width = Dim.Fill() - 1, 
+			Width = Dim.Fill () - 1, 
 			Height = 1,
 			ColorScheme = Globals.WhiteOnBlue
 		};
@@ -130,7 +151,7 @@ public class DialogPack
 
 		viewProgress.Add(listViewProgress);
 	
-		dialog.Add (viewOutput, progressBar, progressLabel, viewProgress);
+		dialog.Add (viewOutput, progressBar, progressBarBlock, progressLabel, viewProgress);
 		Application.Run (dialog);
 
 		return;

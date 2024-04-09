@@ -453,12 +453,19 @@ public class BouncyCastleHelper
 	/// <param name="key">The encryption key.</param>
 	/// <param name="nonce">The nonce value.</param>
 	/// <returns>A list of file chunks generated during the encryption process.</returns>
-	public static List<string> EncryptFileInBlocks(string filename, byte[] key, byte[] nonce)
+	public static async Task<List<string>> EncryptFileInBlocks(string filename, byte[] key, byte[] nonce, IProgress<StatusUpdate>? progress = null)
 	{
 		List<string> chunkList = new List<string>();
 
 		// read the file in 1 MB chunks
 		byte[] buffer = new byte[1024 * 1024];
+
+		// get the filesize
+		FileInfo fi = new FileInfo(filename);
+		long fileSize = fi.Length;
+
+		// calculate the number of chunks
+		long chunkCount = fileSize / buffer.Length;
 		
 		// loop through each 1mb chunk of the file
 		using (FileStream fs = new FileStream(filename, FileMode.Open))
@@ -467,6 +474,9 @@ public class BouncyCastleHelper
 			int chunkNumber = 0;
 			while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0)
 			{
+				progress?.Report(new StatusUpdate { BlockIndex = chunkNumber, BlockCount = chunkCount});
+				await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
+
 				byte[] chunk = new byte[bytesRead];
 				Array.Copy(buffer, chunk, bytesRead);
 			
@@ -479,6 +489,8 @@ public class BouncyCastleHelper
 				// save the chunk to a file
 				File.WriteAllBytes($"{filename}.suredrop{chunkNumber}", encryptedChunk);
 				chunkList.Add($"{filename}.suredrop{chunkNumber}");
+
+				
 
 				chunkNumber++;
 			}
