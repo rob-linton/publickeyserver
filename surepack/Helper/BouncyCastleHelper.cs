@@ -490,8 +490,6 @@ public class BouncyCastleHelper
 				File.WriteAllBytes($"{filename}.suredrop{chunkNumber}", encryptedChunk);
 				chunkList.Add($"{filename}.suredrop{chunkNumber}");
 
-				
-
 				chunkNumber++;
 			}
 
