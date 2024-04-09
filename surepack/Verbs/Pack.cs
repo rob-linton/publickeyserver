@@ -398,7 +398,11 @@ class Pack
 					To = recipients, 
 					From = opts.From,
 					Created = createDate,
-					Version = "1.0"
+					Version = "1.0",
+					KeyType = "RSA2048",
+					PqeKeyType = "KYBER1024",
+					Compression = "BROTLI",
+					EncryptionAlgorithm = "AES_GCM_256"	
 				};
 
 				//envelope["asymmetric"] = "RSA2048";  

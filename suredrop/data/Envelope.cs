@@ -17,5 +17,17 @@ public class Envelope
     [JsonPropertyName("version")]
     public required string Version { get; set; }
 
+	[JsonPropertyName("key-type")]
+    public string? KeyType { get; set; }
+
+	[JsonPropertyName("pqe-key-type")]
+    public string? PqeKeyType { get; set; }
+
+	[JsonPropertyName("encryption-algorithm")]
+    public string? EncryptionAlgorithm { get; set; }
+
+	[JsonPropertyName("compression")]
+    public string? Compression { get; set; }
+
 }
 
