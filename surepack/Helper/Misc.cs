@@ -423,15 +423,21 @@ public class Misc
 		// check if the path contains a wildcard
 		if (path.Contains("*"))
 		{
+			
 			// get the directory from the path
 			string directory = Path.GetDirectoryName(path) ?? string.Empty;
 			// get the search pattern from the path
 			string searchPattern = Path.GetFileName(path);
+			
+			Misc.LogLine($"Wildcard found: {directory}  / {searchPattern}");
+
 			// get the files
 			files = Directory.GetFiles(directory, searchPattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 		}
 		else
 		{
+			Misc.LogLine($"Files: {path} / *");
+
 			// get the files
 			files = Directory.GetFiles(path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 		}
