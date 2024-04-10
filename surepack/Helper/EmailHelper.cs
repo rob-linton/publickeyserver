@@ -11,12 +11,13 @@ public class EmailHelper
 	public static async Task<CertResult> GetAliasOrEmailFromServer(string emailOrAlias, bool create)
 	{
 		// get the domain for requests
-			string domain = Misc.GetDomain("");
+			string domain = Misc.GetDomain(emailOrAlias);
 
 		// if there is no @ then just return the email as it will be an alias
 		if (!emailOrAlias.Contains('@'))
 		{
-			var result = await HttpHelper.Get($"https://{domain}/cert/{Misc.GetAliasFromAlias(emailOrAlias)}");
+			string a = Misc.GetAliasFromAlias(emailOrAlias);
+			var result = await HttpHelper.Get($"https://{domain}/cert/{a}");
 			var c = JsonSerializer.Deserialize<CertResult>(result);
 			if (c == null)
 			{

@@ -193,6 +193,7 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
+					Log.Information($"GET -> {GLOBALS.origin}/cert/{alias}.pem");
 					raw = await AwsHelper.Get(client, $"{GLOBALS.origin}/cert/{alias}.pem");
 				};
 
@@ -318,6 +319,7 @@ namespace publickeyserver
 				{
 					string index = System.IO.File.ReadAllText("wwwroot/index.html");
 					index = index.Replace("{CERTIFICATE}", "");
+					index = index.Replace("{ORIGIN}", GLOBALS.origin);
 					return new ContentResult()
 					{
 						Content = index,
@@ -405,6 +407,7 @@ namespace publickeyserver
 				
 				string index2 = System.IO.File.ReadAllText("wwwroot/index.html");
 				index2 = index2.Replace("{CERTIFICATE}", certInfo);
+				index2 = index2.Replace("{ORIGIN}", GLOBALS.origin);
 				return new ContentResult()
 				{
 					Content = index2,
