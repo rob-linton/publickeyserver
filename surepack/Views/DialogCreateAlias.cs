@@ -19,6 +19,8 @@ public class DialogCreateAlias
 	// build
 	public void Build()
 	{
+		Settings settings = Storage.GetSettings();
+
 		//
 		// dialog
 		//
@@ -36,7 +38,7 @@ public class DialogCreateAlias
 			}
 
 			// save the last domain
-			Settings settings = Storage.GetSettings();
+			//Settings settings = Storage.GetSettings();
 			settings.Domain = domain.Text.ToString();
 			Storage.SaveSettings(settings);
 
@@ -92,7 +94,7 @@ public class DialogCreateAlias
 			Height = Dim.Fill(),
 			ColorScheme = Globals.BlueOnWhite
 		};
-		domain.Text = Misc.GetDomain("");
+		domain.Text = settings.Domain ?? Misc.GetDomain("");
 
 		// add a button
 		Button getDomain = new Button("Check Server")

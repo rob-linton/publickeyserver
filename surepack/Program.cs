@@ -15,7 +15,7 @@ public class Program
 	{
 		// load up the settings file
 		Settings settings = Storage.GetSettings();
-		Globals.Domain = settings.Domain;
+		//Globals.Domain = settings.Domain;
 		Globals.Password = settings.Password;
 		
 		// if the first parameter does has a - then insert the word "gui"
