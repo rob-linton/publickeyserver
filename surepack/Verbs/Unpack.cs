@@ -322,8 +322,8 @@ class Unpack
 							DateTime modifiedDate = DateTimeOffset.FromUnixTimeSeconds(file.Mtime).DateTime;
 
 							// now set the date attributes
-							File.SetCreationTime(file.Name, createDate);
-							File.SetLastWriteTime(file.Name, modifiedDate);
+							File.SetCreationTime(Path.Join(outputDirectory,file.Name), createDate);
+							File.SetLastWriteTime(Path.Join(outputDirectory,file.Name), modifiedDate);
 
 							// update the progress bar if it is not null
 							//Globals.UpdateProgressBar((float)manifest.Files.IndexOf(file) + 1, (float)manifest.Files.Count);
@@ -349,7 +349,8 @@ class Unpack
 			}
 			catch (Exception ex)
 			{
-				Misc.LogError("Unable to unpack package", ex.Message);
+				Misc.LogError("Unable to unpack package", ex.Message, ex.StackTrace??"");
+
 				throw new Exception("Unable to unpack package", ex);
 			}
 

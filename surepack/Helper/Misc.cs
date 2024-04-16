@@ -154,16 +154,19 @@ public class Misc
 	/// <param name="message">The message to be logged.</param>
 	public static void LogLine(string message)
 	{
+		File.AppendAllLines("output.log", new string[] { message });	
 		if (Globals.Verbose > 0)
 			Console.WriteLine(message);
 	}
 	public static void WriteLine(string message)
 	{
+		File.AppendAllLines("output.log", new string[] { message });
 		if (Globals.Verbose >= 0)
 			Console.WriteLine(message);
 	}
 	public static void LogLine1(string message)
 	{
+		File.AppendAllLines("output.log", new string[] { message });
 		if (Globals.Verbose > 1)
 			Console.WriteLine(message);
 	}
@@ -175,6 +178,7 @@ public class Misc
 	/// <param name="message">The message to be logged.</param>
 	public static void LogLine2(string message)
 	{
+		//File.AppendAllLines("output.log", new string[] { message });
 		if (Globals.Verbose > 2)
 		{
 			Console.WriteLine("--------------------------------------------------------------------------------");
@@ -190,7 +194,7 @@ public class Misc
 	/// <param name="opts">The options object.</param>
 	/// <param name="message">The error message.</param>
 	/// <param name="details">Optional details about the error.</param>
-	public static void LogError(string message, string details = "")
+	public static void LogError(string message, string details = "", string stack = "")
 	{
 		if (Globals.Verbose > 0)
 		{
@@ -201,6 +205,11 @@ public class Misc
 				Console.Write($"{details}\n");
 			Console.ResetColor();
 		}
+
+		// log it to a file by writing it
+		// to the error log file
+		File.AppendAllLines("error.log", new string[] { message, details, stack});	
+
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
@@ -216,6 +225,7 @@ public class Misc
 	// --------------------------------------------------------------------------------------------------------
 	public static void LogCheckMark(string message)
 	{
+		File.AppendAllLines("output.log", new string[] { message });
 		message = "[ \u2713 ]  " + message;
 
 		Globals.UpdateProgressSource(message);
@@ -229,6 +239,7 @@ public class Misc
 	// log a cross check mark
 	public static void LogCross(string message)
 	{
+		File.AppendAllLines("output.log", new string[] { message });
 		message = "[ X ]  " + message;
 		Globals.UpdateProgressSource(message);
 	
