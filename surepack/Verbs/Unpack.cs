@@ -298,16 +298,6 @@ class Unpack
 									// get the filename of the chunk
 									string shash = Path.GetFileName(block);
 
-									// get the hash of the chunk
-									byte[] hash = BouncyCastleHelper.GetHashOfBytes(encryptedBlock);
-									string computedHash = BouncyCastleHelper.ConvertHashToString(hash);
-
-									if (computedHash != shash)
-									{
-										Misc.LogError($"Error: hash mismatch for {block}");
-										throw new Exception($"Error: hash mismatch for {block}");
-									}
-
 									byte[] decryptedBlock = BouncyCastleHelper.DecryptWithKey(encryptedBlock, key, nonce);
 
 									// decompress the block
@@ -319,6 +309,16 @@ class Unpack
 									else if (compression == "Brotli")
 									{
 										decompressedBlock = Misc.DecompressBytesBrotli(decryptedBlock);
+									}
+
+									// get the hash of the chunk
+									byte[] hash = BouncyCastleHelper.GetHashOfBytes(decompressedBlock);
+									string computedHash = BouncyCastleHelper.ConvertHashToString(hash);
+
+									if (computedHash != shash)
+									{
+										Misc.LogError($"Error: hash mismatch for {block}");
+										throw new Exception($"Error: hash mismatch for {block}");
 									}
 									
 									fs.Write(decompressedBlock, 0, decompressedBlock.Length);

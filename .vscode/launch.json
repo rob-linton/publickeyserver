@@ -202,7 +202,7 @@
 			"program": "${workspaceFolder}/surepack/bin/Debug/net8.0/surepack.dll",
 			"args": [],
 			//"cwd": "${workspaceFolder}/surepack/test",
-			"cwd": "~/Downloads",
+			"cwd": "~/Downloads/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {

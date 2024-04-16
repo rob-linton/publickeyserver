@@ -478,8 +478,13 @@ public class BouncyCastleHelper
 				await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 
 				byte[] chunk = new byte[bytesRead];
+
 				Array.Copy(buffer, chunk, bytesRead);
 			
+				// get the hash of the chunk
+				byte[] hash = BouncyCastleHelper.GetHashOfBytes(chunk);
+				string sHash = BouncyCastleHelper.ConvertHashToString(hash);
+				
 				// compress the chunk
 				byte[] compressedChunk = chunk; // no compression
 				if (compression == "GZip")
@@ -495,8 +500,8 @@ public class BouncyCastleHelper
 				byte[] encryptedChunk = EncryptWithKey(compressedChunk, key, nonce);
 
 				// save the chunk to a file
-				File.WriteAllBytes($"{filename}.suredrop{chunkNumber}", encryptedChunk);
-				chunkList.Add($"{filename}.suredrop{chunkNumber}");
+				File.WriteAllBytes($"{sHash}", encryptedChunk);
+				chunkList.Add($"{sHash}");
 
 				chunkNumber++;
 			}

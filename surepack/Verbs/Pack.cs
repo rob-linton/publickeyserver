@@ -181,13 +181,13 @@ class Pack
 						foreach (string chunk in blockFileList)
 						{
 							// get the hash of the chunk
-							byte[] hash = BouncyCastleHelper.GetHashOfFile(chunk);
-							string sHash = BouncyCastleHelper.ConvertHashToString(hash);
+							//byte[] hash = BouncyCastleHelper.GetHashOfFile(chunk);
+							//string sHash = BouncyCastleHelper.ConvertHashToString(hash);
 
-							zip.CreateEntryFromFile(chunk, sHash, CompressionLevel.NoCompression);
+							zip.CreateEntryFromFile(chunk, chunk, CompressionLevel.NoCompression);
 
 							// add the entry to the list
-							blockList.Add(sHash);
+							blockList.Add(chunk);
 
 							// delete the chunk
 							File.Delete(chunk);
