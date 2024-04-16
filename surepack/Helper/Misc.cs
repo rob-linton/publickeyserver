@@ -283,7 +283,7 @@ public class Misc
 			return ms.ToArray();
 		}
 	}
-	public static byte[] CompressBytes(byte[] data)
+	public static byte[] CompressBytesBrotli(byte[] data)
 	{
 		using (MemoryStream output = new MemoryStream())
 		{
@@ -295,13 +295,40 @@ public class Misc
 		}
 	}
 
-	public static byte[] DecompressBytes(byte[] data)
+	public static byte[] DecompressBytesBrotli(byte[] data)
 	{
 		using (MemoryStream input = new MemoryStream(data))
 		{
 			using (MemoryStream output = new MemoryStream())
 			{
 				using (BrotliStream dstream = new BrotliStream(input, CompressionMode.Decompress))
+				{
+					dstream.CopyTo(output);
+				}
+				return output.ToArray();
+			}
+		}
+	}
+
+	public static byte[] CompressBytesGZip(byte[] data)
+	{
+		using (MemoryStream output = new MemoryStream())
+		{
+			using (GZipStream dstream = new GZipStream(output, CompressionLevel.Optimal))
+			{
+				dstream.Write(data, 0, data.Length);
+			}
+			return output.ToArray();
+		}
+	}
+
+	public static byte[] DecompressBytesGZip(byte[] data)
+	{
+		using (MemoryStream input = new MemoryStream(data))
+		{
+			using (MemoryStream output = new MemoryStream())
+			{
+				using (GZipStream dstream = new GZipStream(input, CompressionMode.Decompress))
 				{
 					dstream.CopyTo(output);
 				}

@@ -35,6 +35,9 @@ public class PackOptions : Options
 
 	[Option('f', "from", Required = true, HelpText = "From alias")]
     public required string From { get; set; }
+
+	[Option('c', "compression", Default = "GZIP", HelpText = "[BROTLI, GZIP, NONE]")]
+	public string Compression { get; set; } = "GZIP";
 	
 }
 class Pack 
@@ -171,7 +174,7 @@ class Pack
 					{
 						// encrypt the file in chunks
 						
-						List<string> blockFileList = await BouncyCastleHelper.EncryptFileInBlocks(filePath, key, nonce, progress);
+						List<string> blockFileList = await BouncyCastleHelper.EncryptFileInBlocks(filePath, key, nonce, opts.Compression, progress);
 
 						Misc.LogChar("  ");
 						// Add each chunk to the zip file
@@ -401,7 +404,7 @@ class Pack
 					Version = "1.0",
 					KeyType = "RSA2048",
 					PqeKeyType = "KYBER1024",
-					Compression = "BROTLI",
+					Compression = opts.Compression,
 					EncryptionAlgorithm = "AES_GCM_256"	
 				};
 

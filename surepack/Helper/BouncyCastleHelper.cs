@@ -453,7 +453,7 @@ public class BouncyCastleHelper
 	/// <param name="key">The encryption key.</param>
 	/// <param name="nonce">The nonce value.</param>
 	/// <returns>A list of file chunks generated during the encryption process.</returns>
-	public static async Task<List<string>> EncryptFileInBlocks(string filename, byte[] key, byte[] nonce, IProgress<StatusUpdate>? progress = null)
+	public static async Task<List<string>> EncryptFileInBlocks(string filename, byte[] key, byte[] nonce, string compression, IProgress<StatusUpdate>? progress = null)
 	{
 		List<string> chunkList = new List<string>();
 
@@ -481,7 +481,15 @@ public class BouncyCastleHelper
 				Array.Copy(buffer, chunk, bytesRead);
 			
 				// compress the chunk
-				byte[] compressedChunk = Misc.CompressBytes(chunk);
+				byte[] compressedChunk = chunk; // no compression
+				if (compression == "GZip")
+				{
+					compressedChunk = Misc.CompressBytesGZip(chunk);
+				}
+				else if (compression == "Brotli")
+				{
+					compressedChunk = Misc.CompressBytesBrotli(chunk);
+				}
 
 				// encrypt the chunk
 				byte[] encryptedChunk = EncryptWithKey(compressedChunk, key, nonce);

@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using CommandLine;
+using NStack;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
 
@@ -21,6 +22,7 @@ public class DialogCreateSurePack
 		List<string> surePackRecipients = new List<string>();
 		string[] surePackFiles = new string[0];
 		bool recursive = false;
+		RadioGroup compression = new RadioGroup();
 		//string filename = "";
 
 
@@ -46,6 +48,7 @@ public class DialogCreateSurePack
 				Message = message.Text.ToString(),
 				Subject = subject.Text.ToString(),
 				From = from.Text.ToString()??"",
+				Compression = compression.SelectedItem == 0 ? "GZip" : compression.SelectedItem == 1 ? "Brotli" : "None", 
 			};
 			
 			new DialogPack().Build(opts); 
@@ -211,6 +214,8 @@ public class DialogCreateSurePack
 		viewMessage.Border.BorderStyle = BorderStyle.Single;
 		viewMessage.Add(message);
 
+		
+
 		//
 		// add the list of files
 		//
@@ -221,6 +226,7 @@ public class DialogCreateSurePack
 			Width = Dim.Fill () - 61,
 			Height = Dim.Fill () - 2
 		};
+
 		var files = new ListView(surePackFiles)
 		{
 			X = 1,
@@ -230,6 +236,19 @@ public class DialogCreateSurePack
 			ColorScheme = Globals.StandardColors
 		};
 		viewLeft.Add(files);
+
+		//
+		// add the compression type
+		//
+		// add a radio button
+		compression = new RadioGroup(new ustring[] {"GZip", "Brotli", "None"})
+		{
+			X = Pos.Right(files) - 10,
+			Y = 1,
+			Width = 10,
+			Height = 6
+		};
+		viewLeft.Add(compression);
 
 		//
 		// add the files add button
@@ -249,6 +268,7 @@ public class DialogCreateSurePack
 			files.SetSource(listFiles);
 		};
 
+	
 
 		//
 		// add the list of recipients
@@ -294,9 +314,9 @@ public class DialogCreateSurePack
 				}
 			}
 			recipients.SetSource(surePackRecipients);
-			
-			
 		};
+
+		
 
 		dialog.Ready += () => 
 		{

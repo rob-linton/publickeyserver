@@ -279,7 +279,8 @@ class Unpack
 						//
 
 						//Misc.LogLine(opts, "");
-
+						// get the compression
+						string compression = envelope.Compression??"";
 						// now decrypt each file
 						foreach (FileItem file in manifest.Files)
 						{
@@ -310,7 +311,15 @@ class Unpack
 									byte[] decryptedBlock = BouncyCastleHelper.DecryptWithKey(encryptedBlock, key, nonce);
 
 									// decompress the block
-									byte[] decompressedBlock = decryptedBlock = Misc.DecompressBytes(decryptedBlock);
+									byte[] decompressedBlock = decryptedBlock; // no compression
+									if (compression == "GZip")
+									{
+										decompressedBlock = Misc.DecompressBytesGZip(decryptedBlock);
+									}
+									else if (compression == "Brotli")
+									{
+										decompressedBlock = Misc.DecompressBytesBrotli(decryptedBlock);
+									}
 									
 									fs.Write(decompressedBlock, 0, decompressedBlock.Length);
 									Misc.LogChar("#");
