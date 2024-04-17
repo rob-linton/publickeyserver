@@ -293,6 +293,7 @@ namespace publickeyserver
 		{
 			try
 			{
+				
 				string alias = "";
 
 				// get the host string
@@ -312,6 +313,17 @@ namespace publickeyserver
 				{
 					// else take the end of the url
 					alias = aliasIn + "." + GLOBALS.origin;
+				}
+
+				// get the Accept header to see if it is text/html or application/json
+				string? accept = Request.Headers["Accept"];
+
+				//
+				// return the alias if asked for
+				//
+				if (accept != null && accept.Contains("application/json"))
+				{
+					return await Cert(shortAlias);
 				}
 
 				// return the index.html page if the host was empty and the url was empty
@@ -414,19 +426,6 @@ namespace publickeyserver
 					ContentType = "text/html",
 				};
 
-
-				/*
-				Response.StatusCode = StatusCodes.Status200OK;
-				Dictionary<string, string> ret = new Dictionary<string, string>();
-
-				ret["alias"] = alias;
-				ret["origin"] = GLOBALS.origin;
-				ret["certificate"] = cert;
-				ret["help"] = Help.cert;
-
-				GLOBALS.status_certs_served++;
-				return new JsonResult(ret);
-				*/
 			}
 			catch (Exception e)
 			{
