@@ -41,7 +41,7 @@ class Verify
 
 			Misc.LogLine("- verifying email...");
 
-			var result = await HttpHelper.Post($"https://{domain}/verify/{opts.Email}", "");
+			var result = await HttpHelper.Post($"https://{domain}/verify/email/{opts.Email}", "");
 
 			// update the progress bar if it is not null
 			statusUpdate.Status = result.Replace("\"", "");

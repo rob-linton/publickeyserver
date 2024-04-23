@@ -321,9 +321,9 @@ class Pack
 							if (toFingerprint.SequenceEqual(rootFingerprintFromFile))
 								Misc.LogCheckMark($"Root fingerprint matches");
 							else
-								Misc.LogLine($"Invalid: Root fingerprint does not match");
+								Misc.LogCross($"Invalid: Root fingerprint does not match");
 
-							if (valid)
+							if (aliasValid)
 							{
 								//
 								// the root certificates must match between the sender and the recipient
@@ -331,7 +331,7 @@ class Pack
 
 								if (!fromFingerprint.SequenceEqual(toFingerprint))
 								{
-									Misc.LogLine($"Aliases do not share the same root certificate {opts.From} -> {alias}");
+									Misc.LogCross($"Aliases do not share the same root certificate {opts.From} -> {alias}");
 									throw new Exception($"Aliases do not share the same root certificate {opts.From} -> {alias}");
 									//return 1;
 								}
@@ -391,7 +391,8 @@ class Pack
 						}
 						catch (Exception ex)
 						{
-							Misc.LogError($"Error: could not find alias {alias}", ex.Message);
+							Misc.LogError($"Error with alias {alias}", ex.Message);
+							throw;
 						}
 					}
 				}

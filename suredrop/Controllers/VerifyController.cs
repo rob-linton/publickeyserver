@@ -46,7 +46,7 @@ namespace publickeyserver
 		}
 		// ------------------------------------------------------------------------------------------------------------
 		[Produces("application/json")]
-		[HttpPost("{email}")]
+		[HttpPost("email/{email}")]
 		public async Task<IActionResult> Verify(string email, bool intro = false)
 		{
 			try

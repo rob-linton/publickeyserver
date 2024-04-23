@@ -32,17 +32,23 @@ class List
 				string alias = a.Name;
 				string domain = Misc.GetDomain(alias);
 
-				(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "");
-
-				if (valid)
+				try
 				{
-					Misc.LogLine("");
-					Misc.WriteLine($"{alias}");
-					Misc.LogLine("");
-				}
-				else
-					Misc.LogLine($"*** Invalid: {alias}");
+					(bool valid, byte[] rootFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "");
 
+					if (valid)
+					{
+						Misc.LogLine("");
+						Misc.WriteLine($"{alias}");
+						Misc.LogLine("");
+					}
+					else
+						Misc.LogLine($"*** Invalid: {alias}");
+				}
+				catch (Exception ex)
+				{
+					Misc.LogError("Unable to validate alias", ex.Message);
+				}
 			}
 			catch (Exception ex)
 			{
