@@ -61,11 +61,11 @@ namespace publickeyserver
 				if (!String.IsNullOrEmpty(result))
 					return BadRequest(result);
 
-				// if the recipient is an email
+				// if the recipient is an identity
 				string key = $"{GLOBALS.origin}/cert/{recipient}";
 				if (recipient.Contains("@"))
 				{
-					key = $"{GLOBALS.origin}/email/{recipient}";
+					key = $"{GLOBALS.origin}/identity/{recipient}";
 				}
 
 				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
@@ -88,7 +88,7 @@ namespace publickeyserver
 						List<ListFile> listFiles = new List<ListFile>();
 						foreach (S3Object entry in response.S3Objects)
 						{
-							string S3key = entry.Key.Replace(".pem", "").Replace($"{GLOBALS.origin}/cert/", "").Replace($"{GLOBALS.origin}/email/{recipient}/", "");
+							string S3key = entry.Key.Replace(".pem", "").Replace($"{GLOBALS.origin}/cert/", "").Replace($"{GLOBALS.origin}/identity/{recipient}/", "");
 							ListFile listFile = new ListFile () {
 								Key = S3key,
 								Size = entry.Size,

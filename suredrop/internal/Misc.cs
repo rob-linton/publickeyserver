@@ -135,30 +135,30 @@ namespace publickeyserver
 		}
 
 		// ---------------------------------------------------------------------
-		internal static bool IsAllowedEmail(string email)
+		internal static bool IsAllowedIdentity(string identity)
 		{
-			if (String.IsNullOrEmpty(email))
+			if (String.IsNullOrEmpty(identity))
 				return false;
 
-			string allowedEmailDomains = GLOBALS.AllowedEmailDomains;
+			string allowedIdentityDomains = GLOBALS.AllowedIdentityDomains;
 
-			if (allowedEmailDomains == "*")
+			if (allowedIdentityDomains == "*")
 				return true;
 			
-			string[] allowedDomains = allowedEmailDomains.Split(',');
+			string[] allowedDomains = allowedIdentityDomains.Split(',');
 			
-			string[] emailParts = email.Split('@');
+			string[] identityParts = identity.Split('@');
 
-			if (emailParts.Length != 2)
+			if (identityParts.Length != 2)
 				return false;
 			
 			foreach (string domain in allowedDomains)
 			{
-				if (emailParts[1].Equals(domain.Trim(), StringComparison.OrdinalIgnoreCase))
+				if (identityParts[1].Equals(domain.Trim(), StringComparison.OrdinalIgnoreCase))
 					return true;
 				
-				// do a case insensitive compare between domain and email and igbore spaces
-				if (email.Equals(domain, StringComparison.OrdinalIgnoreCase))
+				// do a case insensitive compare between domain and identity and igbore spaces
+				if (identity.Equals(domain, StringComparison.OrdinalIgnoreCase))
 					return true;
 			}	
 

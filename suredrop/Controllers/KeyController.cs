@@ -84,9 +84,9 @@ namespace publickeyserver
 			ret["max-package-size"] = Convert.ToInt64(GLOBALS.MaxPackageSize);
 
 
-			// return email allowed
+			// return identity allowed
 			ret["anonymous"] = GLOBALS.Anonymous.ToString();
-			//ret["allowed_email_domains"] = GLOBALS.AllowedEmailDomains;
+			//ret["allowed_identity_domains"] = GLOBALS.AllowedIdentityDomains;
 
 			// lets check to see if we have a cacert
 			Org.BouncyCastle.X509.X509Certificate ca;
@@ -219,20 +219,20 @@ namespace publickeyserver
 			}
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
-		// get a cert from the cert store using the email
+		// get a cert from the cert store using the identity
 		// in this case an S3 bucket
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
-		[Route("email/{email}")]
+		[Route("identity/{identity}")]
 		[Produces("application/json")]
 		[HttpGet]
-		public async Task<IActionResult> CertUsingEmail(string email)
+		public async Task<IActionResult> CertUsingIdentity(string identity)
 		{
 			try
 			{
 				List<S3File> aliasList;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					aliasList = await AwsHelper.List(client, $"{GLOBALS.origin}/email/{email}");
+					aliasList = await AwsHelper.List(client, $"{GLOBALS.origin}/identity/{identity}");
 				};
 
 				// loop through the list and get the newest s3file object
@@ -258,7 +258,7 @@ namespace publickeyserver
 				byte[] raw;
 				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
-					raw = await AwsHelper.Get(client, $"{GLOBALS.origin}/email/{email}/{alias}.pem");
+					raw = await AwsHelper.Get(client, $"{GLOBALS.origin}/identity/{identity}/{alias}.pem");
 				};
 
 				string cert = raw.FromBytes();
@@ -481,26 +481,26 @@ namespace publickeyserver
 				string data = Encoding.UTF8.GetString(bytes);
 
 				// convert to a dictionary
-				CustomExtensionData emailTokenData = JsonConvert.DeserializeObject<CustomExtensionData>(data) ?? new CustomExtensionData();
+				CustomExtensionData identityTokenData = JsonConvert.DeserializeObject<CustomExtensionData>(data) ?? new CustomExtensionData();
 
-				string email = emailTokenData.Email ?? "";
-				string token = emailTokenData.Token ?? "";
+				string identity = identityTokenData.Identity ?? "";
+				string token = identityTokenData.Token ?? "";
 
-				// check if this email is allowed
-				if (GLOBALS.Anonymous == false && String.IsNullOrEmpty(email))
+				// check if this identity is allowed
+				if (GLOBALS.Anonymous == false && String.IsNullOrEmpty(identity))
 				{
 					return Misc.err(Response, "Anonymous aliases not allowed on this server", Help.simpleenroll);
 				}
 				if (GLOBALS.Anonymous == false)
 				{
-					if (Misc.IsAllowedEmail(email) == false)
-						return Misc.err(Response, "Invalid email address", Help.simpleenroll);
+					if (Misc.IsAllowedIdentity(identity) == false)
+						return Misc.err(Response, "Invalid identity address", Help.simpleenroll);
 				}
 
-				if (email.Length > 0 && token.Length > 0)
+				if (identity.Length > 0 && token.Length > 0)
 				{
 					// validate the token
-					string tokenFile = $"{GLOBALS.origin}/tokens/{email}.token";
+					string tokenFile = $"{GLOBALS.origin}/tokens/{identity}.token";
 					string tokenFileContents = "";
 					try
 					{
@@ -509,9 +509,9 @@ namespace publickeyserver
 						{
 							raw = await AwsHelper.Get(client, tokenFile);
 						};
-						EmailToken emailTokenFile = JsonConvert.DeserializeObject<EmailToken>(Encoding.UTF8.GetString(raw) ?? "") ?? new EmailToken();
+						IdentityToken identityTokenFile = JsonConvert.DeserializeObject<IdentityToken>(Encoding.UTF8.GetString(raw) ?? "") ?? new IdentityToken();
 						
-						long timestamp = Convert.ToInt64(emailTokenFile.Timestamp);
+						long timestamp = Convert.ToInt64(identityTokenFile.Timestamp);
 
 						// get the current timestamp
 						long unixTimestampFile = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -528,7 +528,7 @@ namespace publickeyserver
 						}
 						else
 						{
-							tokenFileContents = emailTokenFile.Token ?? "";
+							tokenFileContents = identityTokenFile.Token ?? "";
 						}
 					}
 					catch
@@ -549,17 +549,17 @@ namespace publickeyserver
 						};
 					}
 				}
-				else if (email.Length > 0 && token.Length == 0)
+				else if (identity.Length > 0 && token.Length == 0)
 				{
-						return Misc.err(Response, "Email verification code must be provided when associating an email address", Help.simpleenroll);
+						return Misc.err(Response, "Identity verification code must be provided when associating an identity address", Help.simpleenroll);
 				}
-				else if (email.Length == 0 && token.Length > 0)
+				else if (identity.Length == 0 && token.Length > 0)
 				{
-					return Misc.err(Response, "Email address required", Help.simpleenroll);
+					return Misc.err(Response, "Identity address required", Help.simpleenroll);
 				}
 
 				// create the cert
-				var ret = await KeyHelper.CreateKey(publickeyRequestor, words, dataBase64, email);
+				var ret = await KeyHelper.CreateKey(publickeyRequestor, words, dataBase64, identity);
 
 				GLOBALS.status_certs_enrolled++;
 				return Ok(ret);
@@ -726,12 +726,12 @@ namespace publickeyserver
 			}
 		}
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
-		// deletes a public key pair and email in PEM format on behalf of the user
+		// deletes a public key pair and identity in PEM format on behalf of the user
 		// -------------------------------------------------------------------------------------------------------------------------------------------------------
-		[Route("email/{email}/{alias}")]
+		[Route("identity/{identity}/{alias}")]
 		[Produces("application/json")]
 		[HttpDelete]
-		public async Task<IActionResult> DeleteCertEmail(string alias, string email, string timestamp, string signature)
+		public async Task<IActionResult> DeleteCertIdentity(string alias, string identity, string timestamp, string signature)
 		{
 			string longAlias = alias + "." + GLOBALS.origin;
 
@@ -750,7 +750,7 @@ namespace publickeyserver
 				if (!String.IsNullOrEmpty(result))
 					return BadRequest(result);
 
-				string key = $"{GLOBALS.origin}/email/{email}/{longAlias}.pem";
+				string key = $"{GLOBALS.origin}/identity/{identity}/{longAlias}.pem";
 				using (var _s3Client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
 				{
 					var request = new DeleteObjectRequest

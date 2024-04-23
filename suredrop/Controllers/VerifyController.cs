@@ -46,19 +46,19 @@ namespace publickeyserver
 		}
 		// ------------------------------------------------------------------------------------------------------------
 		[Produces("application/json")]
-		[HttpPost("email/{email}")]
-		public async Task<IActionResult> Verify(string email, bool intro = false)
+		[HttpPost("email/{identity}")]
+		public async Task<IActionResult> Verify(string identity, bool intro = false)
 		{
 			try
 			{
 
-				// check if the email is valid
-				if (Misc.IsAllowedEmail(email) == false)
-					return Misc.err(Response, "Invalid email address", Help.simpleenroll);
+				// check if the identity is valid
+				if (Misc.IsAllowedIdentity(identity) == false)
+					return Misc.err(Response, "Invalid identity address", Help.simpleenroll);
 
-				// need to generate the token and email to the email address
+				// need to generate the token and identity to the identity address
 				// generate a token
-				string tokenFile = $"{GLOBALS.origin}/tokens/{email}.token";
+				string tokenFile = $"{GLOBALS.origin}/tokens/{identity}.token";
 				
 				bool generateToken = false;
 				try
@@ -69,8 +69,8 @@ namespace publickeyserver
 						raw = await AwsHelper.Get(client, tokenFile);
 					};
 					var t = Encoding.UTF8.GetString(raw ?? throw new Exception("Token file not found"));
-					EmailToken? emailTokenFile = JsonConvert.DeserializeObject<EmailToken>(t);
-					long timestamp = Convert.ToInt64(emailTokenFile!.Timestamp);
+					IdentityToken? identityTokenFile = JsonConvert.DeserializeObject<IdentityToken>(t);
+					long timestamp = Convert.ToInt64(identityTokenFile!.Timestamp);
 
 					// get the current timestamp
 					long unixTimestampFile = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -95,19 +95,19 @@ namespace publickeyserver
 
 				// send a response that the token has already been sent
 				if (generateToken == false)
-					return Misc.err(Response, "Email verification code already sent to email address, please wait 1 hour between verification requests to the same email", Help.simpleenroll);
+					return Misc.err(Response, "Identity verification code already sent to identity address, please wait 1 hour between verification requests to the same identity", Help.simpleenroll);
 			
 				// no token file, so generate one
 				string tokenFileContentsNew = Misc.GetRandomString(8);
-				EmailToken emailToken = new EmailToken();
-				emailToken.Email = email;
-				emailToken.Token = tokenFileContentsNew;
+				IdentityToken identityToken = new IdentityToken();
+				identityToken.Identity = identity;
+				identityToken.Token = tokenFileContentsNew;
 
 				// get a unix timestamp in utc
 				long unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-				emailToken.Timestamp = unixTimestamp.ToString();
+				identityToken.Timestamp = unixTimestamp.ToString();
 
-				string dataNew = JsonConvert.SerializeObject(emailToken);
+				string dataNew = JsonConvert.SerializeObject(identityToken);
 
 				byte[] tokenFileContentsNewBytes = Encoding.UTF8.GetBytes(dataNew);
 
@@ -116,16 +116,16 @@ namespace publickeyserver
 					await AwsHelper.Put(client, tokenFile, tokenFileContentsNewBytes);
 				};
 
-				// now send the email
-				string emailBody = $"Your email verification code is {tokenFileContentsNew}";
-				string emailSubject = $"Your email verification code for {GLOBALS.origin}";
-				string emailFrom = GLOBALS.emailFrom;
-				string emailTo = email;
+				// now send the identity
+				string identityBody = $"Your identity verification code is {tokenFileContentsNew}";
+				string identitySubject = $"Your identity verification code for {GLOBALS.origin}";
+				string identityFrom = GLOBALS.identityFrom;
+				string identityTo = identity;
 
-				// send the email
-				await EmailHelper.SendEmail(emailFrom, emailTo, emailSubject, emailBody);
+				// send the identity
+				await EmailHelper.SendEmail(identityFrom, identityTo, identitySubject, identityBody);
 
-				return Ok("Verification code sent to email address");
+				return Ok("Verification code sent to identity address");
 					
 			}
 			catch (AmazonS3Exception e)

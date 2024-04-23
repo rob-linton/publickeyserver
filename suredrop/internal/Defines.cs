@@ -15,7 +15,7 @@ namespace publickeyserver
 		public static string s3packages = "";
         public static string origin = "";
         public static string password = "";
-		public static string emailFrom = "";
+		public static string identityFrom = "";
 
 		public static string MaxBucketSize = "100000000"; // 100Mb
 		public static string MaxBucketFiles = "100";
@@ -23,7 +23,7 @@ namespace publickeyserver
 
 		public static bool Anonymous = true;
 
-		public static string AllowedEmailDomains = "*";
+		public static string AllowedIdentityDomains = "*";
 
 
         public static int status_certs_enrolled = 0;

@@ -44,7 +44,7 @@ namespace publickeyserver
 		// ------------------------------------------------------------------------------------------------------------
 		public static async Task SendEmail(string sender, string recipient, string subject, string body)
 		{
-			// send an email
+			// send an identity
 			// https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-using-sdk-net.html
 
 
@@ -74,13 +74,13 @@ namespace publickeyserver
 				};
 				try
 				{
-					Console.WriteLine("Sending email using Amazon SES...");
+					Console.WriteLine("Sending identity using Amazon SES...");
 					var response = await client.SendEmailAsync(sendRequest);
-					Console.WriteLine("The email was sent successfully.");
+					Console.WriteLine("The identity was sent successfully.");
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine("The email was not sent.");
+					Console.WriteLine("The identity was not sent.");
 					Console.WriteLine("Error message: " + ex.Message);
 				}
 			}

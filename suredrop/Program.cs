@@ -28,7 +28,7 @@ namespace publickeyserver
 				GLOBALS.sesendpoint = envVars["SESENDPOINT"];
                 GLOBALS.s3bucket = envVars["S3BUCKET"];
                 GLOBALS.origin = envVars["ORIGIN"];
-				GLOBALS.emailFrom = envVars["EMAILFROM"];
+				GLOBALS.identityFrom = envVars["EMAILFROM"];
 
 				// optional
 				if (envVars.ContainsKey("MAX_BUCKET_SIZE"))
@@ -40,7 +40,7 @@ namespace publickeyserver
 				if (envVars.ContainsKey("ANONYMOUS"))
 					GLOBALS.Anonymous = Convert.ToBoolean(envVars["ANONYMOUS"]);
 				if (envVars.ContainsKey("ALLOWED_EMAIL_DOMAINS"))
-					GLOBALS.AllowedEmailDomains = envVars["ALLOWED_EMAIL_DOMAINS"];
+					GLOBALS.AllowedIdentityDomains = envVars["ALLOWED_EMAIL_DOMAINS"];
 
                 try
                 {

@@ -2,13 +2,13 @@ using System.Text.Json.Serialization;
 
 namespace suredrop;
 
-class EmailToken
+class IdentityToken
 {
 	[JsonPropertyName("token")]
 	public string? Token { get; set; }
 
-	[JsonPropertyName("email")]
-	public string? Email { get; set; }
+	[JsonPropertyName("identity")]
+	public string? Identity { get; set; }
 
 	// timestamp
 	[JsonPropertyName("timestamp")]

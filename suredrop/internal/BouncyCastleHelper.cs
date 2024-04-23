@@ -234,7 +234,7 @@ namespace publickeyserver
 		// --------------------------------------------------------------------------------------------------------
 		public static Org.BouncyCastle.X509.X509Certificate CreateCertificateBasedOnCertificateAuthorityPrivateKey(
 			string subjectName,
-			string email,
+			string identity,
 			string data,
 			string issuerName,
 			AsymmetricKeyParameter issuerPrivKey,
@@ -267,10 +267,10 @@ namespace publickeyserver
 			var a = new GeneralName(GeneralName.DnsName, subjectName);
 			GeneralName[] names;
 
-			if (!String.IsNullOrEmpty(email))
+			if (!String.IsNullOrEmpty(identity))
 			{
-				//var b = new GeneralName(GeneralName.OtherName, CreateGeneralName(X509Extensions.SubjectAlternativeName, email).ToAsn1Object());
-				var b = new GeneralName(GeneralName.Rfc822Name, email);
+				//var b = new GeneralName(GeneralName.OtherName, CreateGeneralName(X509Extensions.SubjectAlternativeName, identity).ToAsn1Object());
+				var b = new GeneralName(GeneralName.Rfc822Name, identity);
 				names = [a, b];
 			}
 			else
