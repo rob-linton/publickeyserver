@@ -509,8 +509,16 @@ namespace publickeyserver
 						{
 							raw = await AwsHelper.Get(client, tokenFile);
 						};
-						IdentityToken identityTokenFile = JsonConvert.DeserializeObject<IdentityToken>(Encoding.UTF8.GetString(raw) ?? "") ?? new IdentityToken();
-						
+						IdentityToken identityTokenFile = JsonConvert.DeserializeObject<IdentityToken>(Encoding.UTF8.GetString(raw) ?? "")!;
+						string identityFromTokenFile = identityTokenFile.Identity;
+						string identityType = identityTokenFile.IdentityType;
+
+						// if the identity does not match then throw an exception
+						if (identityFromTokenFile != identity)
+						{
+							throw new Exception($"Identities do not match {identity} != {identityFromTokenFile}");
+						}
+
 						long timestamp = Convert.ToInt64(identityTokenFile.Timestamp);
 
 						// get the current timestamp
@@ -559,7 +567,7 @@ namespace publickeyserver
 				}
 
 				// create the cert
-				var ret = await KeyHelper.CreateKey(publickeyRequestor, words, dataBase64, identity);
+				var ret = await KeyHelper.CreateKey(publickeyRequestor, words, dataBase64, identity, identityType);
 
 				GLOBALS.status_certs_enrolled++;
 				return Ok(ret);

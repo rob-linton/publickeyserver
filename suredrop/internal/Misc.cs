@@ -147,18 +147,10 @@ namespace publickeyserver
 			
 			string[] allowedDomains = allowedIdentityDomains.Split(',');
 			
-			string[] identityParts = identity.Split('@');
-
-			if (identityParts.Length != 2)
-				return false;
-			
 			foreach (string domain in allowedDomains)
 			{
-				if (identityParts[1].Equals(domain.Trim(), StringComparison.OrdinalIgnoreCase))
-					return true;
-				
-				// do a case insensitive compare between domain and identity and igbore spaces
-				if (identity.Equals(domain, StringComparison.OrdinalIgnoreCase))
+				// check if the domain is a substring of the identity
+				if (identity.Contains(domain.Trim()))
 					return true;
 			}	
 

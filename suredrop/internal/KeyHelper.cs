@@ -41,7 +41,7 @@ namespace publickeyserver
 		
 		}
 		// ------------------------------------------------------------------------------------------------------------
-		public static async Task<Dictionary<string, string>> CreateKey(AsymmetricKeyParameter publickeyRequestor, IWords words, string dataBase64, string identity)
+		public static async Task<Dictionary<string, string>> CreateKey(AsymmetricKeyParameter publickeyRequestor, IWords words, string dataBase64, string identity, string identityType)
 		{
 				// get a three word alias
 				string alias = await ControllerHelper.GenerateAlias(GLOBALS.origin, GLOBALS.s3endpoint, GLOBALS.s3key, GLOBALS.s3secret, words);

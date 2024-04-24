@@ -99,12 +99,19 @@ namespace publickeyserver
 			
 				// no token file, so generate one
 				string tokenFileContentsNew = Misc.GetRandomString(8);
-				IdentityToken identityToken = new IdentityToken();
-				identityToken.Identity = identity;
-				identityToken.Token = tokenFileContentsNew;
+				long unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+				IdentityToken identityToken = new IdentityToken()
+				{
+					Identity = identity,
+					Token = tokenFileContentsNew,
+					Timestamp = unixTimestamp.ToString(),
+					IdentityType = "email"
+				};
+				
 
 				// get a unix timestamp in utc
-				long unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+				
 				identityToken.Timestamp = unixTimestamp.ToString();
 
 				string dataNew = JsonConvert.SerializeObject(identityToken);
