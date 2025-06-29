@@ -1,7 +1,7 @@
-# Simple Step-by-Step Guide: How SureDrop Certificate System Works
+# Simple Step-by-Step Guide: How SurePack Certificate System Works
 
 ## Overview
-SureDrop is like a digital ID card system where users can get unique, secure identities for encrypted communication. Think of it as getting a special passport that only you can use.
+SurePack is like a digital ID card system where users can get unique, secure identities for encrypted communication. Think of it as getting a special passport that only you can use.
 
 ---
 
