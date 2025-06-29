@@ -497,11 +497,13 @@ namespace publickeyserver
 						return Misc.err(Response, "Invalid identity address", Help.simpleenroll);
 				}
 
+				string identityType = "";
 				if (identity.Length > 0 && token.Length > 0)
 				{
 					// validate the token
 					string tokenFile = $"{GLOBALS.origin}/tokens/{identity}.token";
 					string tokenFileContents = "";
+					
 					try
 					{
 						byte[] raw;
@@ -511,7 +513,7 @@ namespace publickeyserver
 						};
 						IdentityToken identityTokenFile = JsonConvert.DeserializeObject<IdentityToken>(Encoding.UTF8.GetString(raw) ?? "")!;
 						string identityFromTokenFile = identityTokenFile.Identity;
-						string identityType = identityTokenFile.IdentityType;
+						identityType = identityTokenFile.IdentityType;
 
 						// if the identity does not match then throw an exception
 						if (identityFromTokenFile != identity)
