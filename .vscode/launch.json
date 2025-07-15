@@ -74,7 +74,7 @@
 			"request": "launch",
 			"preLaunchTask": "build_surepack",
 			"program": "${workspaceFolder}/surepack/bin/Debug/net8.0/surepack.dll",
-			"args": ["create", "-v", "1", "-d", "localhost:5001", "-p","password", "-e", "rob.linton@mac.com", "-t","VUFU5ZHU"],
+			"args": ["create", "-v", "1", "-d", "localhost:5001", "-p","password", "-e", "rob.linton@mac.com", "-t","ZS6NFSQG"],
 			"cwd": "${workspaceFolder}/surepack/test",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",

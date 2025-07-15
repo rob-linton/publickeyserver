@@ -10,8 +10,8 @@ public class CustomExtensionData
 	[JsonPropertyName("dilithium_key")]
 	public string? DilithiumKey { get; set; }
 
-	[JsonPropertyName("email")]
-	public string? Email { get; set; }
+	[JsonPropertyName("identity")]
+	public string? Identity { get; set; }
 
 	[JsonPropertyName("token")]
 	public string? Token { get; set; }

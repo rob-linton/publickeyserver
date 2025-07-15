@@ -68,7 +68,7 @@ class Create
 			var data = new CustomExtensionData{
 				KyberKey = Convert.ToBase64String(KyberPublicKey),
 				DilithiumKey = Convert.ToBase64String(DilithiumPublicKey),
-				Email = opts.Email ?? string.Empty,
+				Identity = opts.Email ?? string.Empty,
 				Token = opts.Token ?? string.Empty
 			};
 			
