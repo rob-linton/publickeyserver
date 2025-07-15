@@ -8,6 +8,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY PublicKeyServer ./PublicKeyServer 
+COPY bc-csharp ./bc-csharp
 
 
 RUN cd PublicKeyServer; dotnet publish PublicKeyServer.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o /app/out

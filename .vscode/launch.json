@@ -5,10 +5,10 @@
 			"name": "Sure Drop .NET Core Launch (console)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_suredrop",
-			"program": "${workspaceFolder}/suredrop/bin/Debug/net8.0/suredrop.dll",
+			"preLaunchTask": "build_public_key_server",
+			"program": "${workspaceFolder}/PublicKeyServer/bin/Debug/net8.0/PublicKeyServer.dll",
 			"args": [],
-			"cwd": "${workspaceFolder}/suredrop",
+			"cwd": "${workspaceFolder}/PublicKeyServer",
 			"stopAtEntry": false,
 			"console":"integratedTerminal",
 			"env": {
@@ -22,11 +22,11 @@
 			"name": "Sure Drop .NET Core Launch (web)",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "build_suredrop",
+			"preLaunchTask": "build_public_key_server",
 			// If you have changed target frameworks, make sure to update the program path.
-			"program": "${workspaceFolder}/suredrop/bin/Debug/net8.0/suredrop.dll",
+			"program": "${workspaceFolder}/PublicKeyServer/bin/Debug/net8.0/PublicKeyServer.dll",
 			"args": [],
-			"cwd": "${workspaceFolder}/suredrop",
+			"cwd": "${workspaceFolder}/PublicKeyServer",
 			"stopAtEntry": false,
 			// Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
 			"serverReadyAction": {
