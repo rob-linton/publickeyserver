@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  fronthouse-git-server:
+    image: dockerly/public-key-server
+    container_name: public-key-server
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    restart: unless-stopped
