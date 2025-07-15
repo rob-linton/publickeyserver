@@ -1,18 +1,56 @@
+build server
+------------
+run docker desktop
+run wsl
+cd to root of project in wsl
+run ./build-publickeyserver.sh
+
+build clients
+-------------
+
+install public-key-server on ubuntu
+-----------------------------------
+# create security group
+
+# launch micro instance
+
+# Attach public IP
+
+
+# install docker
+sudo apt update
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+sudo apt install docker-ce
+
+# pull down docker image and run
+docker login
+docker pull dockerly/public-key-server
+
+# create the .env file
+
+# create the docker-compose.yml file
+
+# and run the following command 
+  docker-compose up -d
+
+# check the logs
+docker logs public-key-server
+docker compose logs public-key-server -f
+
+*** COPY AND THEN REMOVE THE ROOT CA FILE ***
+
+TODO
+----
+
 - Allow destination alias to be in a different domain
-
 - How to authenticate when sending?
-
 - Aliases now look like emails. If the email domain is in the whitelist then just add the front bit infront of the @ symbol, otherwise add the whole email address. .'s get replaced by dashes, dashes get replaced with -- dashes. 
-
 - Don't make it open source, but supply the source on request to verified recipients.
-
 - publickeyserver.org always adds the full email address in front. 
-
 - Limit publickeyserver.org to gmail, hotmail, apple etc accounts only, no company accounts.
-
-- Add a secondary authentication process for non whitelisted emaial domains
-
+- Add a secondary authentication process for non whitelisted emaail domains
 - add a blacklist option to the .env file
-
 - add the option for a root CA for sending between keyservers
 
