@@ -130,6 +130,16 @@ namespace publickeyserver
 		}
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		// simple ping endpoint for load balancers
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
+		[Route("ping")]
+		[HttpGet]
+		public IActionResult Ping()
+		{
+			return Ok("pong");
+		}
+
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		// returns the CA cert in x.509
 		// will create one if one does not already exist
 		// both the cacert and the RSA2048 keys are encrypted with AES-GCM on disk with the provided password
