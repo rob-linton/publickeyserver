@@ -31,8 +31,8 @@ RUN rm -f PublicKeyServer.dbg
 # Set executable permissions
 RUN chmod +x PublicKeyServer
 
-EXPOSE 5000
-ENV ASPNETCORE_URLS=http://0.0.0.0:5000
+EXPOSE 80
+ENV ASPNETCORE_URLS=http://0.0.0.0:80
 
 ENTRYPOINT ["./PublicKeyServer"]
 
