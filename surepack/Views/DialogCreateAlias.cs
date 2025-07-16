@@ -167,7 +167,7 @@ public class DialogCreateAlias
 
 		
 
-		FrameView viewDomain = new FrameView ("SureDrop Server (defaults to suredrop.org)") {
+		FrameView viewDomain = new FrameView ("Public Key Server (defaults to publickeyserver.org)") {
         	X = 1,
             Y = 1,
             Width = Dim.Fill () - 1,

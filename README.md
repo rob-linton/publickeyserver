@@ -130,7 +130,7 @@ surepack.zip/
 
 ```bash
 # Create a new identity
-surepack create -a myalias@suredrop.org
+surepack create -a myalias@publickeyserver.org
 
 # Pack files for recipients
 surepack pack -i "*.pdf" -a recipient1,recipient2 -f myalias -o package.surepack
@@ -194,7 +194,7 @@ Based on the codebase analysis, potential improvements could include:
 
 ## Production Deployment
 
-The reference implementation runs at https://suredrop.org with:
+The reference implementation runs at https://publickeyserver.org with:
 
 - AWS S3 for scalable storage
 - ASP.NET Core on Linux servers

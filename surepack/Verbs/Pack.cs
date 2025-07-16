@@ -448,7 +448,7 @@ class Pack
 				File.Delete("envelope.signature");
 
 				// add a comment to the zip file
-				zip.Comment = "This zip file was created by suredrop.org";
+				zip.Comment = "This zip file was created by publickeyserver.org";
 			}
 
 			Misc.WriteLine("\nDone. Only the following recipient aliases will be able to unpack this surepack.\n");

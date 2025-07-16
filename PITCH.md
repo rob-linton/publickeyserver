@@ -93,7 +93,7 @@ In summary, SurePack combines the security experts have long desired with the **
 
 ## Execution Plan and Why We’re Ready
 
-Our team has not only envisioned this product – **we’ve built it.** The heavy R\&D lifting (architecture design, cryptographic implementation, and prototyping) is already done and **validated in action**. We have a working codebase for both client and server. In fact, a reference implementation is live at **Suredrop.org**, demonstrating the technology in real-world conditions. This significantly de-risks the project: we are not asking for a leap of faith on unproven tech, but rather to productize and launch what we’ve already proven to work.
+Our team has not only envisioned this product – **we’ve built it.** The heavy R\&D lifting (architecture design, cryptographic implementation, and prototyping) is already done and **validated in action**. We have a working codebase for both client and server. In fact, a reference implementation is live at **publickeyserver.org**, demonstrating the technology in real-world conditions. This significantly de-risks the project: we are not asking for a leap of faith on unproven tech, but rather to productize and launch what we’ve already proven to work.
 
 Key development milestones already achieved:
 

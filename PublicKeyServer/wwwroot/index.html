@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SureDrop.org</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Key Server - Secure File Transfer with SurePack</title>
     <style>
         body {
             background-color: #1a1a1a;
             color: #f2f2f2;
-            font-family: 'Arial', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
             padding: 0;
+            line-height: 1.6;
         }
         a {
             color: #4a86e8;
@@ -19,39 +21,168 @@
             text-decoration: underline;
         }
         .container {
-            width: 80%;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            border-bottom: 1px solid #333;
         }
         h1 {
             color: #e6e6e6;
             margin: 0.5em 0;
+            font-size: 2.5em;
+        }
+        h2 {
+            color: #4a86e8;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #66a3ff;
+            margin-top: 30px;
+            margin-bottom: 15px;
         }
         p {
-            line-height: 1.6;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        .intro {
+            font-size: 1.2em;
+            color: #ccc;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        pre {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+            border: 1px solid #444;
+        }
+        code {
+            background-color: #2d2d2d;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .download-section {
+            background-color: #252525;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 40px 0;
+        }
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .download-item {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .download-item:hover {
+            background-color: #3d3d3d;
+        }
+        .download-item a {
+            color: #ffffff;
+            display: block;
+            font-family: monospace;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .feature-card {
+            background-color: #252525;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .certificate-section {
+            background-color: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .nav-menu {
+            background-color: #252525;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .nav-menu a {
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        .section {
+            margin: 50px 0;
+        }
+        .quick-start {
+            background-color: #1e3a5f;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        .step {
+            margin: 20px 0;
+        }
+        .step-number {
+            display: inline-block;
+            background-color: #4a86e8;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
         }
         ul {
             list-style: none;
             padding: 0;
         }
         ul li {
-            background-color: #333;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
         }
-        ul li a {
-            color: #ffffff;
+        ul li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #4a86e8;
         }
-        ul li a:hover {
-            color: #ddd;
+        .info-box {
+            background-color: #2a4a2a;
+            border-left: 4px solid #4a86e8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
         }
-		pre {
-            font-size: 16px;
+        .warning-box {
+            background-color: #4a3a2a;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -59,32 +190,318 @@
     <div class="container">
         <div class="header">
             <h1>{ORIGIN}</h1>
-            <p>Transfer end-to-end post quantum encrypted digital packages comprising of messages and documents of unlimited size using aliases.</p>
-            <a href="https://github.com/rob-linton/suredrop/wiki/About">Learn More</a>
+            <p class="intro">Transfer end-to-end post-quantum encrypted digital packages comprising messages and documents of unlimited size using aliases.</p>
+            <div class="nav-menu">
+                <a href="#how-it-works">How It Works</a>
+                <a href="#downloads">Downloads</a>
+                <a href="#quick-start">Quick Start</a>
+                <a href="#user-manual">User Manual</a>
+                <a href="#security">Security</a>
+            </div>
         </div>
 
-		
-		<div style="text-align: center;">
-			<br>
-			<pre>{CERTIFICATE}</pre>
-			<br>
-		</div>
+        <div class="certificate-section">
+            <pre>{CERTIFICATE}</pre>
+        </div>
 
-
-        <h2>Download</h2>
-        <ul>
-            <li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/osx-x64/surepack.exe">    <pre>(Mac x64)                   surepack</pre></a></li>
-            <li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/osx-arm64/surepack">      <pre>(Mac Arm64)                 surepack</pre></a></li>
-
-            <li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/win-x64/surepack">        <pre>(Windows x64)               surepack.exe</pre></a></li>
-			<li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/win-x86/surepack.exe">    <pre>(Windows x86)               surepack.exe</pre></a></li>
-            <li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/win-arm86/surepack">      <pre>(Windows Arm64)             surepack.exe</pre></a></li>
+        <section id="how-it-works" class="section">
+            <h2>🔐 How the Public Key Server Works</h2>
             
-			<li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/linux-x64/surepack">      <pre>(Linux x64)                 surepack</pre></a></li>
-			<li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/linux-arm64/surepack.exe"><pre>(Linux Arm64)               surepack</pre></a></li>
-            <li><a href="https://s3.ap-southeast-2.amazonaws.com/download.suredrop.org/publish/linux-arm/surepack">      <pre>(Linux Arm - Rasberry Pi)   surepack</pre></a></li>
+            <p>The Public Key Server is the backbone of secure, decentralized file sharing using post-quantum cryptography. Here's how it enables secure communication:</p>
             
-        </ul>
+            <h3>Key Components</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔑</div>
+                    <h4>Alias Registration</h4>
+                    <p>Users create unique aliases (identities) with quantum-resistant key pairs. Public keys are stored on the server, private keys remain with users.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📡</div>
+                    <h4>Key Distribution</h4>
+                    <p>The server acts as a trusted directory, allowing users to look up public keys by alias name for encryption.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h4>Package Routing</h4>
+                    <p>Encrypted packages are temporarily stored on the server and routed to recipients without the server accessing content.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h4>Zero-Knowledge</h4>
+                    <p>The server never sees private keys or decrypted content. All encryption/decryption happens client-side.</p>
+                </div>
+            </div>
+
+            <h3>The Process Flow</h3>
+            
+            <div class="info-box">
+                <ol>
+                    <li><strong>Alias Creation:</strong> User generates a quantum-resistant key pair locally</li>
+                    <li><strong>Registration:</strong> Public key and alias are registered with the server</li>
+                    <li><strong>Lookup:</strong> Sender queries server for recipient's public key</li>
+                    <li><strong>Encryption:</strong> Files are encrypted locally using recipient's public key</li>
+                    <li><strong>Upload:</strong> Encrypted package is uploaded to server</li>
+                    <li><strong>Notification:</strong> Server notifies recipient (if email provided)</li>
+                    <li><strong>Download:</strong> Recipient retrieves encrypted package</li>
+                    <li><strong>Decryption:</strong> Package is decrypted locally with private key</li>
+                </ol>
+            </div>
+
+            <h3>Privacy & Security Features</h3>
+            
+            <ul>
+                <li><strong>Anonymous Option:</strong> Create aliases without email or personal information</li>
+                <li><strong>Quantum-Resistant:</strong> Uses CRYSTALS-Dilithium and CRYSTALS-Kyber algorithms</li>
+                <li><strong>End-to-End Encryption:</strong> Server cannot decrypt packages</li>
+                <li><strong>Temporary Storage:</strong> Packages are automatically deleted after retrieval or timeout</li>
+                <li><strong>Certificate Pinning:</strong> Prevents man-in-the-middle attacks</li>
+            </ul>
+        </section>
+
+        <section id="downloads" class="section">
+            <h2>📥 Download SurePack</h2>
+            
+            <div class="download-section">
+                <p>SurePack is available for all major platforms. Choose your version:</p>
+                
+                <div class="download-grid">
+                    <div class="download-item">
+                        <a href="{DOWNLOAD_BASE_URL}/osx-x64/surepack">
+                            <strong>macOS (Intel x64)</strong><br>
+                            <code>surepack</code>
+                        </a>
+                    </div>
+                    <div class="download-item">
+                        <a href="{DOWNLOAD_BASE_URL}/osx-arm64/surepack">
+                            <strong>macOS (Apple Silicon)</strong><br>
+                            <code>surepack</code>
+                        </a>
+                    </div>
+                    <div class="download-item">
+                        <a href="{DOWNLOAD_BASE_URL}/win-x64/surepack.exe">
+                            <strong>Windows (64-bit)</strong><br>
+                            <code>surepack.exe</code>
+                        </a>
+                    </div>
+                    <div class="download-item">
+                        <a href="{DOWNLOAD_BASE_URL}/win-x86/surepack.exe">
+                            <strong>Windows (32-bit)</strong><br>
+                            <code>surepack.exe</code>
+                        </a>
+                    </div>
+                    <div class="download-item">
+                        <a href="{DOWNLOAD_BASE_URL}/win-arm64/surepack.exe">
+                            <strong>Windows (ARM64)</strong><br>
+                            <code>surepack.exe</code>
+                        </a>
+                    </div>
+                    <div class="download-item">
+                        <a href="{DOWNLOAD_BASE_URL}/linux-x64/surepack">
+                            <strong>Linux (x64)</strong><br>
+                            <code>surepack</code>
+                        </a>
+                    </div>
+                    <div class="download-item">
+                        <a href="{DOWNLOAD_BASE_URL}/linux-arm64/surepack">
+                            <strong>Linux (ARM64)</strong><br>
+                            <code>surepack</code>
+                        </a>
+                    </div>
+                    <div class="download-item">
+                        <a href="{DOWNLOAD_BASE_URL}/linux-arm/surepack">
+                            <strong>Linux (ARM/Raspberry Pi)</strong><br>
+                            <code>surepack</code>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="warning-box">
+                    <strong>Note:</strong> On macOS and Linux, you may need to make the file executable: <code>chmod +x surepack</code>
+                </div>
+            </div>
+        </section>
+
+        <section id="quick-start" class="section">
+            <h2>🚀 Quick Start Guide</h2>
+            
+            <div class="quick-start">
+                <h3>Two Simple Steps to Get Started</h3>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>Create Your Identity (Alias)</strong>
+                    <pre>surepack create</pre>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Send a File</strong>
+                    <pre>surepack pack -i myfile.pdf -a recipient-alias -f your-alias -o package.surepack
+surepack send -i package.surepack</pre>
+                </div>
+                
+                <p>That's it! Your file is now securely encrypted and sent.</p>
+            </div>
+        </section>
+
+        <section id="user-manual" class="section">
+            <h2>📖 SurePack User Manual</h2>
+            
+            <h3>What is SurePack?</h3>
+            <p>SurePack is a secure file transfer application that uses military-grade encryption with post-quantum cryptography. It allows you to send files securely and optionally anonymously to other users. Think of it as "PGP for 2025" - but much easier to use!</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h4>End-to-End Encryption</h4>
+                    <p>Only recipients can decrypt your files</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h4>Quantum-Resistant</h4>
+                    <p>Protected against future quantum computers</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎭</div>
+                    <h4>Anonymous Option</h4>
+                    <p>No email or identity required</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h4>Easy to Use</h4>
+                    <p>Simple commands or GUI interface</p>
+                </div>
+            </div>
+
+            <h3>Creating Your Alias (Digital Identity)</h3>
+            
+            <p>An alias is your unique identity in the SurePack system. It's like a secure email address that you'll use to send and receive files.</p>
+            
+            <h4>Command Line Method</h4>
+            <pre>surepack create</pre>
+            
+            <p>You'll be prompted to enter a password to protect your private keys. Choose a strong password and remember it!</p>
+            
+            <h4>GUI Method</h4>
+            <pre>surepack gui</pre>
+            <p>Then navigate to: <strong>Manage Aliases → Create New Alias</strong></p>
+            
+            <h4>Optional: Associate an Email</h4>
+            <p>If you want to be identifiable (not anonymous), you can associate an email:</p>
+            
+            <pre># Step 1: Request verification code
+surepack verify -e yourname@example.com
+
+# Step 2: Create alias with verification code
+surepack create -e yourname@example.com -t 123456</pre>
+            
+            <h3>Sending Files</h3>
+            
+            <h4>Step 1: Pack Your Files</h4>
+            <pre>surepack pack -i "document.pdf" -a "recipient-alias" -f "your-alias" -o "package.surepack"</pre>
+            
+            <p>For multiple files:</p>
+            <pre>surepack pack -i "file1.doc,file2.pdf,file3.jpg" -a "recipient" -f "sender" -o "package.surepack"</pre>
+            
+            <p>For a whole folder:</p>
+            <pre>surepack pack -i "C:\MyFolder" -a "recipient" -f "sender" -o "package.surepack"</pre>
+            
+            <h4>Step 2: Send the Package</h4>
+            <pre>surepack send -i "package.surepack"</pre>
+            
+            <div class="info-box">
+                <strong>Tip:</strong> You can combine pack and send in one command:
+                <pre>surepack pack -i "file.pdf" -a "recipient" -f "sender" -o "pkg.surepack" && surepack send -i "pkg.surepack"</pre>
+            </div>
+            
+            <h3>Receiving Files</h3>
+            
+            <h4>Step 1: Check for Packages</h4>
+            <pre>surepack receive -a "your-alias"</pre>
+            
+            <h4>Step 2: Unpack the Files</h4>
+            <pre>surepack unpack -i "received-package.surepack" -o "output-folder"</pre>
+            
+            <h3>Command Reference</h3>
+            
+            <table style="width: 100%; background-color: #252525; border-radius: 8px; padding: 20px;">
+                <tr>
+                    <th style="text-align: left; padding: 10px;">Command</th>
+                    <th style="text-align: left; padding: 10px;">Description</th>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><code>surepack create</code></td>
+                    <td style="padding: 10px;">Create a new alias</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><code>surepack verify -e email</code></td>
+                    <td style="padding: 10px;">Request email verification code</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><code>surepack list</code></td>
+                    <td style="padding: 10px;">Show your aliases</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><code>surepack pack</code></td>
+                    <td style="padding: 10px;">Create encrypted package</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><code>surepack send</code></td>
+                    <td style="padding: 10px;">Upload package to server</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><code>surepack receive</code></td>
+                    <td style="padding: 10px;">Download packages</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><code>surepack unpack</code></td>
+                    <td style="padding: 10px;">Decrypt and extract files</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><code>surepack gui</code></td>
+                    <td style="padding: 10px;">Launch graphical interface</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="security" class="section">
+            <h2>🔒 Security Information</h2>
+            
+            <h3>Where Your Keys Are Stored</h3>
+            <ul>
+                <li><strong>Windows:</strong> <code>%APPDATA%\SureDrop</code></li>
+                <li><strong>macOS:</strong> <code>~/Library/Application Support/SureDrop</code></li>
+                <li><strong>Linux:</strong> <code>~/.suredrop</code></li>
+            </ul>
+            
+            <div class="warning-box">
+                <strong>Important:</strong> Your private keys are stored encrypted with your password. Never share your private key files or password with anyone!
+            </div>
+            
+            <h3>Best Practices</h3>
+            <ul>
+                <li>Use a strong, unique password for your alias</li>
+                <li>Back up your key files in a secure location</li>
+                <li>Verify recipient aliases before sending sensitive files</li>
+                <li>For maximum anonymity, don't associate an email with your alias</li>
+                <li>Regularly check for software updates</li>
+            </ul>
+            
+            <h3>Technical Details</h3>
+            <p>SurePack uses the following cryptographic algorithms:</p>
+            <ul>
+                <li><strong>Digital Signatures:</strong> CRYSTALS-Dilithium (NIST PQC standard)</li>
+                <li><strong>Key Encapsulation:</strong> CRYSTALS-Kyber (NIST PQC standard)</li>
+                <li><strong>Symmetric Encryption:</strong> AES-256-GCM</li>
+                <li><strong>Key Derivation:</strong> Argon2id</li>
+            </ul>
+        </section>
+
+        <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid #333;">
+            <p style="color: #999;">© 2024 Public Key Server Project | <a href="https://github.com/publickeyserver">GitHub</a></p>
+        </div>
     </div>
 </body>
 </html>
