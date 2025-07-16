@@ -5,7 +5,7 @@ services:
     image: dockerly/public-key-server
     container_name: public-key-server
     ports:
-      - "80:80"
+      - "5000:5000"
     env_file:
       - .env
     volumes:
