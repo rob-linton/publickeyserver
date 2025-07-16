@@ -88,3 +88,32 @@ done
 
 echo "Build process completed for version $VER!"
 echo "All builds are located in: ../Deploy/$VER/"
+
+# Copy latest versions to the latest folder
+echo "========================================="
+echo "Copying latest versions to latest folder..."
+echo "========================================="
+
+# Create latest directory if it doesn't exist
+mkdir -p ../Deploy/latest
+
+# Copy each platform build to the latest folder
+for PLATFORM in "${platforms[@]}"; do
+    if [ -d "../Deploy/$VER/$PLATFORM" ]; then
+        echo "Copying $PLATFORM to latest folder..."
+        
+        # Remove existing platform folder in latest if it exists
+        rm -rf ../Deploy/latest/$PLATFORM
+        
+        # Copy the new version to latest
+        cp -r ../Deploy/$VER/$PLATFORM ../Deploy/latest/
+        
+        echo "✓ $PLATFORM copied to latest"
+    else
+        echo "⚠ $PLATFORM build not found, skipping copy to latest"
+    fi
+done
+
+echo
+echo "Latest versions copied to: ../Deploy/latest/"
+echo "Build and deployment process completed!"

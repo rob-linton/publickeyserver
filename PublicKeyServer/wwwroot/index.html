@@ -4,185 +4,389 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Public Key Server - Secure File Transfer with SurePack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-bright: #f0f6fc;
+            --accent-primary: #58a6ff;
+            --accent-success: #3fb950;
+            --accent-warning: #f0883e;
+            --accent-error: #f85149;
+            --border-color: #30363d;
+        }
+        
         body {
-            background-color: #1a1a1a;
-            color: #f2f2f2;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            font-size: 14px;
         }
+        
         a {
-            color: #4a86e8;
+            color: var(--accent-primary);
             text-decoration: none;
         }
+        
         a:hover {
             text-decoration: underline;
+            text-decoration-style: dotted;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
+        
         .header {
-            text-align: center;
-            margin-bottom: 50px;
-            padding: 40px 0;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+            padding: 20px 0;
         }
+        
         h1 {
-            color: #e6e6e6;
-            margin: 0.5em 0;
             font-size: 2.5em;
+            margin: 10px 0;
+            font-weight: 400;
+            letter-spacing: -1px;
         }
+        
+        h1::before {
+            content: "$ ";
+            color: var(--accent-success);
+        }
+        
         h2 {
-            color: #4a86e8;
-            margin-top: 40px;
-            margin-bottom: 20px;
             font-size: 1.8em;
+            margin-bottom: 20px;
+            color: var(--text-bright);
+            font-weight: 400;
         }
+        
+        h2::before {
+            content: "## ";
+            color: var(--accent-success);
+            opacity: 0.6;
+        }
+        
         h3 {
-            color: #66a3ff;
-            margin-top: 30px;
-            margin-bottom: 15px;
+            font-size: 1.3em;
+            margin: 25px 0 15px 0;
+            color: var(--accent-primary);
+            font-weight: 400;
+        }
+        
+        h3::before {
+            content: "### ";
+            color: var(--text-secondary);
+            opacity: 0.5;
         }
         p {
             line-height: 1.8;
             margin-bottom: 16px;
         }
         .intro {
-            font-size: 1.2em;
-            color: #ccc;
-            max-width: 800px;
-            margin: 0 auto 30px;
+            font-size: 1em;
+            color: var(--text-secondary);
+            max-width: 900px;
+            margin: 15px 0;
+            font-style: italic;
         }
-        pre {
-            background-color: #2d2d2d;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-size: 14px;
-            border: 1px solid #444;
+        
+        .intro::before {
+            content: "// ";
+            color: var(--text-secondary);
         }
+        pre, code {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95em;
+        }
+        
         code {
-            background-color: #2d2d2d;
             padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', Courier, monospace;
+            color: var(--accent-warning);
+        }
+        
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            line-height: 1.45;
+        }
+        
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: inherit;
         }
         .download-section {
-            background-color: #252525;
-            padding: 30px;
-            border-radius: 10px;
-            margin: 40px 0;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 6px;
         }
+        
         .download-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
+        
         .download-item {
-            background-color: #333;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
             padding: 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            position: relative;
         }
+        
         .download-item:hover {
-            background-color: #3d3d3d;
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
         }
+        
+        .download-item::before {
+            content: ">";
+            position: absolute;
+            left: 8px;
+            top: 15px;
+            color: var(--accent-success);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .download-item:hover::before {
+            opacity: 1;
+        }
+        
         .download-item a {
-            color: #ffffff;
             display: block;
-            font-family: monospace;
+            color: var(--text-primary);
+            text-decoration: none;
+            padding-left: 20px;
+        }
+        
+        .download-item:hover a {
+            color: var(--text-bright);
         }
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin: 30px 0;
         }
+        
         .feature-card {
-            background-color: #252525;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
             padding: 20px;
-            border-radius: 8px;
-            text-align: center;
+            border-radius: 6px;
+            transition: border-color 0.2s ease;
         }
+        
+        .feature-card:hover {
+            border-color: var(--accent-primary);
+        }
+        
         .feature-icon {
-            font-size: 2em;
+            font-size: 1.5em;
             margin-bottom: 10px;
+            opacity: 0.8;
         }
         .certificate-section {
-            background-color: #2d2d2d;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 30px 0;
-            text-align: center;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 0.9em;
         }
+        
+        .certificate-section.empty {
+            display: none;
+        }
+        
+        .certificate-section pre {
+            margin: 0;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+        
         .nav-menu {
-            background-color: #252525;
-            padding: 15px;
-            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             margin: 20px 0;
-            text-align: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
         }
+        
         .nav-menu a {
-            margin: 0 15px;
-            font-weight: 500;
+            padding: 6px 12px;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--text-bright);
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+            text-decoration: none;
         }
         .section {
-            margin: 50px 0;
+            margin: 40px 0;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
         }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
         .quick-start {
-            background-color: #1e3a5f;
-            padding: 25px;
-            border-radius: 8px;
-            margin: 30px 0;
-        }
-        .step {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 6px;
             margin: 20px 0;
         }
+        
+        .step {
+            margin: 15px 0;
+            position: relative;
+            padding-left: 30px;
+        }
+        
         .step-number {
-            display: inline-block;
-            background-color: #4a86e8;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 30px;
-            margin-right: 10px;
+            position: absolute;
+            left: 0;
+            color: var(--accent-success);
             font-weight: bold;
+        }
+        
+        .step-number::before {
+            content: "[";
+        }
+        
+        .step-number::after {
+            content: "]";
         }
         ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
+        
         ul li {
-            margin: 10px 0;
-            padding-left: 25px;
+            margin: 8px 0;
+            padding-left: 20px;
             position: relative;
+            color: var(--text-secondary);
         }
+        
         ul li:before {
-            content: "▸";
+            content: "$";
             position: absolute;
             left: 0;
-            color: #4a86e8;
+            color: var(--accent-success);
         }
+        
+        ul li strong {
+            color: var(--text-primary);
+        }
+        
         .info-box {
-            background-color: #2a4a2a;
-            border-left: 4px solid #4a86e8;
+            background-color: var(--bg-secondary);
+            border-left: 3px solid var(--accent-primary);
             padding: 15px;
             margin: 20px 0;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-size: 0.95em;
         }
+        
+        .info-box ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .info-box li {
+            margin: 8px 0;
+        }
+        
         .warning-box {
-            background-color: #4a3a2a;
-            border-left: 4px solid #ff9800;
+            background-color: rgba(240, 136, 62, 0.1);
+            border-left: 3px solid var(--accent-warning);
+            border: 1px solid rgba(240, 136, 62, 0.3);
             padding: 15px;
             margin: 20px 0;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        
+        .warning-box strong {
+            color: var(--accent-warning);
+        }
+        .github-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 400;
+            transition: all 0.2s ease;
+            margin: 5px;
+            background-color: var(--bg-secondary);
+            font-size: 0.9em;
+        }
+        
+        .github-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--text-bright);
+            text-decoration: none;
+            background-color: var(--bg-tertiary);
+        }
+        
+        .github-btn span {
+            opacity: 0.8;
+        }
+        
+        .github-btn-primary:hover {
+            border-color: var(--accent-primary);
+        }
+        
+        .github-btn-blue {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        .github-btn-green {
+            border-color: var(--accent-success);
+            color: var(--accent-success);
+        }
+        
+        h4 {
+            margin: 15px 0 10px 0;
+            color: var(--text-bright);
+            font-weight: 400;
         }
     </style>
 </head>
@@ -197,6 +401,7 @@
                 <a href="#quick-start">Quick Start</a>
                 <a href="#user-manual">User Manual</a>
                 <a href="#security">Security</a>
+                <a href="#open-source">Open Source</a>
             </div>
         </div>
 
@@ -499,9 +704,56 @@ surepack create -e yourname@example.com -t 123456</pre>
             </ul>
         </section>
 
+        <section id="open-source" class="section">
+            <h2>💻 Open Source</h2>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <p style="margin-bottom: 30px;">The Public Key Server and SurePack are open source projects. View the source code, contribute, or report issues on GitHub.</p>
+                
+                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                    <a href="https://github.com/rob-linton/publickeyserver" class="github-btn github-btn-primary">
+                        <span style="margin-right: 8px;">📁</span> View Source Code
+                    </a>
+                    <a href="https://github.com/rob-linton/publickeyserver/issues" class="github-btn github-btn-blue">
+                        <span style="margin-right: 8px;">🐛</span> Report Issues
+                    </a>
+                    <a href="https://github.com/rob-linton/publickeyserver/blob/main/README.md" class="github-btn github-btn-green">
+                        <span style="margin-right: 8px;">📖</span> Documentation
+                    </a>
+                    <a href="https://github.com/rob-linton/publickeyserver/fork" class="github-btn github-btn-primary">
+                        <span style="margin-right: 8px;">🍴</span> Contribute
+                    </a>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <iframe src="https://ghbtns.com/github-btn.html?user=rob-linton&repo=publickeyserver&type=star&count=true&size=large" 
+                            frameborder="0" scrolling="0" width="170" height="30" title="GitHub Stars"></iframe>
+                    <iframe src="https://ghbtns.com/github-btn.html?user=rob-linton&repo=publickeyserver&type=fork&count=true&size=large" 
+                            frameborder="0" scrolling="0" width="170" height="30" title="GitHub Forks" style="margin-left: 10px;"></iframe>
+                </div>
+            </div>
+        </section>
+
         <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid #333;">
-            <p style="color: #999;">© 2024 Public Key Server Project | <a href="https://github.com/publickeyserver">GitHub</a></p>
+            <p style="color: #999;">© 2024 Public Key Server Project | <a href="https://github.com/rob-linton/publickeyserver">GitHub Repository</a></p>
         </div>
     </div>
+    
+    <script>
+        // Hide certificate section if empty
+        document.addEventListener('DOMContentLoaded', function() {
+            const certSection = document.querySelector('.certificate-section');
+            const certContent = certSection.querySelector('pre');
+            
+            if (certContent && (
+                certContent.textContent.trim() === '' || 
+                certContent.textContent.trim() === '{CERTIFICATE}' ||
+                certContent.textContent.trim() === 'undefined' ||
+                certContent.textContent.trim() === 'null'
+            )) {
+                certSection.classList.add('empty');
+            }
+        });
+    </script>
 </body>
 </html>
