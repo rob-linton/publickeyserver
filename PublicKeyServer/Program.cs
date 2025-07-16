@@ -25,13 +25,13 @@ namespace publickeyserver
 
                 // Check if we have environment variables from system or .env file
                 // Prefer system environment variables over .env file
-                GLOBALS.s3key = Environment.GetEnvironmentVariable("S3KEY") ?? (envVars.ContainsKey("S3KEY") ? envVars["S3KEY"] : null);
-                GLOBALS.s3secret = Environment.GetEnvironmentVariable("S3SECRET") ?? (envVars.ContainsKey("S3SECRET") ? envVars["S3SECRET"] : null);
-                GLOBALS.s3endpoint = Environment.GetEnvironmentVariable("S3ENDPOINT") ?? (envVars.ContainsKey("S3ENDPOINT") ? envVars["S3ENDPOINT"] : null);
-                GLOBALS.sesendpoint = Environment.GetEnvironmentVariable("SESENDPOINT") ?? (envVars.ContainsKey("SESENDPOINT") ? envVars["SESENDPOINT"] : null);
-                GLOBALS.s3bucket = Environment.GetEnvironmentVariable("S3BUCKET") ?? (envVars.ContainsKey("S3BUCKET") ? envVars["S3BUCKET"] : null);
-                GLOBALS.origin = Environment.GetEnvironmentVariable("ORIGIN") ?? (envVars.ContainsKey("ORIGIN") ? envVars["ORIGIN"] : null);
-                GLOBALS.identityFrom = Environment.GetEnvironmentVariable("EMAILFROM") ?? (envVars.ContainsKey("EMAILFROM") ? envVars["EMAILFROM"] : null);
+                GLOBALS.s3key = Environment.GetEnvironmentVariable("S3KEY") ?? (envVars.ContainsKey("S3KEY") ? envVars["S3KEY"] : "") ?? "";
+                GLOBALS.s3secret = Environment.GetEnvironmentVariable("S3SECRET") ?? (envVars.ContainsKey("S3SECRET") ? envVars["S3SECRET"] : "") ?? "";
+                GLOBALS.s3endpoint = Environment.GetEnvironmentVariable("S3ENDPOINT") ?? (envVars.ContainsKey("S3ENDPOINT") ? envVars["S3ENDPOINT"] : "") ?? "";
+                GLOBALS.sesendpoint = Environment.GetEnvironmentVariable("SESENDPOINT") ?? (envVars.ContainsKey("SESENDPOINT") ? envVars["SESENDPOINT"] : "") ?? "";
+                GLOBALS.s3bucket = Environment.GetEnvironmentVariable("S3BUCKET") ?? (envVars.ContainsKey("S3BUCKET") ? envVars["S3BUCKET"] : "") ?? "";
+                GLOBALS.origin = Environment.GetEnvironmentVariable("ORIGIN") ?? (envVars.ContainsKey("ORIGIN") ? envVars["ORIGIN"] : "") ?? "";
+                GLOBALS.identityFrom = Environment.GetEnvironmentVariable("EMAILFROM") ?? (envVars.ContainsKey("EMAILFROM") ? envVars["EMAILFROM"] : "") ?? "";
 
                 // optional parameters
                 var maxBucketSize = Environment.GetEnvironmentVariable("MAX_BUCKET_SIZE") ?? (envVars.ContainsKey("MAX_BUCKET_SIZE") ? envVars["MAX_BUCKET_SIZE"] : null);
@@ -57,7 +57,7 @@ namespace publickeyserver
                 // password
                 try
                 {
-                    GLOBALS.password = Environment.GetEnvironmentVariable("PASSWORD") ?? (envVars.ContainsKey("PASSWORD") ? envVars["PASSWORD"] : null);
+                    GLOBALS.password = Environment.GetEnvironmentVariable("PASSWORD") ?? (envVars.ContainsKey("PASSWORD") ? envVars["PASSWORD"] : "") ?? "";
                 }
                 catch { }
 
