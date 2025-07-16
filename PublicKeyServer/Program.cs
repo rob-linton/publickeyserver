@@ -19,34 +19,57 @@ namespace publickeyserver
             Console.WriteLine($"{GLOBALS.origin} {GLOBALS.version}");
             if (args.Length < 5)
             {
+                // Try to load from .env file first
                 DotEnv.Load(options: new DotEnvOptions(trimValues: true));
                 var envVars = DotEnv.Read();
 
-                GLOBALS.s3key = envVars["S3KEY"];
-                GLOBALS.s3secret = envVars["S3SECRET"];
-                GLOBALS.s3endpoint = envVars["S3ENDPOINT"];
-				GLOBALS.sesendpoint = envVars["SESENDPOINT"];
-                GLOBALS.s3bucket = envVars["S3BUCKET"];
-                GLOBALS.origin = envVars["ORIGIN"];
-				GLOBALS.identityFrom = envVars["EMAILFROM"];
+                // Check if we have environment variables from system or .env file
+                // Prefer system environment variables over .env file
+                GLOBALS.s3key = Environment.GetEnvironmentVariable("S3KEY") ?? (envVars.ContainsKey("S3KEY") ? envVars["S3KEY"] : null);
+                GLOBALS.s3secret = Environment.GetEnvironmentVariable("S3SECRET") ?? (envVars.ContainsKey("S3SECRET") ? envVars["S3SECRET"] : null);
+                GLOBALS.s3endpoint = Environment.GetEnvironmentVariable("S3ENDPOINT") ?? (envVars.ContainsKey("S3ENDPOINT") ? envVars["S3ENDPOINT"] : null);
+                GLOBALS.sesendpoint = Environment.GetEnvironmentVariable("SESENDPOINT") ?? (envVars.ContainsKey("SESENDPOINT") ? envVars["SESENDPOINT"] : null);
+                GLOBALS.s3bucket = Environment.GetEnvironmentVariable("S3BUCKET") ?? (envVars.ContainsKey("S3BUCKET") ? envVars["S3BUCKET"] : null);
+                GLOBALS.origin = Environment.GetEnvironmentVariable("ORIGIN") ?? (envVars.ContainsKey("ORIGIN") ? envVars["ORIGIN"] : null);
+                GLOBALS.identityFrom = Environment.GetEnvironmentVariable("EMAILFROM") ?? (envVars.ContainsKey("EMAILFROM") ? envVars["EMAILFROM"] : null);
 
-				// optional
-				if (envVars.ContainsKey("MAX_BUCKET_SIZE"))
-					GLOBALS.MaxBucketSize = envVars["MAX_BUCKET_SIZE"];
-				if (envVars.ContainsKey("MAX_BUCKET_FILES"))
-					GLOBALS.MaxBucketFiles = envVars["MAX_BUCKET_FILES"];
-				if (envVars.ContainsKey("MAX_PACKAGE_SIZE"))
-					GLOBALS.MaxPackageSize = envVars["MAX_PACKAGE_SIZE"];
-				if (envVars.ContainsKey("ANONYMOUS"))
-					GLOBALS.Anonymous = Convert.ToBoolean(envVars["ANONYMOUS"]);
-				if (envVars.ContainsKey("ALLOWED_EMAIL_DOMAINS"))
-					GLOBALS.AllowedIdentityDomains = envVars["ALLOWED_EMAIL_DOMAINS"];
+                // optional parameters
+                var maxBucketSize = Environment.GetEnvironmentVariable("MAX_BUCKET_SIZE") ?? (envVars.ContainsKey("MAX_BUCKET_SIZE") ? envVars["MAX_BUCKET_SIZE"] : null);
+                if (!string.IsNullOrEmpty(maxBucketSize))
+                    GLOBALS.MaxBucketSize = maxBucketSize;
 
+                var maxBucketFiles = Environment.GetEnvironmentVariable("MAX_BUCKET_FILES") ?? (envVars.ContainsKey("MAX_BUCKET_FILES") ? envVars["MAX_BUCKET_FILES"] : null);
+                if (!string.IsNullOrEmpty(maxBucketFiles))
+                    GLOBALS.MaxBucketFiles = maxBucketFiles;
+
+                var maxPackageSize = Environment.GetEnvironmentVariable("MAX_PACKAGE_SIZE") ?? (envVars.ContainsKey("MAX_PACKAGE_SIZE") ? envVars["MAX_PACKAGE_SIZE"] : null);
+                if (!string.IsNullOrEmpty(maxPackageSize))
+                    GLOBALS.MaxPackageSize = maxPackageSize;
+
+                var anonymous = Environment.GetEnvironmentVariable("ANONYMOUS") ?? (envVars.ContainsKey("ANONYMOUS") ? envVars["ANONYMOUS"] : null);
+                if (!string.IsNullOrEmpty(anonymous))
+                    GLOBALS.Anonymous = Convert.ToBoolean(anonymous);
+
+                var allowedDomains = Environment.GetEnvironmentVariable("ALLOWED_EMAIL_DOMAINS") ?? (envVars.ContainsKey("ALLOWED_EMAIL_DOMAINS") ? envVars["ALLOWED_EMAIL_DOMAINS"] : null);
+                if (!string.IsNullOrEmpty(allowedDomains))
+                    GLOBALS.AllowedIdentityDomains = allowedDomains;
+
+                // password
                 try
                 {
-                    GLOBALS.password = envVars["PASSWORD"];
+                    GLOBALS.password = Environment.GetEnvironmentVariable("PASSWORD") ?? (envVars.ContainsKey("PASSWORD") ? envVars["PASSWORD"] : null);
                 }
                 catch { }
+
+                // Validate required parameters
+                if (string.IsNullOrEmpty(GLOBALS.s3key) || string.IsNullOrEmpty(GLOBALS.s3secret) || 
+                    string.IsNullOrEmpty(GLOBALS.s3endpoint) || string.IsNullOrEmpty(GLOBALS.s3bucket) || 
+                    string.IsNullOrEmpty(GLOBALS.origin))
+                {
+                    Console.WriteLine("Error: Missing required configuration parameters.");
+                    Console.WriteLine("Required: S3KEY, S3SECRET, S3ENDPOINT, S3BUCKET, ORIGIN");
+                    Environment.Exit(1);
+                }
 
                 Console.WriteLine("------------------------------------------------------------------------------------------------------------");
                 Console.WriteLine("Reading configuration from env...");
