@@ -97,7 +97,7 @@ namespace publickeyserver
 
 			try
 			{
-				byte[] cacertBytes = System.IO.File.ReadAllBytes($"subcacert.{GLOBALS.origin}.pem");
+				byte[] cacertBytes = System.IO.File.ReadAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"subcacert.{GLOBALS.origin}.pem"));
 
 				byte[] cacertDecrypted = BouncyCastleHelper.DecryptWithKey(cacertBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
 
@@ -147,11 +147,11 @@ namespace publickeyserver
 
 			try
 			{
-				byte[] cacertBytes = System.IO.File.ReadAllBytes($"cacert.{GLOBALS.origin}.pem");
+				byte[] cacertBytes = System.IO.File.ReadAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"cacert.{GLOBALS.origin}.pem"));
 				byte[] cacertDecrypted = BouncyCastleHelper.DecryptWithKey(cacertBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
 				certPEM = cacertDecrypted.FromBytes();
 
-				byte[] subcacertBytes = System.IO.File.ReadAllBytes($"subcacert.{GLOBALS.origin}.pem");
+				byte[] subcacertBytes = System.IO.File.ReadAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"subcacert.{GLOBALS.origin}.pem"));
 				byte[] subcacertDecrypted = BouncyCastleHelper.DecryptWithKey(subcacertBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
 				subcertPEM = subcacertDecrypted.FromBytes();
 
@@ -676,7 +676,7 @@ namespace publickeyserver
 				//
 				// get the CA private key
 				//
-				byte[] cakeysBytes = System.IO.File.ReadAllBytes($"subcakeys.{GLOBALS.origin}.pem");
+				byte[] cakeysBytes = System.IO.File.ReadAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"subcakeys.{GLOBALS.origin}.pem"));
 				byte[] cakeysDecrypted = BouncyCastleHelper.DecryptWithKey(cakeysBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
 				string cakeysPEM = cakeysDecrypted.FromBytes();
 				AsymmetricCipherKeyPair cakeys = (AsymmetricCipherKeyPair)BouncyCastleHelper.fromPEM(cakeysPEM);

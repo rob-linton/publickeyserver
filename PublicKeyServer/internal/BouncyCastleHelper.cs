@@ -43,11 +43,14 @@ namespace publickeyserver
 			string password
 			)
 		{
+			// Ensure certificate directory exists
+			System.IO.Directory.CreateDirectory(GLOBALS.CertificateDirectory);
+			
 			// first check if we have a sub ca
-			if (!File.Exists($"subcacert.{origin}.pem"))
+			if (!File.Exists(Path.Combine(GLOBALS.CertificateDirectory, $"subcacert.{origin}.pem")))
 			{
 				// if we don't then check if we have a root ca
-				if (!File.Exists($"cacert.{origin}.pem"))
+				if (!File.Exists(Path.Combine(GLOBALS.CertificateDirectory, $"cacert.{origin}.pem")))
 				{
 					// if we dont create the root ca
 					CreateEncryptedCA(origin, password);
@@ -56,7 +59,7 @@ namespace publickeyserver
 				//
 				// get the CA private key
 				//
-				byte[] cakeysBytes = System.IO.File.ReadAllBytes($"SAVE-ME-OFFLINE-cakeys.{GLOBALS.origin}.pem");
+				byte[] cakeysBytes = System.IO.File.ReadAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"SAVE-ME-OFFLINE-cakeys.{GLOBALS.origin}.pem"));
 				byte[] cakeysDecrypted = BouncyCastleHelper.DecryptWithKey(cakeysBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
 				string cakeysPEM = cakeysDecrypted.FromBytes();
 				AsymmetricCipherKeyPair cakeys = (AsymmetricCipherKeyPair)BouncyCastleHelper.fromPEM(cakeysPEM);
@@ -89,8 +92,8 @@ namespace publickeyserver
 				byte[] cacertEncrypted = EncryptWithKey(cacertBytes, password.ToBytes(), origin.ToBytes());
 				byte[] cakeysEncrypted = EncryptWithKey(cakeysBytes, password.ToBytes(), origin.ToBytes());
 
-				System.IO.File.WriteAllBytes($"cacert.{origin}.pem", cacertEncrypted);
-				System.IO.File.WriteAllBytes($"SAVE-ME-OFFLINE-cakeys.{origin}.pem", cakeysEncrypted);
+				System.IO.File.WriteAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"cacert.{origin}.pem"), cacertEncrypted);
+				System.IO.File.WriteAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"SAVE-ME-OFFLINE-cakeys.{origin}.pem"), cakeysEncrypted);
 			}
 		}
 		// --------------------------------------------------------------------------------------------------------
@@ -116,8 +119,8 @@ namespace publickeyserver
 				byte[] cacertEncrypted = EncryptWithKey(cacertBytes, password.ToBytes(), origin.ToBytes());
 				byte[] cakeysEncrypted = EncryptWithKey(cakeysBytes, password.ToBytes(), origin.ToBytes());
 
-				System.IO.File.WriteAllBytes($"subcacert.{origin}.pem", cacertEncrypted);
-				System.IO.File.WriteAllBytes($"subcakeys.{origin}.pem", cakeysEncrypted);
+				System.IO.File.WriteAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"subcacert.{origin}.pem"), cacertEncrypted);
+				System.IO.File.WriteAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"subcakeys.{origin}.pem"), cakeysEncrypted);
 			}
 		}
 		// --------------------------------------------------------------------------------------------------------
@@ -695,7 +698,7 @@ namespace publickeyserver
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		public static async Task<byte[]> GetCaRootFingerprint(string domain)
 		{
-			byte[] cacertBytes = System.IO.File.ReadAllBytes($"cacert.{GLOBALS.origin}.pem");
+			byte[] cacertBytes = System.IO.File.ReadAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"cacert.{GLOBALS.origin}.pem"));
 			byte[] cacertDecrypted = BouncyCastleHelper.DecryptWithKey(cacertBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
 			string certPEM = cacertDecrypted.FromBytes();
 

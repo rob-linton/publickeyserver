@@ -116,7 +116,10 @@ namespace publickeyserver
                 // test the validity of the password
                 try
 				{
-                    if (!File.Exists($"subcacert.{GLOBALS.origin}.pem"))
+                    // Ensure certificate directory exists
+                    System.IO.Directory.CreateDirectory(GLOBALS.CertificateDirectory);
+                    
+                    if (!File.Exists(Path.Combine(GLOBALS.CertificateDirectory, $"subcacert.{GLOBALS.origin}.pem")))
 					{
                         Console.WriteLine("The Certificate Authority Sub Cert does not exist.");
                         //Console.WriteLine("Please enter the password again to confirm creation:");
@@ -140,7 +143,7 @@ namespace publickeyserver
 					{
                         try
 						{
-                            byte[] cacertBytes = BouncyCastleHelper.DecryptWithKey(File.ReadAllBytes($"cacert.{GLOBALS.origin}.pem"), password1.ToBytes(), GLOBALS.origin.ToBytes());
+                            byte[] cacertBytes = BouncyCastleHelper.DecryptWithKey(File.ReadAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"cacert.{GLOBALS.origin}.pem")), password1.ToBytes(), GLOBALS.origin.ToBytes());
 
                             // if we get here we successfully decrypted it, so accept the password
                             GLOBALS.password = password1;
@@ -160,7 +163,10 @@ namespace publickeyserver
 			}
             else
 			{
-                if (!File.Exists($"subcacert.{GLOBALS.origin}.pem"))
+                // Ensure certificate directory exists
+                System.IO.Directory.CreateDirectory(GLOBALS.CertificateDirectory);
+                
+                if (!File.Exists(Path.Combine(GLOBALS.CertificateDirectory, $"subcacert.{GLOBALS.origin}.pem")))
                 {
                     BouncyCastleHelper.CheckCAandCreate(GLOBALS.origin, GLOBALS.password);
                 }

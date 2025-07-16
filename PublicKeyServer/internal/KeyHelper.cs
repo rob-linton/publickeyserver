@@ -49,7 +49,7 @@ namespace publickeyserver
 				//
 				// get the CA private key
 				//
-				byte[] cakeysBytes = System.IO.File.ReadAllBytes($"subcakeys.{GLOBALS.origin}.pem");
+				byte[] cakeysBytes = System.IO.File.ReadAllBytes(Path.Combine(GLOBALS.CertificateDirectory, $"subcakeys.{GLOBALS.origin}.pem"));
 				byte[] cakeysDecrypted = BouncyCastleHelper.DecryptWithKey(cakeysBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
 				string cakeysPEM = cakeysDecrypted.FromBytes();
 				AsymmetricCipherKeyPair cakeys = (AsymmetricCipherKeyPair)BouncyCastleHelper.fromPEM(cakeysPEM);

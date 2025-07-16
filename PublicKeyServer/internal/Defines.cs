@@ -25,6 +25,8 @@ namespace publickeyserver
 
 		public static string AllowedIdentityDomains = "*";
 
+		// Certificate storage directory
+		public static string CertificateDirectory = "certificates";
 
         public static int status_certs_enrolled = 0;
         public static int status_certs_served = 0;
