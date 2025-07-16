@@ -28,6 +28,9 @@ using Org.BouncyCastle.Asn1.Ocsp;
 using System.Reflection.Metadata;
 using System.Linq;
 using suredrop;
+using System.Text.Json;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.X509;
 
 
 namespace publickeyserver
@@ -386,6 +389,73 @@ namespace publickeyserver
 				foreach (var s in san)
 				{
 					certificate.Add($"Subject Alternative Name: {s.ToString()}");
+				}
+
+				// get the custom extension data (quantum keys, etc.)
+				string customData = BouncyCastleHelper.GetCustomExtensionData(x509, "1.3.6.1.4.1.57055");
+				if (!string.IsNullOrEmpty(customData))
+				{
+					try
+					{
+						byte[] decodedBytes = Convert.FromBase64String(customData);
+						string jsonData = Encoding.UTF8.GetString(decodedBytes);
+						var extensionData = System.Text.Json.JsonSerializer.Deserialize<CustomExtensionData>(jsonData);
+						
+						certificate.Add("<br>");
+						certificate.Add("Quantum-Resistant Keys:");
+						
+						if (!string.IsNullOrEmpty(extensionData?.KyberKey))
+						{
+							certificate.Add($"Kyber Public Key: {extensionData.KyberKey.Substring(0, Math.Min(50, extensionData.KyberKey.Length))}...");
+						}
+						
+						if (!string.IsNullOrEmpty(extensionData?.DilithiumKey))
+						{
+							certificate.Add($"Dilithium Public Key: {extensionData.DilithiumKey.Substring(0, Math.Min(50, extensionData.DilithiumKey.Length))}...");
+						}
+						
+						if (!string.IsNullOrEmpty(extensionData?.Identity))
+						{
+							certificate.Add($"Identity (Email): {extensionData.Identity}");
+						}
+					}
+					catch
+					{
+						certificate.Add($"Custom Extension Data: Present but could not be decoded");
+					}
+				}
+
+				// get signature algorithm
+				certificate.Add($"<br>Signature Algorithm: {x509.SigAlgName}");
+				
+				// get key usage
+				var keyUsageExtension = x509.GetExtensionValue(X509Extensions.KeyUsage);
+				if (keyUsageExtension != null)
+				{
+					try
+					{
+						var keyUsage = KeyUsage.GetInstance(Asn1Object.FromByteArray(keyUsageExtension.GetOctets()));
+						certificate.Add($"Key Usage: {keyUsage.ToString()}");
+					}
+					catch
+					{
+						certificate.Add($"Key Usage: Present but could not be decoded");
+					}
+				}
+				
+				// get basic constraints
+				var basicConstraints = x509.GetExtensionValue(X509Extensions.BasicConstraints);
+				if (basicConstraints != null)
+				{
+					try
+					{
+						var bc = BasicConstraints.GetInstance(Asn1Object.FromByteArray(basicConstraints.GetOctets()));
+						certificate.Add($"Basic Constraints: CA={bc.IsCA()}");
+					}
+					catch
+					{
+						certificate.Add($"Basic Constraints: Present but could not be decoded");
+					}
 				}
 
 				bool recipientValid = false;
