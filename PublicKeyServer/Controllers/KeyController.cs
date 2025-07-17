@@ -368,12 +368,41 @@ namespace publickeyserver
 				}
 
 				byte[] raw;
-				using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+				string cert;
+				try
 				{
-					raw = await AwsHelper.Get(client, $"{GLOBALS.origin}/cert/{alias}.pem");
-				};
-
-				string cert = raw.FromBytes();
+					using (var client = new AmazonS3Client(GLOBALS.s3key, GLOBALS.s3secret, RegionEndpoint.GetBySystemName(GLOBALS.s3endpoint)))
+					{
+						raw = await AwsHelper.Get(client, $"{GLOBALS.origin}/cert/{alias}.pem");
+					};
+					cert = raw.FromBytes();
+				}
+				catch
+				{
+					// If the certificate is not found, return the index page
+					string index = System.IO.File.ReadAllText("wwwroot/index.html");
+					index = index.Replace("{CERTIFICATE}", "");
+					index = index.Replace("{ORIGIN}", GLOBALS.origin);
+					
+					// Get the root CA signature
+					try
+					{
+						byte[] rootFingerprint = await BouncyCastleHelper.GetCaRootFingerprint(GLOBALS.origin);
+						List<string> rootSig = Misc.GenerateSignature(rootFingerprint);
+						string rootSignature = string.Join(" ", rootSig);
+						index = index.Replace("{ROOTCA}", rootSignature);
+					}
+					catch
+					{
+						index = index.Replace("{ROOTCA}", "");
+					}
+					
+					return new ContentResult()
+					{
+						Content = index,
+						ContentType = "text/html",
+					};
+				}
 
 				//
 				// we now return the info page
