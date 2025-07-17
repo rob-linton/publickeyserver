@@ -345,6 +345,20 @@ namespace publickeyserver
 					string index = System.IO.File.ReadAllText("wwwroot/index.html");
 					index = index.Replace("{CERTIFICATE}", "");
 					index = index.Replace("{ORIGIN}", GLOBALS.origin);
+					
+					// Get the root CA signature
+					try
+					{
+						byte[] rootFingerprint = await BouncyCastleHelper.GetCaRootFingerprint(GLOBALS.origin);
+						List<string> rootSig = Misc.GenerateSignature(rootFingerprint);
+						string rootSignature = string.Join(" ", rootSig);
+						index = index.Replace("{ROOTCA}", rootSignature);
+					}
+					catch
+					{
+						index = index.Replace("{ROOTCA}", "");
+					}
+					
 					return new ContentResult()
 					{
 						Content = index,
@@ -500,6 +514,20 @@ namespace publickeyserver
 				string index2 = System.IO.File.ReadAllText("wwwroot/index.html");
 				index2 = index2.Replace("{CERTIFICATE}", certInfo);
 				index2 = index2.Replace("{ORIGIN}", GLOBALS.origin);
+				
+				// Get the root CA signature for this server
+				try
+				{
+					byte[] rootFingerprint = await BouncyCastleHelper.GetCaRootFingerprint(GLOBALS.origin);
+					List<string> rootSig = Misc.GenerateSignature(rootFingerprint);
+					string rootSignature = string.Join(" ", rootSig);
+					index2 = index2.Replace("{ROOTCA}", rootSignature);
+				}
+				catch
+				{
+					index2 = index2.Replace("{ROOTCA}", "");
+				}
+				
 				return new ContentResult()
 				{
 					Content = index2,

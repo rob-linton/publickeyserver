@@ -429,6 +429,58 @@
             background-color: var(--bg-tertiary);
             color: var(--text-bright) !important;
         }
+        
+        .root-signature-section {
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .root-signature-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-success), var(--accent-primary));
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .root-signature-section h3 {
+            margin: 0 0 20px 0;
+            font-size: 1.4em;
+            color: var(--accent-primary);
+        }
+        
+        .root-signature-section h3::before {
+            content: "";
+        }
+        
+        .signature-content {
+            font-size: 1.2em;
+            font-weight: 500;
+            color: var(--text-bright);
+            letter-spacing: 0.5px;
+            line-height: 1.8;
+            font-family: 'JetBrains Mono', monospace;
+            word-spacing: 0.5em;
+            text-transform: uppercase;
+        }
+        
+        .root-signature-section.empty {
+            display: none;
+        }
     </style>
     
     <!-- GitHub SVG Icon -->
@@ -456,6 +508,11 @@
 
         <div class="certificate-section">
             <pre>{CERTIFICATE}</pre>
+        </div>
+
+        <div class="root-signature-section">
+            <h3>🔐 Root Certificate Authority Signature</h3>
+            <div class="signature-content">{ROOTCA}</div>
         </div>
 
         <section id="how-it-works" class="section">
@@ -804,6 +861,19 @@ surepack create -e yourname@example.com -t 123456</pre>
                 certContent.textContent.trim() === 'null'
             )) {
                 certSection.classList.add('empty');
+            }
+            
+            // Hide root signature section if empty
+            const rootSection = document.querySelector('.root-signature-section');
+            const rootContent = rootSection.querySelector('.signature-content');
+            
+            if (rootContent && (
+                rootContent.textContent.trim() === '' || 
+                rootContent.textContent.trim() === '{ROOTCA}' ||
+                rootContent.textContent.trim() === 'undefined' ||
+                rootContent.textContent.trim() === 'null'
+            )) {
+                rootSection.classList.add('empty');
             }
         });
     </script>
