@@ -21,7 +21,7 @@
             --accent-error: #f85149;
             --border-color: #30363d;
         }
-         
+        
         body {
             background-color: var(--bg-primary);
             color: var(--text-primary);
@@ -30,12 +30,6 @@
             padding: 0;
             line-height: 1.6;
             font-size: 14px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
         }
         
         a {
@@ -48,14 +42,23 @@
             text-decoration-style: dotted;
         }
         
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
         h1 {
             font-size: 2.5em;
-            margin: 30px 0 20px 0;
+            margin: 10px 0;
             font-weight: 400;
             letter-spacing: -1px;
-            color: var(--text-bright);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
         }
         
         h1::before {
@@ -65,7 +68,7 @@
         
         h2 {
             font-size: 1.8em;
-            margin: 40px 0 20px 0;
+            margin-bottom: 20px;
             color: var(--text-bright);
             font-weight: 400;
         }
@@ -78,7 +81,7 @@
         
         h3 {
             font-size: 1.3em;
-            margin: 30px 0 15px 0;
+            margin: 25px 0 15px 0;
             color: var(--accent-primary);
             font-weight: 400;
         }
@@ -89,10 +92,215 @@
             opacity: 0.5;
         }
         
+        h4 {
+            margin: 15px 0 10px 0;
+            color: var(--text-bright);
+            font-weight: 400;
+        }
+        
         p {
             line-height: 1.8;
             margin-bottom: 16px;
+        }
+        
+        .intro {
+            font-size: 1em;
+            color: var(--text-secondary);
+            max-width: 900px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+        
+        .intro::before {
+            content: "// ";
+            color: var(--text-secondary);
+        }
+        
+        pre, code {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95em;
+        }
+        
+        code {
+            padding: 2px 6px;
+            color: var(--accent-warning);
+        }
+        
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            line-height: 1.45;
+        }
+        
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px 0;
+        }
+        
+        .nav-menu a {
+            padding: 6px 12px;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--text-bright);
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+            text-decoration: none;
+        }
+        
+        .section {
+            margin: 40px 0;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        ul li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: var(--text-secondary);
+        }
+        
+        ul li:before {
+            content: "$";
+            position: absolute;
+            left: 0;
+            color: var(--accent-success);
+        }
+        
+        ul li strong {
             color: var(--text-primary);
+        }
+        
+        ol {
+            padding-left: 30px;
+            margin: 15px 0;
+        }
+        
+        ol li {
+            margin: 8px 0;
+        }
+        
+        .info-box {
+            background-color: var(--bg-secondary);
+            border-left: 3px solid var(--accent-primary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        
+        .info-box ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .info-box li {
+            margin: 8px 0;
+        }
+        
+        .warning-box {
+            background-color: rgba(240, 136, 62, 0.1);
+            border-left: 3px solid var(--accent-warning);
+            border: 1px solid rgba(240, 136, 62, 0.3);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        
+        .warning-box strong {
+            color: var(--accent-warning);
+        }
+        
+        .github-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 400;
+            transition: all 0.2s ease;
+            margin: 5px;
+            background-color: var(--bg-secondary);
+            font-size: 0.9em;
+        }
+        
+        .github-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--text-bright);
+            text-decoration: none;
+            background-color: var(--bg-tertiary);
+        }
+        
+        .github-btn span {
+            opacity: 0.8;
+        }
+        
+        .github-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 8px;
+            fill: currentColor;
+        }
+        
+        .footer-github-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 5px;
+            fill: currentColor;
+        }
+        
+        .footer-github-link:hover {
+            color: var(--accent-primary) !important;
+        }
+        
+        .nav-github-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 6px;
+            fill: currentColor;
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 40px 0;
         }
         
         strong {
@@ -105,95 +313,7 @@
             font-style: italic;
         }
         
-        code {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 2px 6px;
-            color: var(--accent-warning);
-            font-family: inherit;
-            font-size: 0.95em;
-        }
-        
-        pre {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 16px;
-            overflow-x: auto;
-            margin: 20px 0;
-        }
-        
-        pre code {
-            background-color: transparent;
-            border: none;
-            padding: 0;
-            color: var(--text-primary);
-            display: block;
-            white-space: pre;
-        }
-        
-        hr {
-            border: none;
-            border-top: 1px solid var(--border-color);
-            margin: 40px 0;
-        }
-        
-        /* Navigation bar */
-        .nav-bar {
-            background-color: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .nav-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        
-        .nav-links a {
-            color: var(--text-secondary);
-            font-size: 0.9em;
-            transition: color 0.2s ease;
-        }
-        
-        .nav-links a:hover {
-            color: var(--text-bright);
-            text-decoration: none;
-        }
-        
-        .section {
-            margin: 40px 0;
-            padding: 20px 0;
-        }
-        
-        ul {
-            margin: 15px 0;
-            padding-left: 30px;
-        }
-        
-        ol {
-            margin: 15px 0;
-            padding-left: 30px;
-        }
-        
-        li {
-            margin: 8px 0;
-        }
-        
+        /* Pitch-specific styling */
         .highlight-box {
             background-color: var(--bg-secondary);
             border-left: 3px solid var(--accent-primary);
@@ -219,37 +339,33 @@
             font-size: 0.9em;
         }
         
-        .footer {
-            text-align: center;
-            margin-top: 60px;
-            padding-top: 40px;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-secondary);
+        .sources ul {
+            margin-top: 10px;
         }
     </style>
+    
+    <!-- GitHub SVG Icon -->
+    <svg style="display: none;">
+        <symbol id="github-icon" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </symbol>
+    </svg>
 </head>
 <body>
-    <nav class="nav-bar">
-        <div class="nav-content">
-            <div class="nav-links">
-                <a href="index.html">← Documentation Hub</a>
+    <div class="container">
+        <div class="header">
+            <h1>SurePack: Anonymous, Quantum‑Resilient Secure File Sharing</h1>
+            <p class="intro">A business case for revolutionizing secure file transfer with post-quantum cryptography and user-friendly design</p>
+            <div class="nav-menu">
+                <a href="index.html">Documentation Hub</a>
                 <a href="#problem">Problem</a>
                 <a href="#solution">Solution</a>
                 <a href="#features">Features</a>
                 <a href="#market">Market</a>
                 <a href="#execution">Execution</a>
-                <a href="https://github.com/rob-linton/publickeyserver">
-                    <svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-                    </svg>
-                    GitHub
-                </a>
+                <a href="https://github.com/rob-linton/publickeyserver"><svg class="nav-github-icon"><use href="#github-icon"></use></svg>GitHub</a>
             </div>
         </div>
-    </nav>
-    
-    <div class="container">
-        <h1>SurePack: Anonymous, Quantum‑Resilient Secure File Sharing</h1>
         
         <section id="problem" class="section">
             <h2>The Problem: Insecure File Sharing is Costly and Outdated</h2>
@@ -428,16 +544,8 @@
             </ul>
         </div>
         
-        <div class="footer">
-            <p>Business Case & Pitch • 
-                <a href="https://github.com/rob-linton/publickeyserver">
-                    <svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-                    </svg>
-                    GitHub
-                </a>
-            </p>
-            <p>© 2024 PublicKeyServer Project</p>
+        <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border-color);">
+            <p style="color: var(--text-secondary);">© 2024 Public Key Server Project | <a href="https://github.com/rob-linton/publickeyserver" class="footer-github-link" style="color: var(--text-secondary); transition: color 0.2s ease;"><svg class="footer-github-icon"><use href="#github-icon"></use></svg>GitHub Repository</a></p>
         </div>
     </div>
 </body>

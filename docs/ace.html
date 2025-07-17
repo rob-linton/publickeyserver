@@ -1,440 +1,561 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACE Protocol Specification - PublicKeyServer</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-tertiary: #21262d;
-            --text-primary: #c9d1d9;
-            --text-secondary: #8b949e;
-            --text-bright: #f0f6fc;
-            --accent-primary: #58a6ff;
-            --accent-success: #3fb950;
-            --accent-warning: #f0883e;
-            --accent-error: #f85149;
-            --border-color: #30363d;
-        }
-        
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-            font-size: 14px;
-        }
-        
-        a {
-            color: var(--accent-primary);
-            text-decoration: none;
-        }
-        
-        a:hover {
-            text-decoration: underline;
-            text-decoration-style: dotted;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 30px;
-            padding: 20px 0;
-        }
-        
-        h1 {
-            font-size: 2.5em;
-            margin: 10px 0;
-            font-weight: 400;
-            letter-spacing: -1px;
-        }
-        
-        h1::before {
-            content: "$ ";
-            color: var(--accent-success);
-        }
-        
-        h2 {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            color: var(--text-bright);
-            font-weight: 400;
-        }
-        
-        h2::before {
-            content: "## ";
-            color: var(--accent-success);
-            opacity: 0.6;
-        }
-        
-        h3 {
-            font-size: 1.3em;
-            margin: 25px 0 15px 0;
-            color: var(--accent-primary);
-            font-weight: 400;
-        }
-        
-        h3::before {
-            content: "### ";
-            color: var(--text-secondary);
-            opacity: 0.5;
-        }
-        
-        h4 {
-            margin: 15px 0 10px 0;
-            color: var(--text-bright);
-            font-weight: 400;
-        }
-        
-        p {
-            line-height: 1.8;
-            margin-bottom: 16px;
-        }
-        
-        .intro {
-            font-size: 1em;
-            color: var(--text-secondary);
-            max-width: 900px;
-            margin: 15px 0;
-            font-style: italic;
-        }
-        
-        .intro::before {
-            content: "// ";
-            color: var(--text-secondary);
-        }
-        
-        pre, code {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.95em;
-        }
-        
-        code {
-            padding: 2px 6px;
-            color: var(--accent-warning);
-        }
-        
-        pre {
-            padding: 16px;
-            overflow-x: auto;
-            line-height: 1.45;
-        }
-        
-        pre code {
-            background: none;
-            border: none;
-            padding: 0;
-            color: inherit;
-        }
-        
-        .nav-menu {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 20px 0;
-            padding: 15px 0;
-        }
-        
-        .nav-menu a {
-            padding: 6px 12px;
-            color: var(--text-secondary);
-            border: 1px solid transparent;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-            font-size: 0.9em;
-        }
-        
-        .nav-menu a:hover {
-            color: var(--text-bright);
-            background-color: var(--bg-secondary);
-            border-color: var(--border-color);
-            text-decoration: none;
-        }
-        
-        .section {
-            margin: 40px 0;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .section:last-child {
-            border-bottom: none;
-        }
-        
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        ul li {
-            margin: 8px 0;
-            padding-left: 20px;
-            position: relative;
-            color: var(--text-secondary);
-        }
-        
-        ul li:before {
-            content: "$";
-            position: absolute;
-            left: 0;
-            color: var(--accent-success);
-        }
-        
-        ul li strong {
-            color: var(--text-primary);
-        }
-        
-        .info-box {
-            background-color: var(--bg-secondary);
-            border-left: 3px solid var(--accent-primary);
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 6px;
-            font-size: 0.95em;
-        }
-        
-        .info-box ol {
-            margin: 0;
-            padding-left: 20px;
-        }
-        
-        .info-box li {
-            margin: 8px 0;
-        }
-        
-        .warning-box {
-            background-color: rgba(240, 136, 62, 0.1);
-            border-left: 3px solid var(--accent-warning);
-            border: 1px solid rgba(240, 136, 62, 0.3);
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 6px;
-            font-size: 0.95em;
-        }
-        
-        .warning-box strong {
-            color: var(--accent-warning);
-        }
-        
-        .github-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            text-decoration: none;
-            color: var(--text-primary);
-            font-weight: 400;
-            transition: all 0.2s ease;
-            margin: 5px;
-            background-color: var(--bg-secondary);
-            font-size: 0.9em;
-        }
-        
-        .github-btn:hover {
-            border-color: var(--accent-primary);
-            color: var(--text-bright);
-            text-decoration: none;
-            background-color: var(--bg-tertiary);
-        }
-        
-        .github-btn span {
-            opacity: 0.8;
-        }
-        
-        .github-icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            vertical-align: middle;
-            margin-right: 8px;
-            fill: currentColor;
-        }
-        
-        .footer-github-icon {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            vertical-align: middle;
-            margin-right: 5px;
-            fill: currentColor;
-        }
-        
-        .footer-github-link:hover {
-            color: var(--accent-primary) !important;
-        }
-        
-        .nav-github-icon {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            vertical-align: middle;
-            margin-right: 6px;
-            fill: currentColor;
-        }
-        
-        .highlight-box {
-            background-color: var(--bg-secondary);
-            border-left: 3px solid var(--accent-primary);
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 6px;
-        }
-        
-        hr {
-            border: none;
-            border-top: 1px solid var(--border-color);
-            margin: 40px 0;
-        }
-    </style>
-    
-    <!-- GitHub SVG Icon -->
-    <svg style="display: none;">
-        <symbol id="github-icon" viewBox="0 0 24 24">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-        </symbol>
-    </svg>
+<title>ace.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Anonymous Certificate Enrollment protocol (ACE)</h1>
-            <p class="intro">A simple, opinionated protocol for creating, providing and validating anonymous certificates for encryption without identity</p>
-            <div class="nav-menu">
-                <a href="index.html">Documentation Hub</a>
-                <a href="#abstract">Abstract</a>
-                <a href="#authentication">Authentication</a>
-                <a href="#implementation">Implementation</a>
-                <a href="https://github.com/rob-linton/publickeyserver"><svg class="nav-github-icon"><use href="#github-icon"></use></svg>GitHub</a>
-            </div>
-        </div>
-        
-        <div class="highlight-box">
-            <p>This protocol is loosely based on the Enrollment over Secure Transport <a href="https://tools.ietf.org/html/rfc7030">EST</a> (RFC7030) protocol.<br>
-            https://tools.ietf.org/html/rfc7030</p>
-        </div>
-        
-        <section id="abstract" class="section">
-            <h2>Abstract</h2>
-            <p>RFC7030 (EST) provides a secure method for creating and verifying certificates.</p>
-            <p>The ACE protocol is a simple, opinionated version of EST, developed for the purpose of creating, providing and validating anonymous certificates that may be used for encryption without identity.</p>
-            <p>The ACE protocol is designed (as is EST) to provide an automated method for creating, retrieving and verifying certificates. However this protocol removes all requirement for identification, other than the verification that a certificate is bound to an anonymous alias.</p>
-            <p>This protocol has been designed to facilitate an end-to-end encrypted communication such that the private key associated with an alias never leaves the client device and that the device is associated with an anonymous alias and nothing more.</p>
-            <p>The assumption being, that to communicate securely and anonymously using an end-to-end encryption protocol that can be securely verified by all parties, all one needs to know is the <code>alias</code> of the destination individual.</p>
-        </section>
-        
-        <section id="detail" class="section">
-            <h2>Detail</h2>
-            <p>The ACE protocol is designed to be as simple as possible with very little (if any) customization options.</p>
-            <p>RSA key pairs are RSA2048.</p>
-            <p>X.509 certificates are signed using the following algorithm:</p>
-            <p><code>SHA512WITHRSA</code></p>
-            <p>Alias's are automatically assigned and are a random group of three words separated by a hyphen.</p>
-            <p>eg:
-            missions-locks-sox.publickeyserver.org</p>
-            <p>Optional extra information may be baked into an X.509 certificate. The base OID for your info is as follows:</p>
-            <p><code>iso.org.dod.internet.private.enterprise.publickeyserver (1.3.6.1.4.1.57055)</code></p>
-            <p>Optional information must be base64 encoded, no assumption is made as to the data format provided.</p>
-        </section>
-        
-        <section id="authentication" class="section">
-            <h2>Authentication</h2>
-            <p>No authentication will be used to access a server providing the ACE protocol.</p>
-        </section>
-        
-        <section id="implementation" class="section">
-            <h2>Implementation</h2>
-            <p>The ACE protocol uses the same REST API mechanism as EST and provides the following endpoints:</p>
-            <p><code>GET /cacerts</code><br>
-            <code>GET /simpleenroll</code><br>
-            <code>POST /simpleenroll</code><br>
-            <code>GET /serverkeygen</code></p>
-            <p>Because the EST protocol does not provide a mechanism for the retrieval of public keys, the extra endpoint has been implemented:</p>
-            <p><code>GET /cert?alias={alias}</code></p>
-            <p>OR</p>
-            <p><code>GET /cert/{alias}</code></p>
-            <p>OR</p>
-            <p><code>GET {alias}.publickeyserver.org</code></p>
-        </section>
-        
-        <section class="section">
-            <h2>GET /cacerts</h2>
-            <p>Returns a JSON snippet of the certificate chain in PEM format.</p>
-            <pre><code>Return format:  
-  application/json  
-</code></pre>
-        </section>
-        
-        <section class="section">
-            <h2>GET /simpleenroll</h2>
-            <p>The quick way to get one</p>
-            <p>However you should not use the quick way as it will generate a private/public RSA2048 key pair
-            on your behalf...which means it knows your private key, if only for a moment.</p>
-        </section>
-        
-        <section class="section">
-            <h2>POST /simpleenroll</h2>
-            <p>Creates a certificate and returns it in PEM format</p>
-            <pre><code>POST BODY  
-
-Post format:  
-  application/json    
-
-
-{  
-  "key"  : "[public key in PEM format (RSA2048)]"    *mandatory
-  "data" : "[BASE64ENCODED DATA]"                    *optional
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="anonymous-certificate-enrollment-ace-protocol">Anonymous Certificate Enrollment (ACE) Protocol</h1>
+<h2 id="abstract">Abstract</h2>
+<p>This document describes the Anonymous Certificate Enrollment (ACE) protocol, a simplified adaptation of the Enrollment over Secure Transport (EST) protocol defined in <a href="https://tools.ietf.org/html/rfc7030">RFC 7030</a>. EST describes a simple, yet functional, certificate management protocol targeting Public Key Infrastructure (PKI) clients that need to acquire client certificates and associated Certification Authority (CA) certificates.</p>
+<p>The ACE protocol extends EST's foundation to provide automated certificate enrollment while preserving client anonymity. Unlike traditional PKI systems that require identity verification, ACE enables secure end-to-end encrypted communication using anonymous aliases, ensuring that private keys never leave the client device.</p>
+<h2 id="1-introduction">1. Introduction</h2>
+<h3 id="11-relationship-to-est-rfc-7030">1.1 Relationship to EST (RFC 7030)</h3>
+<p>EST profiles certificate enrollment for clients using Certificate Management over CMS (CMC) messages over a secure transport. The ACE protocol adopts EST's RESTful approach and transport security model while introducing anonymity as a core design principle.</p>
+<p>Key similarities to EST:</p>
+<ul>
+<li>Use of HTTPS for secure transport</li>
+<li>RESTful API design patterns</li>
+<li>Certificate lifecycle management capabilities</li>
+<li>Support for client-generated key pairs</li>
+</ul>
+<p>Key differences from EST:</p>
+<ul>
+<li>Removal of identity-based authentication requirements</li>
+<li>Simplified enrollment process without CMC complexity</li>
+<li>Anonymous alias-based certificate binding</li>
+<li>Streamlined API with fewer configuration options</li>
+</ul>
+<h3 id="12-design-rationale">1.2 Design Rationale</h3>
+<p>The ACE protocol addresses specific use cases where:</p>
+<ol>
+<li><strong>Privacy is paramount</strong> - Users require secure communication without revealing identity</li>
+<li><strong>Simplicity matters</strong> - Reduced complexity compared to full EST implementation</li>
+<li><strong>Automation is essential</strong> - No manual identity verification steps</li>
+<li><strong>Security is maintained</strong> - Strong cryptographic binding between certificates and aliases</li>
+</ol>
+<h2 id="2-technical-specifications">2. Technical Specifications</h2>
+<h3 id="21-cryptographic-standards">2.1 Cryptographic Standards</h3>
+<p>The ACE protocol employs industry-standard cryptographic algorithms:</p>
+<p><strong>RSA Key Pairs</strong></p>
+<ul>
+<li>Algorithm: RSA-2048</li>
+<li>Justification: Provides 112-bit security strength per NIST SP 800-57, adequate for medium-term use while maintaining compatibility with legacy systems</li>
+</ul>
+<p><strong>Certificate Signatures</strong></p>
+<ul>
+<li>Algorithm: SHA512withRSA</li>
+<li>Justification: SHA-512 provides strong collision resistance; RSA signatures ensure broad compatibility</li>
+</ul>
+<p><strong>Certificate Format</strong></p>
+<ul>
+<li>Standard: X.509 v3 certificates per RFC 5280</li>
+<li>Extensions: Custom OIDs for anonymous metadata storage</li>
+</ul>
+<h3 id="22-alias-generation">2.2 Alias Generation</h3>
+<p>Aliases follow a three-word hyphenated format (e.g., <code>missions-locks-sox.publickeyserver.org</code>):</p>
+<ul>
+<li><strong>Uniqueness</strong>: Random selection from large word pools prevents collisions</li>
+<li><strong>Memorability</strong>: Human-readable format aids in practical use</li>
+<li><strong>Anonymity</strong>: No correlation to user identity or attributes</li>
+</ul>
+<h2 id="3-protocol-operations">3. Protocol Operations</h2>
+<h3 id="31-transport-security">3.1 Transport Security</h3>
+<p>Following EST's model, EST specifies how to transfer messages securely via HTTP over TLS (HTTPS). ACE requires:</p>
+<ul>
+<li>Minimum TLS version: 1.2</li>
+<li>Server authentication via valid TLS certificate</li>
+<li>No client authentication requirement (preserving anonymity)</li>
+</ul>
+<h3 id="32-api-endpoints">3.2 API Endpoints</h3>
+<p>The ACE protocol implements a subset of EST functionality plus anonymous-specific extensions:</p>
+<h4 id="321-get-cacerts">3.2.1 GET /cacerts</h4>
+<p>Returns the certificate chain for the ACE Certificate Authority.</p>
+<p><strong>Purpose</strong>: Allows clients to establish trust in the CA before enrollment
+<strong>Format</strong>: <code>application/json</code> containing PEM-encoded certificate chain
+<strong>EST Equivalent</strong>: <code>/cacerts</code> endpoint per RFC 7030 Section 4.1</p>
+<h4 id="322-get-simpleenroll">3.2.2 GET /simpleenroll</h4>
+<p>Quick enrollment method (not recommended for production use).</p>
+<p><strong>Security Consideration</strong>: Server-side key generation violates the principle that private keys should never leave the client device. Provided only for testing/development.</p>
+<h4 id="323-post-simpleenroll">3.2.3 POST /simpleenroll</h4>
+<p>Primary enrollment method for certificate issuance.</p>
+<p><strong>Request Body</strong>:</p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"key"</span>: <span class="hljs-string">"[public key in PEM format (RSA2048)]"</span>,
+  <span class="hljs-attr">"data"</span>: <span class="hljs-string">"[BASE64ENCODED DATA]"</span>
 }
-</code></pre>
-            <p>Where:</p>
-            <p>data:</p>
-            <p>An optional list of arbitrary data in JSON format</p>
-            <p>Allowed characters.</p>
-            <pre><code>[a..z|A..Z|[0..9]:|/|;|.|?|&amp;|#|!|$|%|^|*|(|)|[|]|{|}|&lt;|&gt;|,|_|-|+|=|@|~|
-</code></pre>
-            <p>Each optional data piece is has no limit to it's data length</p>
-            <pre><code>Return format:  
-  application/json  
-  
-  with embedded OID's:
-  OID 1.3.6.1.4.1.57055
-  
-</code></pre>
-            <p>Official listing:
-            http://oid-info.com/cgi-bin/display?oid=1.3.6.1.4.1.57055&amp;a=display</p>
-        </section>
-        
-        <section class="section">
-            <h2>GET /cert?alias={alias}</h2>
-            <p>GET {alias}.publickeyserver.org</p>
-            <p>GET /cert/{alias}</p>
-            <hr>
-            <p>Returns the associated certificate with the alias in x.509 PEM format.</p>
-        </section>
-        
-        <section class="section">
-            <h2>GET /serverkeygen</h2>
-            <p>Returns a public/private key pair (generally for testing)</p>
-        </section>
-        
-        <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border-color);">
-            <p style="color: var(--text-secondary);">© 2024 Public Key Server Project | <a href="https://github.com/rob-linton/publickeyserver" class="footer-github-link" style="color: var(--text-secondary); transition: color 0.2s ease;"><svg class="footer-github-icon"><use href="#github-icon"></use></svg>GitHub Repository</a></p>
-        </div>
-    </div>
+</div></code></pre>
+<p><strong>Process</strong>:</p>
+<ol>
+<li>Client generates RSA-2048 key pair locally</li>
+<li>Client submits public key with optional metadata</li>
+<li>Server validates request format</li>
+<li>Server generates unique alias</li>
+<li>Server issues certificate binding alias to public key</li>
+</ol>
+<p><strong>Response</strong>: <code>application/json</code> containing issued certificate in PEM format</p>
+<h4 id="324-certificate-retrieval-endpoints">3.2.4 Certificate Retrieval Endpoints</h4>
+<p>ACE extends EST with flexible certificate retrieval:</p>
+<ol>
+<li><code>GET /cert?alias={alias}</code> - Query parameter format</li>
+<li><code>GET /cert/{alias}</code> - RESTful path parameter</li>
+<li><code>GET https://{alias}.publickeyserver.org</code> - Subdomain-based retrieval</li>
+</ol>
+<p><strong>Justification</strong>: Multiple retrieval methods accommodate different client capabilities and network configurations.</p>
+<h4 id="325-get-serverkeygen">3.2.5 GET /serverkeygen</h4>
+<p>Test endpoint for server-generated key pairs.</p>
+<p><strong>Warning</strong>: For development/testing only. Production systems must generate keys client-side.</p>
+<h2 id="4-security-considerations">4. Security Considerations</h2>
+<h3 id="41-anonymous-authentication-challenges">4.1 Anonymous Authentication Challenges</h3>
+<p>Unlike EST which relies on authentication of the EST client, ACE must prevent abuse without identity:</p>
+<p><strong>Rate Limiting</strong>: IP-based and temporal restrictions prevent mass enrollment
+<strong>Proof of Work</strong>: Optional computational challenges for enrollment requests
+<strong>Revocation</strong>: Alias-based revocation without revealing identity</p>
+<h3 id="42-privacy-protection">4.2 Privacy Protection</h3>
+<ul>
+<li><strong>No Identity Storage</strong>: Server maintains no mapping between aliases and real identities</li>
+<li><strong>Metadata Sanitization</strong>: Optional data fields are base64-encoded to prevent information leakage</li>
+<li><strong>Access Logs</strong>: Minimal logging to prevent correlation attacks</li>
+</ul>
+<h3 id="43-certificate-lifecycle">4.3 Certificate Lifecycle</h3>
+<p><strong>Validity Period</strong>: Recommended 90-365 days
+<strong>Renewal</strong>: New enrollment required (no identity-based renewal)
+<strong>Revocation</strong>: Standard CRL/OCSP with alias as identifier</p>
+<h2 id="5-implementation-guidelines">5. Implementation Guidelines</h2>
+<h3 id="51-client-requirements">5.1 Client Requirements</h3>
+<ol>
+<li><strong>Secure Key Storage</strong>: Private keys must be generated and stored securely on client device</li>
+<li><strong>TLS Validation</strong>: Proper validation of server TLS certificate</li>
+<li><strong>Alias Management</strong>: Secure storage and retrieval of assigned aliases</li>
+</ol>
+<h3 id="52-server-requirements">5.2 Server Requirements</h3>
+<ol>
+<li><strong>Scalability</strong>: Support for high-volume anonymous enrollments</li>
+<li><strong>Audit Trail</strong>: Privacy-preserving audit logs for security monitoring</li>
+<li><strong>CA Integration</strong>: Secure interface to issuing Certificate Authority</li>
+</ol>
+<h3 id="53-interoperability">5.3 Interoperability</h3>
+<p>While ACE is not directly compatible with EST clients, it follows similar design patterns:</p>
+<ul>
+<li>RESTful API structure</li>
+<li>HTTPS transport</li>
+<li>Standard X.509 certificates</li>
+<li>JSON message formatting</li>
+</ul>
+<h2 id="6-privacy-and-compliance">6. Privacy and Compliance</h2>
+<h3 id="61-data-minimization">6.1 Data Minimization</h3>
+<p>ACE implements privacy by design:</p>
+<ul>
+<li>No personally identifiable information (PII) collected</li>
+<li>Anonymous aliases prevent user tracking</li>
+<li>Optional metadata under user control</li>
+</ul>
+<h3 id="62-regulatory-compliance">6.2 Regulatory Compliance</h3>
+<p>The protocol design considers:</p>
+<ul>
+<li>GDPR Article 25: Data protection by design and default</li>
+<li>No special category data processing</li>
+<li>User right to anonymity preserved</li>
+</ul>
+<h2 id="7-operational-considerations">7. Operational Considerations</h2>
+<h3 id="71-deployment-models">7.1 Deployment Models</h3>
+<ol>
+<li><strong>Public Service</strong>: Open enrollment for anonymous communication</li>
+<li><strong>Private Network</strong>: Organization-specific anonymous certificates</li>
+<li><strong>Hybrid</strong>: Authenticated enrollment with anonymous usage</li>
+</ol>
+<h3 id="72-monitoring-and-maintenance">7.2 Monitoring and Maintenance</h3>
+<ul>
+<li><strong>Health Checks</strong>: Regular validation of CA chain and service availability</li>
+<li><strong>Performance Metrics</strong>: Enrollment rate, certificate issuance time</li>
+<li><strong>Security Monitoring</strong>: Anomaly detection without compromising anonymity</li>
+</ul>
+<h2 id="8-future-considerations">8. Future Considerations</h2>
+<h3 id="81-post-quantum-readiness">8.1 Post-Quantum Readiness</h3>
+<p>Future versions may incorporate:</p>
+<ul>
+<li>Quantum-resistant algorithms (e.g., CRYSTALS-Dilithium)</li>
+<li>Hybrid classical/post-quantum certificates</li>
+<li>Algorithm agility for smooth transitions</li>
+</ul>
+<h3 id="82-enhanced-privacy-features">8.2 Enhanced Privacy Features</h3>
+<p>Potential enhancements:</p>
+<ul>
+<li>Zero-knowledge proofs for attribute verification</li>
+<li>Blind signatures for enhanced anonymity</li>
+<li>Decentralized trust models</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li>[RFC 7030] Pritikin, M., Ed., Yee, P., Ed., and D. Harkins, Ed., &quot;Enrollment over Secure Transport&quot;, RFC 7030, October 2013.</li>
+<li>[RFC 5280] Cooper, D., et al., &quot;Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile&quot;, RFC 5280, May 2008.</li>
+<li>[RFC 8555] Barnes, R., et al., &quot;Automatic Certificate Management Environment (ACME)&quot;, RFC 8555, March 2019.</li>
+<li>[NIST SP 800-57] NIST, &quot;Recommendation for Key Management, Part 1: General&quot;, NIST Special Publication 800-57 Part 1 Revision 5, May 2020.</li>
+</ul>
+<h2 id="appendix-a-implementation-status">Appendix A: Implementation Status</h2>
+<p>The ACE protocol has been implemented and is operational at https://publickeyserver.org. The reference implementation is available at https://github.com/rob-linton/publickeyserver.</p>
+<h2 id="appendix-b-acknowledgments">Appendix B: Acknowledgments</h2>
+<p>The ACE protocol builds upon the foundational work of EST (RFC 7030) while addressing the specific needs of anonymous certificate enrollment. We acknowledge the EST authors and the broader IETF community for establishing the standards that make this work possible.</p>
+
 </body>
 </html>
