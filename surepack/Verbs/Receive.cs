@@ -12,7 +12,7 @@ using Org.BouncyCastle.Utilities;
 
 namespace suredrop.Verbs;
 
-[Verb("receive", HelpText = "Receive a package")]
+[Verb("receive", HelpText = "Download encrypted packages sent to your alias from the server")]
 public class ReceiveOptions : Options
 {
 	//[Option('i', "input", Required = true, HelpText = "Package key to Receive")]

@@ -51,7 +51,15 @@ public class Program
 			}
 		}
 
-		var opts = Parser.Default.ParseArguments<Options, PackOptions, UnpackOptions, CreateOptions, CertifyOptions, ListOptions, SendOptions, ReceiveOptions, VerifyOptions, GuiOptions, DeleteOptions, AboutOptions>(args);
+		// Create a parser with custom settings to ensure help is always regenerated
+		var parser = new Parser(with => 
+		{
+			with.HelpWriter = Console.Out;
+			with.EnableDashDash = true;
+			with.CaseInsensitiveEnumValues = true;
+		});
+
+		var opts = parser.ParseArguments<Options, PackOptions, UnpackOptions, CreateOptions, CertifyOptions, ListOptions, SendOptions, ReceiveOptions, VerifyOptions, GuiOptions, DeleteOptions, AboutOptions>(args);
 
 		return opts.MapResult(
 		(CreateOptions opts) 	=> Verbs.Create.Execute(opts).Result,

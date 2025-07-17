@@ -10,7 +10,7 @@ using Org.BouncyCastle.OpenSsl;
 
 namespace suredrop.Verbs;
 
-[Verb("about", false, HelpText = "Quick About to pack and unpack a file")]
+[Verb("about", false, HelpText = "Display version and about information")]
 public class AboutOptions : Options
 {
   

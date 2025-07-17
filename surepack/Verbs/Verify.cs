@@ -10,7 +10,7 @@ using Org.BouncyCastle.OpenSsl;
 
 namespace suredrop.Verbs;
 
-[Verb("verify", HelpText = "Verify an alias.")]
+[Verb("verify", HelpText = "Request email verification code to associate an email with an alias")]
 public class VerifyOptions : Options
 {
   [Option('e', "email", Required = true, HelpText = "Email to be verified")]

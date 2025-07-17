@@ -10,7 +10,7 @@ using Org.BouncyCastle.OpenSsl;
 
 namespace suredrop.Verbs;
 
-[Verb("send", HelpText = "Send your package to another alias")]
+[Verb("send", HelpText = "Upload encrypted packages to the server for recipients to download")]
 public class SendOptions : Options
 {
 	[Option('i', "input", HelpText = "Package file to send")]

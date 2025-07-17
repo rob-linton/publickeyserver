@@ -13,7 +13,7 @@ using Org.BouncyCastle.Security;
 
 namespace suredrop.Verbs;
 
-[Verb("create", HelpText = "Create an alias.")]
+[Verb("create", HelpText = "Create a new alias (digital identity) for sending and receiving encrypted files")]
 public class CreateOptions : Options
 {
   	[Option('e', "email", HelpText = "Optional email address to associate with alias")]

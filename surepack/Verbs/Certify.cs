@@ -11,7 +11,7 @@ using Org.BouncyCastle.OpenSsl;
 
 namespace suredrop.Verbs;
 
-[Verb("certify", HelpText = "Certify an alias.")]
+[Verb("certify", HelpText = "Verify the certificate chain and authenticity of an alias")]
 public class CertifyOptions : Options
 {
   	[Option('a', "alias", Required = true, HelpText = "Alias to be certified")]

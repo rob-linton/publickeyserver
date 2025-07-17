@@ -8,7 +8,7 @@ using Org.BouncyCastle.X509;
 
 namespace suredrop.Verbs;
 
-[Verb("unpack", HelpText = "Unpack a package.")]
+[Verb("unpack", HelpText = "Decrypt and extract files from a .surepack package")]
 public class UnpackOptions : Options
 {
    [Option('i', "input", Required = true, HelpText = "Input suredrop file to be processed")]

@@ -12,7 +12,7 @@ using Terminal.Gui;
 
 namespace suredrop.Verbs;
 
-[Verb("gui", HelpText = "Run the Gui")]
+[Verb("gui", HelpText = "Launch the graphical user interface")]
 public class GuiOptions : Options
 {
   	[Option('u', "unpack", HelpText = "Unpack suredrop file")]

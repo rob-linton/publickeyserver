@@ -11,7 +11,7 @@ using Org.BouncyCastle.OpenSsl;
 
 namespace suredrop.Verbs;
 
-[Verb("delete", HelpText = "Delete an alias.")]
+[Verb("delete", HelpText = "Delete an alias from both local storage and the server")]
 public class DeleteOptions : Options
 {
   	[Option('a', "alias", Required = true, HelpText = "Alias to be deleted")]

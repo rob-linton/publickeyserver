@@ -10,7 +10,7 @@ using Org.BouncyCastle.OpenSsl;
 
 namespace suredrop.Verbs;
 
-[Verb("list", HelpText = "List all of your aliases")]
+[Verb("list", HelpText = "List all your aliases and verify their certificates")]
 public class ListOptions : Options
 {
   

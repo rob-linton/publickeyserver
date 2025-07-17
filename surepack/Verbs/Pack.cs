@@ -12,7 +12,7 @@ using Org.BouncyCastle.Utilities;
 
 namespace suredrop.Verbs;
 
-[Verb("pack", HelpText = "Create a package.")]
+[Verb("pack", HelpText = "Create an encrypted package (.surepack file) from one or more files")]
 public class PackOptions : Options
 {
 	[Option('i', "input file name or wildcard", Required = true, HelpText = "Input file to be processed, (use wildcards for multiple)")]
