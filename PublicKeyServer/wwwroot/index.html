@@ -477,6 +477,93 @@
             word-spacing: 0.5em;
             text-transform: uppercase;
         }
+        
+        .intro-help-link {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 0.95em;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+        
+        .intro-help-link a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+        
+        .intro-help-link a:hover {
+            color: var(--text-bright);
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+            text-decoration: none;
+        }
+        
+        .intro-help-link::before {
+            content: "→ ";
+            color: var(--accent-success);
+            opacity: 0.6;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .header-main {
+            flex: 1;
+        }
+        
+        .help-button-container {
+            flex-shrink: 0;
+            padding-top: 50px;
+        }
+        
+        .side-help-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--accent-primary);
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .side-help-btn:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-bright);
+            border-color: var(--accent-primary);
+            text-decoration: none;
+            transform: translateX(-2px);
+        }
+        
+        .side-help-btn-icon {
+            display: inline-block;
+            margin-right: 8px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .help-button-container {
+                padding-top: 0;
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
     
     <!-- GitHub SVG Icon -->
@@ -490,8 +577,18 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>{ORIGIN}</h1>
-            <p class="intro">Transfer end-to-end post-quantum encrypted digital packages comprising messages and documents of unlimited size using aliases.</p>
+            <div class="header-content">
+                <div class="header-main">
+                    <h1>{ORIGIN}</h1>
+                    <p class="intro">Transfer end-to-end post-quantum encrypted digital packages comprising messages and documents of unlimited size using aliases.</p>
+                </div>
+                <div class="help-button-container">
+                    <a href="https://rob-linton.github.io/publickeyserver/HELP.html" class="side-help-btn">
+                        <span class="side-help-btn-icon">📖</span>
+                        Documentation
+                    </a>
+                </div>
+            </div>
             <div class="nav-menu">
                 <a href="#how-it-works">How It Works</a>
                 <a href="#downloads">Downloads</a>
