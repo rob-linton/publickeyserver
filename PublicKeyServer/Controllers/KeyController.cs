@@ -380,8 +380,6 @@ namespace publickeyserver
 				//
 
 				List<string> certificate = new List<string>();
-				certificate.Add("<br>");
-				certificate.Add("<br>");
 				certificate.Add($"Alias: {alias}");
 				certificate.Add("<br>");
 

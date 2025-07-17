@@ -477,10 +477,6 @@
             word-spacing: 0.5em;
             text-transform: uppercase;
         }
-        
-        .root-signature-section.empty {
-            display: none;
-        }
     </style>
     
     <!-- GitHub SVG Icon -->
@@ -861,19 +857,6 @@ surepack create -e yourname@example.com -t 123456</pre>
                 certContent.textContent.trim() === 'null'
             )) {
                 certSection.classList.add('empty');
-            }
-            
-            // Hide root signature section if empty
-            const rootSection = document.querySelector('.root-signature-section');
-            const rootContent = rootSection.querySelector('.signature-content');
-            
-            if (rootContent && (
-                rootContent.textContent.trim() === '' || 
-                rootContent.textContent.trim() === '{ROOTCA}' ||
-                rootContent.textContent.trim() === 'undefined' ||
-                rootContent.textContent.trim() === 'null'
-            )) {
-                rootSection.classList.add('empty');
             }
         });
     </script>
