@@ -1,758 +1,290 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>HELP.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-body {
-	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
-	font-size: var(--vscode-markdown-font-size, 14px);
-	padding: 0 26px;
-	line-height: var(--vscode-markdown-line-height, 22px);
-	word-wrap: break-word;
-}
-
-#code-csp-warning {
-	position: fixed;
-	top: 0;
-	right: 0;
-	color: white;
-	margin: 16px;
-	text-align: center;
-	font-size: 12px;
-	font-family: sans-serif;
-	background-color:#444444;
-	cursor: pointer;
-	padding: 6px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
-}
-
-#code-csp-warning:hover {
-	text-decoration: none;
-	background-color:#007acc;
-	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-}
-
-body.scrollBeyondLastLine {
-	margin-bottom: calc(100vh - 22px);
-}
-
-body.showEditorSelection .code-line {
-	position: relative;
-}
-
-body.showEditorSelection .code-active-line:before,
-body.showEditorSelection .code-line:hover:before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0;
-	left: -12px;
-	height: 100%;
-}
-
-body.showEditorSelection li.code-active-line:before,
-body.showEditorSelection li.code-line:hover:before {
-	left: -30px;
-}
-
-.vscode-light.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.15);
-}
-
-.vscode-light.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.40);
-}
-
-.vscode-light.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-dark.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.4);
-}
-
-.vscode-dark.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.60);
-}
-
-.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-high-contrast.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 160, 0, 0.7);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 160, 0, 1);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-img {
-	max-width: 100%;
-	max-height: 100%;
-}
-
-a {
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
-}
-
-a:focus,
-input:focus,
-select:focus,
-textarea:focus {
-	outline: 1px solid -webkit-focus-ring-color;
-	outline-offset: -1px;
-}
-
-hr {
-	border: 0;
-	height: 2px;
-	border-bottom: 2px solid;
-}
-
-h1 {
-	padding-bottom: 0.3em;
-	line-height: 1.2;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-}
-
-h1, h2, h3 {
-	font-weight: normal;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-table > thead > tr > th {
-	text-align: left;
-	border-bottom: 1px solid;
-}
-
-table > thead > tr > th,
-table > thead > tr > td,
-table > tbody > tr > th,
-table > tbody > tr > td {
-	padding: 5px 10px;
-}
-
-table > tbody > tr + tr > td {
-	border-top: 1px solid;
-}
-
-blockquote {
-	margin: 0 7px 0 5px;
-	padding: 0 16px 0 10px;
-	border-left-width: 5px;
-	border-left-style: solid;
-}
-
-code {
-	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	font-size: 1em;
-	line-height: 1.357em;
-}
-
-body.wordWrap pre {
-	white-space: pre-wrap;
-}
-
-pre:not(.hljs),
-pre.hljs code > div {
-	padding: 16px;
-	border-radius: 3px;
-	overflow: auto;
-}
-
-pre code {
-	color: var(--vscode-editor-foreground);
-	tab-size: 4;
-}
-
-/** Theming */
-
-.vscode-light pre {
-	background-color: rgba(220, 220, 220, 0.4);
-}
-
-.vscode-dark pre {
-	background-color: rgba(10, 10, 10, 0.4);
-}
-
-.vscode-high-contrast pre {
-	background-color: rgb(0, 0, 0);
-}
-
-.vscode-high-contrast h1 {
-	border-color: rgb(0, 0, 0);
-}
-
-.vscode-light table > thead > tr > th {
-	border-color: rgba(0, 0, 0, 0.69);
-}
-
-.vscode-dark table > thead > tr > th {
-	border-color: rgba(255, 255, 255, 0.69);
-}
-
-.vscode-light h1,
-.vscode-light hr,
-.vscode-light table > tbody > tr + tr > td {
-	border-color: rgba(0, 0, 0, 0.18);
-}
-
-.vscode-dark h1,
-.vscode-dark hr,
-.vscode-dark table > tbody > tr + tr > td {
-	border-color: rgba(255, 255, 255, 0.18);
-}
-
-</style>
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-
-<style>
-/*
- * Markdown PDF CSS
- */
-
- body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
-	padding: 0 12px;
-}
-
-pre {
-	background-color: #f8f8f8;
-	border: 1px solid #cccccc;
-	border-radius: 3px;
-	overflow-x: auto;
-	white-space: pre-wrap;
-	overflow-wrap: break-word;
-}
-
-pre:not(.hljs) {
-	padding: 23px;
-	line-height: 19px;
-}
-
-blockquote {
-	background: rgba(127, 127, 127, 0.1);
-	border-color: rgba(0, 122, 204, 0.5);
-}
-
-.emoji {
-	height: 1.4em;
-}
-
-code {
-	font-size: 14px;
-	line-height: 19px;
-}
-
-/* for inline code */
-:not(pre):not(.hljs) > code {
-	color: #C9AE75; /* Change the old color so it seems less like an error */
-	font-size: inherit;
-}
-
-/* Page Break : use <div class="page"/> to insert page break
--------------------------------------------------------- */
-.page {
-	page-break-after: always;
-}
-
-</style>
-
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SurePack Help Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-bright: #f0f6fc;
+            --accent-primary: #58a6ff;
+            --accent-success: #3fb950;
+            --accent-warning: #f0883e;
+            --accent-error: #f85149;
+            --border-color: #30363d;
+        }
+         
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin: 30px 0 20px 0;
+            font-weight: 400;
+            letter-spacing: -1px;
+            color: var(--text-bright);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        
+        h1::before {
+            content: "$ ";
+            color: var(--accent-success);
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            margin: 40px 0 20px 0;
+            color: var(--text-bright);
+            font-weight: 400;
+        }
+        
+        h2::before {
+            content: "## ";
+            color: var(--accent-success);
+            opacity: 0.6;
+        }
+        
+        h3 {
+            font-size: 1.3em;
+            margin: 30px 0 15px 0;
+            color: var(--accent-primary);
+            font-weight: 400;
+        }
+        
+        h3::before {
+            content: "### ";
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+        
+        h4 {
+            font-size: 1.1em;
+            margin: 20px 0 10px 0;
+            color: var(--text-bright);
+            font-weight: 500;
+        }
+        
+        p {
+            line-height: 1.8;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        
+        code {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 2px 6px;
+            color: var(--accent-warning);
+            font-family: inherit;
+            font-size: 0.95em;
+        }
+        
+        pre {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background-color: transparent;
+            border: none;
+            padding: 0;
+            color: var(--text-primary);
+            display: block;
+            white-space: pre;
+        }
+        
+        blockquote {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--bg-secondary);
+            border-left: 3px solid var(--accent-primary);
+            border-radius: 6px;
+        }
+        
+        blockquote p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+            color: var(--text-primary);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        th {
+            background-color: var(--bg-tertiary);
+            color: var(--text-bright);
+            font-weight: 500;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 40px 0;
+        }
+        
+        strong {
+            color: var(--text-bright);
+            font-weight: 600;
+        }
+        
+        em {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        /* Navigation bar */
+        .nav-bar {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            transition: color 0.2s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-bright);
+            text-decoration: none;
+        }
+        
+        /* Syntax highlighting for inline code in different contexts */
+        h3 code {
+            background-color: var(--bg-tertiary);
+            color: var(--accent-success);
+            font-size: 0.9em;
+        }
+        
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-bright);
+            border-color: var(--accent-primary);
+        }
+    </style>
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<h1 id="surepack-help-documentation">SurePack Help Documentation</h1>
-<h2 id="overview">Overview</h2>
-<p>SurePack is a secure file transfer application that uses post-quantum cryptography to protect your files. It allows you to send files securely and optionally anonymously to other users through encrypted packages.</p>
-<h2 id="quick-start-guide">Quick Start Guide</h2>
-<h3 id="1-create-your-identity-alias">1. Create Your Identity (Alias)</h3>
-<pre class="hljs"><code><div>surepack create
-</div></code></pre>
-<h3 id="2-pack-your-files">2. Pack Your Files</h3>
-<pre class="hljs"><code><div>surepack pack -i document.pdf -a recipient-alias -f your-alias -o package.surepack
-</div></code></pre>
-<h3 id="3-send-the-package">3. Send the Package</h3>
-<pre class="hljs"><code><div>surepack send -i package.surepack
-</div></code></pre>
-<h3 id="4-receive-packages">4. Receive Packages</h3>
-<pre class="hljs"><code><div>surepack receive -a your-alias
-</div></code></pre>
-<h3 id="5-unpack-received-files">5. Unpack Received Files</h3>
-<pre class="hljs"><code><div>surepack unpack -i package.surepack -o output-folder
-</div></code></pre>
-<hr>
-<h2 id="complete-command-reference">Complete Command Reference</h2>
-<h3 id="surepack-about"><code>surepack about</code></h3>
-<p>Display version and about information for SurePack.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div>surepack about
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-v, --verbose</code> : Set output to verbose messages (default: 0)</li>
-</ul>
-<hr>
-<h3 id="surepack-certify"><code>surepack certify</code></h3>
-<p>Verify the certificate chain and authenticity of an alias.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div>surepack certify -a alice.publickeyserver.org
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-a, --alias</code> : The alias to certify (required)</li>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-<li><code>-p, --passphrase</code> : Enter password</li>
-<li><code>-d, --domain</code> : Domain name</li>
-</ul>
-<hr>
-<h3 id="surepack-create"><code>surepack create</code></h3>
-<p>Create a new alias (digital identity) for sending and receiving encrypted files.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Create anonymous alias</span>
-surepack create
-
-<span class="hljs-comment"># Create alias with email</span>
-surepack create -e john@example.com -t 123456
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-e, --email</code> : Optional email address to associate with alias</li>
-<li><code>-t, --token</code> : Email validation token (obtained via verify command)</li>
-<li><code>-d, --domain</code> : Domain name (default: publickeyserver.org)</li>
-<li><code>-p, --passphrase</code> : Enter password</li>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-</ul>
-<p><strong>Example Output:</strong></p>
-<pre class="hljs"><code><div>Creating...
-Domain: publickeyserver.org
-
-Please enter passphrase: ********
-
-[✓] Generated RSA key pair
-[✓] Generated Quantum Kyber key pair  
-[✓] Generated Quantum Dilithium key pair
-[✓] Root certificate fingerprint saved
-
-Alias happy-cloud-tree.publickeyserver.org created
-</div></code></pre>
-<hr>
-<h3 id="surepack-delete"><code>surepack delete</code></h3>
-<p>Delete an alias from both local storage and the server.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div>surepack delete -a old-alias.publickeyserver.org
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-a, --alias</code> : The alias to delete (required)</li>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-<li><code>-p, --passphrase</code> : Enter password</li>
-<li><code>-d, --domain</code> : Domain name</li>
-</ul>
-<p><strong>Warning:</strong> This action is permanent and cannot be undone.</p>
-<hr>
-<h3 id="surepack-gui"><code>surepack gui</code></h3>
-<p>Launch the graphical user interface.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Launch GUI</span>
-surepack gui
-
-<span class="hljs-comment"># Open a surepack file in GUI</span>
-surepack gui -u package.surepack
-
-<span class="hljs-comment"># Create new package with file in GUI</span>
-surepack gui -i document.pdf
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-u, --unpack</code> : Unpack surepack file in GUI</li>
-<li><code>-i, --input</code> : Input file for packing in GUI</li>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-</ul>
-<hr>
-<h3 id="surepack-list"><code>surepack list</code></h3>
-<p>List all your aliases and verify their certificates.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div>surepack list
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-<li><code>-p, --passphrase</code> : Enter password</li>
-</ul>
-<p><strong>Example Output:</strong></p>
-<pre class="hljs"><code><div>alice-smith.publickeyserver.org
-bob-jones.publickeyserver.org
-charlie-work.company.com
-</div></code></pre>
-<hr>
-<h3 id="surepack-pack"><code>surepack pack</code></h3>
-<p>Create an encrypted package (.surepack file) from one or more files.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Pack single file</span>
-surepack pack -i document.pdf -a recipient -f sender -o package.surepack
-
-<span class="hljs-comment"># Pack multiple files with wildcard</span>
-surepack pack -i <span class="hljs-string">"*.txt"</span> -a recipient -f sender -o documents.surepack
-
-<span class="hljs-comment"># Pack with multiple recipients</span>
-surepack pack -i file.doc -a alice,bob,charlie -f sender -o shared.surepack
-
-<span class="hljs-comment"># Pack with subdirectories</span>
-surepack pack -i <span class="hljs-string">"*"</span> -r -a recipient -f sender -o everything.surepack
-
-<span class="hljs-comment"># Pack with message and subject</span>
-surepack pack -i report.xlsx -a boss -f employee -s <span class="hljs-string">"Q4 Report"</span> -m <span class="hljs-string">"Please review"</span> -o report.surepack
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-i, --input</code> : Input file(s) to pack (wildcards supported) (required)</li>
-<li><code>-a, --aliases</code> : Recipient aliases/emails (comma-delimited) (required)</li>
-<li><code>-f, --from</code> : Your sender alias (required)</li>
-<li><code>-o, --output</code> : Output package filename (required)</li>
-<li><code>-r, --recurse</code> : Include subdirectories</li>
-<li><code>-s, --subject</code> : Package subject line</li>
-<li><code>-m, --message</code> : Optional message to include</li>
-<li><code>-c, --compression</code> : Compression type [BROTLI, GZIP, NONE] (default: GZIP)</li>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-<li><code>-p, --passphrase</code> : Enter password</li>
-</ul>
-<p><strong>Examples:</strong></p>
-<ol>
-<li>
-<p><strong>Basic file packaging:</strong></p>
-<pre class="hljs"><code><div>surepack pack -i invoice.pdf -a client.publickeyserver.org -f mycompany.publickeyserver.org -o invoice-package.surepack
-</div></code></pre>
-</li>
-<li>
-<p><strong>Pack all PDFs in a folder:</strong></p>
-<pre class="hljs"><code><div>surepack pack -i <span class="hljs-string">"reports/*.pdf"</span> -a manager -f employee -o monthly-reports.surepack
-</div></code></pre>
-</li>
-<li>
-<p><strong>Pack for multiple recipients with a message:</strong></p>
-<pre class="hljs"><code><div>surepack pack -i contract.docx -a <span class="hljs-string">"alice,bob,legal@company.com"</span> -f sender -s <span class="hljs-string">"Contract Review"</span> -m <span class="hljs-string">"Please sign by Friday"</span> -o contract.surepack
-</div></code></pre>
-</li>
-</ol>
-<hr>
-<h3 id="surepack-receive"><code>surepack receive</code></h3>
-<p>Download encrypted packages sent to your alias from the server.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Interactive receive (choose which packages)</span>
-surepack receive -a your-alias
-
-<span class="hljs-comment"># Automatic receive all packages</span>
-surepack receive -a your-alias -f
-
-<span class="hljs-comment"># Continuous monitoring (check every 60 seconds)</span>
-surepack receive -a your-alias -s 60
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-a, --alias</code> : Your alias to check for packages</li>
-<li><code>-f, --force</code> : Download all packages without prompting</li>
-<li><code>-s, --seconds</code> : Check for packages every X seconds (0 = once only)</li>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-<li><code>-p, --passphrase</code> : Enter password</li>
-</ul>
-<p><strong>Example Session:</strong></p>
-<pre class="hljs"><code><div>Receiving packages...
-Alias: alice.publickeyserver.org
-
-Found 3 packages:
-1. package1.surepack (2.5 MB) from bob.publickeyserver.org
-2. package2.surepack (512 KB) from charlie.publickeyserver.org
-3. package3.surepack (10 MB) from david.publickeyserver.org
-
-Select packages to download (1-3, 'a' for all, 'q' to quit): a
-
-Downloading package1.surepack... Done
-Downloading package2.surepack... Done
-Downloading package3.surepack... Done
-</div></code></pre>
-<hr>
-<h3 id="surepack-send"><code>surepack send</code></h3>
-<p>Upload encrypted packages to the server for recipients to download.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Send specific package</span>
-surepack send -i package.surepack
-
-<span class="hljs-comment"># Send all packages in outbox</span>
-surepack send
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-i, --input</code> : Package file to send (optional, sends all outbox if omitted)</li>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-<li><code>-p, --passphrase</code> : Enter password</li>
-</ul>
-<p><strong>Examples:</strong></p>
-<ol>
-<li>
-<p><strong>Send a specific package:</strong></p>
-<pre class="hljs"><code><div>surepack send -i invoice-package.surepack
-</div></code></pre>
-</li>
-<li>
-<p><strong>Send all pending packages from outbox:</strong></p>
-<pre class="hljs"><code><div>surepack send
-</div></code></pre>
-</li>
-</ol>
-<hr>
-<h3 id="surepack-unpack"><code>surepack unpack</code></h3>
-<p>Decrypt and extract files from a .surepack package.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Unpack to specific directory</span>
-surepack unpack -i package.surepack -o extracted-files/
-
-<span class="hljs-comment"># Unpack using specific alias</span>
-surepack unpack -i package.surepack -o output/ -a your-alias
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-i, --input</code> : Input .surepack file to unpack (required)</li>
-<li><code>-o, --output</code> : Output directory for extracted files</li>
-<li><code>-a, --alias</code> : Specific alias to use (auto-detects if omitted)</li>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-<li><code>-p, --passphrase</code> : Enter password</li>
-</ul>
-<p><strong>Example Output:</strong></p>
-<pre class="hljs"><code><div>Unpacking surepack...
-Input: package.surepack
-Output directory: extracted-files/
-
-Checking alias alice.publickeyserver.org...
-[✓] Valid recipient
-[✓] Certificate verified
-[✓] Decrypting package...
-
-Extracted files:
-- document1.pdf (1.2 MB)
-- document2.docx (456 KB)
-- image.png (2.3 MB)
-
-Package unpacked successfully to: extracted-files/
-</div></code></pre>
-<hr>
-<h3 id="surepack-verify"><code>surepack verify</code></h3>
-<p>Request email verification code to associate an email with an alias.</p>
-<p><strong>Usage:</strong></p>
-<pre class="hljs"><code><div>surepack verify -e john@example.com
-</div></code></pre>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>-e, --email</code> : Email address to verify (required)</li>
-<li><code>-d, --domain</code> : Domain name</li>
-<li><code>-v, --verbose</code> : Set output to verbose messages</li>
-</ul>
-<p><strong>Note:</strong> After receiving the verification code via email, use it when creating an alias:</p>
-<pre class="hljs"><code><div>surepack create -e john@example.com -t 123456
-</div></code></pre>
-<hr>
-<h2 id="complete-workflow-examples">Complete Workflow Examples</h2>
-<h3 id="example-1-anonymous-file-transfer">Example 1: Anonymous File Transfer</h3>
-<p><strong>Sender (Alice):</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Create anonymous alias</span>
-surepack create
-<span class="hljs-comment"># Output: Alias alice-tree-cloud.publickeyserver.org created</span>
-
-<span class="hljs-comment"># Pack sensitive documents</span>
-surepack pack -i <span class="hljs-string">"whistleblower-docs/*"</span> -a journalist.newspaper.com -f alice-tree-cloud.publickeyserver.org -o anonymous-leak.surepack
-
-<span class="hljs-comment"># Send the package</span>
-surepack send -i anonymous-leak.surepack
-</div></code></pre>
-<p><strong>Recipient (Journalist):</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Check for new packages</span>
-surepack receive -a journalist.newspaper.com
-
-<span class="hljs-comment"># Unpack the received file</span>
-surepack unpack -i anonymous-leak.surepack -o secure-folder/
-</div></code></pre>
-<h3 id="example-2-business-document-exchange">Example 2: Business Document Exchange</h3>
-<p><strong>Setup:</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Request email verification</span>
-surepack verify -e john@company.com
-<span class="hljs-comment"># Check email for verification code: 123456</span>
-
-<span class="hljs-comment"># Create business alias with email</span>
-surepack create -e john@company.com -t 123456 -d company.com
-</div></code></pre>
-<p><strong>Sending Contract:</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Pack contract with metadata</span>
-surepack pack -i <span class="hljs-string">"contract-v2.docx"</span> -a <span class="hljs-string">"legal@client.com,ceo@client.com"</span> -f john@company.com -s <span class="hljs-string">"Contract for Review"</span> -m <span class="hljs-string">"Please review sections 3 and 5 carefully. Sign by EOD Friday."</span> -o contract-package.surepack
-
-<span class="hljs-comment"># Send to server</span>
-surepack send -i contract-package.surepack
-</div></code></pre>
-<p><strong>Receiving Response:</strong></p>
-<pre class="hljs"><code><div><span class="hljs-comment"># Check for responses</span>
-surepack receive -a john@company.com -f
-
-<span class="hljs-comment"># Extract signed contract</span>
-surepack unpack -i signed-contract.surepack -o completed-contracts/
-</div></code></pre>
-<h3 id="example-3-batch-processing">Example 3: Batch Processing</h3>
-<pre class="hljs"><code><div><span class="hljs-comment"># Pack all monthly reports</span>
-surepack pack -i <span class="hljs-string">"2024-reports/*.pdf"</span> -a accounting@hq.com -f branch-office.company.com -s <span class="hljs-string">"Monthly Reports - January 2024"</span> -o january-reports.surepack
-
-<span class="hljs-comment"># Pack all quarterly data with compression</span>
-surepack pack -i <span class="hljs-string">"Q4-data/*"</span> -r -c BROTLI -a data-team@company.com -f analytics.company.com -o q4-data.surepack
-
-<span class="hljs-comment"># Send all packages in outbox</span>
-surepack send
-</div></code></pre>
-<hr>
-<h2 id="global-options">Global Options</h2>
-<p>These options are available for all commands:</p>
-<ul>
-<li><code>-v, --verbose</code> : Verbosity level (0=quiet, 1=normal, 2=detailed, 3=debug)</li>
-<li><code>-p, --passphrase</code> : Provide password via command line (not recommended for security)</li>
-<li><code>-d, --domain</code> : Override default domain (publickeyserver.org)</li>
-</ul>
-<hr>
-<h2 id="security-best-practices">Security Best Practices</h2>
-<ol>
-<li><strong>Password Protection</strong>: Always use a strong password when creating aliases</li>
-<li><strong>Alias Verification</strong>: Use <code>surepack certify</code> to verify recipients before sending sensitive data</li>
-<li><strong>Anonymous Transfers</strong>: For maximum anonymity, create aliases without email association</li>
-<li><strong>Key Storage</strong>: Private keys are stored in:
-<ul>
-<li>Windows: <code>%LOCALAPPDATA%\surepack\aliases\</code></li>
-<li>Linux/Mac: <code>~/.local/share/surepack/aliases/</code></li>
-</ul>
-</li>
-</ol>
-<hr>
-<h2 id="troubleshooting">Troubleshooting</h2>
-<h3 id="common-issues">Common Issues</h3>
-<p><strong>&quot;Incorrect password&quot;</strong></p>
-<ul>
-<li>Ensure you're using the password set when creating the alias</li>
-<li>Passwords are case-sensitive</li>
-</ul>
-<p><strong>&quot;Could not find alias in package&quot;</strong></p>
-<ul>
-<li>You're trying to unpack a file not sent to any of your aliases</li>
-<li>Use <code>surepack list</code> to see your available aliases</li>
-</ul>
-<p><strong>&quot;Aliases do not share the same root certificate&quot;</strong></p>
-<ul>
-<li>Sender and recipient must be from compatible servers</li>
-<li>Check domain compatibility with administrator</li>
-</ul>
-<hr>
-<h2 id="need-more-help">Need More Help?</h2>
-<ul>
-<li>Run <code>surepack &lt;command&gt; --help</code> for detailed help on any command</li>
-<li>Visit <a href="https://publickeyserver.org">publickeyserver.org</a> for documentation</li>
-<li>Report issues at <a href="https://github.com/publickeyserver/surepack">github.com/publickeyserver/surepack</a></li>
-</ul>
-
-</body>
-</html>
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <div class="nav-links">
+                <a href="index.html">← Documentation Hub</a>
+                <a href="#overview">Overview</a>
+                <a href="#quick-start-guide">Quick Start</a>
+                <a href="#complete-command-reference">Commands</a>
+                <a href="#complete-workflow-examples">Examples</a>
+                <a href="https://github.com/rob-linton/publickeyserver">
+                    <svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
