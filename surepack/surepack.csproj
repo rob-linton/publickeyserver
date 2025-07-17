@@ -3,6 +3,8 @@
   <PropertyGroup>
   	
 	<Version>1.0.0</Version>
+	<AssemblyVersion>1.0.0.0</AssemblyVersion>
+	<FileVersion>1.0.0.0</FileVersion>
 	<InformationalVersion>This is a prerelease package</InformationalVersion>
 
     <OutputType>Exe</OutputType>

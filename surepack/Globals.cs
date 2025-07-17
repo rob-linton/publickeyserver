@@ -1,11 +1,12 @@
 using suredrop.Verbs;
 using Terminal.Gui;
+using System.Reflection;
 
 namespace suredrop;
 public static class Globals
 {
-	// Current version
-	public const string version = "1.0.0";
+	// Current version - gets the assembly version at runtime
+	public static string version => Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
 	// 
 	// current alias & location
 	//
