@@ -1,553 +1,614 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>README.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-body {
-	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
-	font-size: var(--vscode-markdown-font-size, 14px);
-	padding: 0 26px;
-	line-height: var(--vscode-markdown-line-height, 22px);
-	word-wrap: break-word;
-}
-
-#code-csp-warning {
-	position: fixed;
-	top: 0;
-	right: 0;
-	color: white;
-	margin: 16px;
-	text-align: center;
-	font-size: 12px;
-	font-family: sans-serif;
-	background-color:#444444;
-	cursor: pointer;
-	padding: 6px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
-}
-
-#code-csp-warning:hover {
-	text-decoration: none;
-	background-color:#007acc;
-	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-}
-
-body.scrollBeyondLastLine {
-	margin-bottom: calc(100vh - 22px);
-}
-
-body.showEditorSelection .code-line {
-	position: relative;
-}
-
-body.showEditorSelection .code-active-line:before,
-body.showEditorSelection .code-line:hover:before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0;
-	left: -12px;
-	height: 100%;
-}
-
-body.showEditorSelection li.code-active-line:before,
-body.showEditorSelection li.code-line:hover:before {
-	left: -30px;
-}
-
-.vscode-light.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.15);
-}
-
-.vscode-light.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.40);
-}
-
-.vscode-light.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-dark.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.4);
-}
-
-.vscode-dark.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.60);
-}
-
-.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-high-contrast.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 160, 0, 0.7);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 160, 0, 1);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-img {
-	max-width: 100%;
-	max-height: 100%;
-}
-
-a {
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
-}
-
-a:focus,
-input:focus,
-select:focus,
-textarea:focus {
-	outline: 1px solid -webkit-focus-ring-color;
-	outline-offset: -1px;
-}
-
-hr {
-	border: 0;
-	height: 2px;
-	border-bottom: 2px solid;
-}
-
-h1 {
-	padding-bottom: 0.3em;
-	line-height: 1.2;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-}
-
-h1, h2, h3 {
-	font-weight: normal;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-table > thead > tr > th {
-	text-align: left;
-	border-bottom: 1px solid;
-}
-
-table > thead > tr > th,
-table > thead > tr > td,
-table > tbody > tr > th,
-table > tbody > tr > td {
-	padding: 5px 10px;
-}
-
-table > tbody > tr + tr > td {
-	border-top: 1px solid;
-}
-
-blockquote {
-	margin: 0 7px 0 5px;
-	padding: 0 16px 0 10px;
-	border-left-width: 5px;
-	border-left-style: solid;
-}
-
-code {
-	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	font-size: 1em;
-	line-height: 1.357em;
-}
-
-body.wordWrap pre {
-	white-space: pre-wrap;
-}
-
-pre:not(.hljs),
-pre.hljs code > div {
-	padding: 16px;
-	border-radius: 3px;
-	overflow: auto;
-}
-
-pre code {
-	color: var(--vscode-editor-foreground);
-	tab-size: 4;
-}
-
-/** Theming */
-
-.vscode-light pre {
-	background-color: rgba(220, 220, 220, 0.4);
-}
-
-.vscode-dark pre {
-	background-color: rgba(10, 10, 10, 0.4);
-}
-
-.vscode-high-contrast pre {
-	background-color: rgb(0, 0, 0);
-}
-
-.vscode-high-contrast h1 {
-	border-color: rgb(0, 0, 0);
-}
-
-.vscode-light table > thead > tr > th {
-	border-color: rgba(0, 0, 0, 0.69);
-}
-
-.vscode-dark table > thead > tr > th {
-	border-color: rgba(255, 255, 255, 0.69);
-}
-
-.vscode-light h1,
-.vscode-light hr,
-.vscode-light table > tbody > tr + tr > td {
-	border-color: rgba(0, 0, 0, 0.18);
-}
-
-.vscode-dark h1,
-.vscode-dark hr,
-.vscode-dark table > tbody > tr + tr > td {
-	border-color: rgba(255, 255, 255, 0.18);
-}
-
-</style>
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-
-<style>
-/*
- * Markdown PDF CSS
- */
-
- body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
-	padding: 0 12px;
-}
-
-pre {
-	background-color: #f8f8f8;
-	border: 1px solid #cccccc;
-	border-radius: 3px;
-	overflow-x: auto;
-	white-space: pre-wrap;
-	overflow-wrap: break-word;
-}
-
-pre:not(.hljs) {
-	padding: 23px;
-	line-height: 19px;
-}
-
-blockquote {
-	background: rgba(127, 127, 127, 0.1);
-	border-color: rgba(0, 122, 204, 0.5);
-}
-
-.emoji {
-	height: 1.4em;
-}
-
-code {
-	font-size: 14px;
-	line-height: 19px;
-}
-
-/* for inline code */
-:not(pre):not(.hljs) > code {
-	color: #C9AE75; /* Change the old color so it seems less like an error */
-	font-size: inherit;
-}
-
-/* Page Break : use <div class="page"/> to insert page break
--------------------------------------------------------- */
-.page {
-	page-break-after: always;
-}
-
-</style>
-
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Technical Analysis - PublicKeyServer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-bright: #f0f6fc;
+            --accent-primary: #58a6ff;
+            --accent-success: #3fb950;
+            --accent-warning: #f0883e;
+            --accent-error: #f85149;
+            --border-color: #30363d;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin: 10px 0;
+            font-weight: 400;
+            letter-spacing: -1px;
+        }
+        
+        h1::before {
+            content: "$ ";
+            color: var(--accent-success);
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: var(--text-bright);
+            font-weight: 400;
+        }
+        
+        h2::before {
+            content: "## ";
+            color: var(--accent-success);
+            opacity: 0.6;
+        }
+        
+        h3 {
+            font-size: 1.3em;
+            margin: 25px 0 15px 0;
+            color: var(--accent-primary);
+            font-weight: 400;
+        }
+        
+        h3::before {
+            content: "### ";
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+        
+        h4 {
+            margin: 15px 0 10px 0;
+            color: var(--text-bright);
+            font-weight: 400;
+        }
+        
+        p {
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        
+        .intro {
+            font-size: 1em;
+            color: var(--text-secondary);
+            max-width: 900px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+        
+        .intro::before {
+            content: "// ";
+            color: var(--text-secondary);
+        }
+        
+        pre, code {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95em;
+        }
+        
+        code {
+            padding: 2px 6px;
+            color: var(--accent-warning);
+        }
+        
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            line-height: 1.45;
+        }
+        
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px 0;
+        }
+        
+        .nav-menu a {
+            padding: 6px 12px;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--text-bright);
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+            text-decoration: none;
+        }
+        
+        .section {
+            margin: 40px 0;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        ul li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: var(--text-secondary);
+        }
+        
+        ul li:before {
+            content: "$";
+            position: absolute;
+            left: 0;
+            color: var(--accent-success);
+        }
+        
+        ul li strong {
+            color: var(--text-primary);
+        }
+        
+        ol {
+            padding-left: 30px;
+            margin: 15px 0;
+        }
+        
+        ol li {
+            margin: 8px 0;
+        }
+        
+        .info-box {
+            background-color: var(--bg-secondary);
+            border-left: 3px solid var(--accent-primary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        
+        .info-box ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .info-box li {
+            margin: 8px 0;
+        }
+        
+        .warning-box {
+            background-color: rgba(240, 136, 62, 0.1);
+            border-left: 3px solid var(--accent-warning);
+            border: 1px solid rgba(240, 136, 62, 0.3);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        
+        .warning-box strong {
+            color: var(--accent-warning);
+        }
+        
+        .github-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 400;
+            transition: all 0.2s ease;
+            margin: 5px;
+            background-color: var(--bg-secondary);
+            font-size: 0.9em;
+        }
+        
+        .github-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--text-bright);
+            text-decoration: none;
+            background-color: var(--bg-tertiary);
+        }
+        
+        .github-btn span {
+            opacity: 0.8;
+        }
+        
+        .github-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 8px;
+            fill: currentColor;
+        }
+        
+        .footer-github-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 5px;
+            fill: currentColor;
+        }
+        
+        .footer-github-link:hover {
+            color: var(--accent-primary) !important;
+        }
+        
+        .nav-github-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 6px;
+            fill: currentColor;
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 40px 0;
+        }
+        
+        strong {
+            color: var(--text-bright);
+            font-weight: 500;
+        }
+        
+        /* Technical documentation specific styling */
+        .tech-specs {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .highlight-box {
+            background-color: var(--bg-secondary);
+            border-left: 3px solid var(--accent-primary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        
+        .code-structure {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+        
+        /* Comments in code blocks */
+        .comment {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+    </style>
+    
+    <!-- GitHub SVG Icon -->
+    <svg style="display: none;">
+        <symbol id="github-icon" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </symbol>
+    </svg>
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<h1 id="publickeyserver--surepack---deep-analysis">PublicKeyServer &amp; SurePack - Deep Analysis</h1>
-<h2 id="overview">Overview</h2>
-<p>The Public Key Server project is a sophisticated secure file transfer system that implements the Anonymous Certificate Enrollment (ACE) protocol. It provides end-to-end encrypted file sharing with anonymous identity capabilities, similar to PGP but with enhanced usability and anonymity features.</p>
-<h2 id="architecture">Architecture</h2>
-<h3 id="components">Components</h3>
-<ol>
-<li><strong>Suredrop (Server)</strong> - REST API server providing certificate management and file relay services</li>
-<li><strong>Surepack (Client)</strong> - Command-line and GUI client for creating, sending, and receiving encrypted packages</li>
-<li><strong>ACE Protocol</strong> - Anonymous Certificate Enrollment protocol based loosely on EST (RFC7030)</li>
-</ol>
-<h3 id="key-technologies">Key Technologies</h3>
-<ul>
-<li><strong>Cryptography</strong>: Bouncy Castle library for cryptographic operations</li>
-<li><strong>Classical Encryption</strong>: RSA 2048-bit for key exchange</li>
-<li><strong>Post-Quantum Encryption</strong>: Kyber1024 for quantum-resistant key encapsulation</li>
-<li><strong>Symmetric Encryption</strong>: AES-256-GCM for file encryption</li>
-<li><strong>Hashing</strong>: SHA-512 for signatures and verification</li>
-<li><strong>Storage</strong>: Amazon S3 for certificate and package storage</li>
-<li><strong>Framework</strong>: ASP.NET Core for the server, .NET for the client</li>
-</ul>
-<h2 id="core-features">Core Features</h2>
-<h3 id="1-anonymous-certificate-system">1. Anonymous Certificate System</h3>
-<p>The system generates anonymous aliases using three random words (e.g., <code>crow-mandate-current.publickeyserver.org</code>). Key features:</p>
-<ul>
-<li><strong>No Identity Required</strong>: Users can obtain certificates without revealing their identity</li>
-<li><strong>Automatic Alias Generation</strong>: Three-word phrases ensure uniqueness and memorability</li>
-<li><strong>Domain-based Validation</strong>: Certificates can be verified by accessing the alias as a URL</li>
-<li><strong>Optional Identity Binding</strong>: Users can optionally bind certificates to email addresses</li>
-</ul>
-<h3 id="2-hybrid-encryption-system">2. Hybrid Encryption System</h3>
-<p>The project implements a sophisticated multi-layer encryption approach:</p>
-<pre class="hljs"><code><div>File → AES-256-GCM → RSA-2048 → Kyber1024 (Post-Quantum)
-</div></code></pre>
-<ul>
-<li>Files are encrypted with AES-256-GCM using a random 256-bit key</li>
-<li>The AES key is encrypted with the recipient's RSA public key</li>
-<li>The RSA-encrypted key is further encrypted with Kyber1024 for quantum resistance</li>
-<li>Each recipient gets their own encrypted copy of the AES key</li>
-</ul>
-<h3 id="3-surepack-file-format">3. Surepack File Format</h3>
-<p>Surepacks are specially formatted ZIP files containing:</p>
-<pre class="hljs"><code><div>surepack.zip/
-├── envelope               # JSON metadata (recipients, sender, algorithms)
-├── envelope.signature     # Digital signature of envelope
-├── manifest              # Encrypted file listing and metadata
-├── manifest.signature    # Digital signature of manifest
-└── [encrypted blocks]    # File data split into encrypted chunks
-</div></code></pre>
-<h3 id="4-certificate-lifecycle">4. Certificate Lifecycle</h3>
-<ul>
-<li><strong>Short-lived Certificates</strong>: Designed to be temporary and disposable</li>
-<li><strong>Automatic Enrollment</strong>: Simple POST request with public key</li>
-<li><strong>Custom Extensions</strong>: Support for arbitrary data in X.509 extensions (OID: 1.3.6.1.4.1.57055)</li>
-<li><strong>Root CA Management</strong>: Encrypted CA certificate storage with AES-GCM</li>
-</ul>
-<h2 id="security-model">Security Model</h2>
-<h3 id="cryptographic-security">Cryptographic Security</h3>
-<ol>
-<li><strong>End-to-End Encryption</strong>: Private keys never leave the client device</li>
-<li><strong>Perfect Forward Secrecy</strong>: Each package uses a unique AES key</li>
-<li><strong>Post-Quantum Resistance</strong>: Kyber1024 provides protection against quantum attacks</li>
-<li><strong>Digital Signatures</strong>: All packages are signed with SHA512withRSA</li>
-<li><strong>Certificate Validation</strong>: Multi-step validation including root fingerprint verification</li>
-</ol>
-<h3 id="anonymity-features">Anonymity Features</h3>
-<ul>
-<li><strong>Anonymous Enrollment</strong>: No authentication required for certificate generation</li>
-<li><strong>Random Aliases</strong>: Three-word combinations provide sufficient entropy</li>
-<li><strong>Optional Identity</strong>: Users can choose between anonymous or identity-bound certificates</li>
-<li><strong>No Tracking</strong>: Server doesn't store user information beyond certificates</li>
-</ul>
-<h3 id="server-security">Server Security</h3>
-<ul>
-<li><strong>Encrypted Storage</strong>: CA certificates stored with AES-GCM encryption</li>
-<li><strong>AWS Security</strong>: Leverages Amazon S3 security features</li>
-<li><strong>Rate Limiting</strong>: Package size and count limits to prevent abuse</li>
-<li><strong>Signature Verification</strong>: All API calls require cryptographic signatures</li>
-</ul>
-<h2 id="api-endpoints">API Endpoints</h2>
-<h3 id="certificate-management">Certificate Management</h3>
-<ul>
-<li><code>GET /status</code> - Server status and statistics</li>
-<li><code>GET /cacerts</code> - Retrieve CA certificate chain</li>
-<li><code>POST /simpleenroll</code> - Enroll a new certificate with provided public key</li>
-<li><code>GET /cert/{alias}</code> - Retrieve certificate by alias</li>
-<li><code>GET /identity/{identity}</code> - Retrieve certificate by identity</li>
-<li><code>DELETE /{alias}</code> - Delete a certificate</li>
-</ul>
-<h3 id="package-management">Package Management</h3>
-<ul>
-<li><code>POST /package/{recipient}</code> - Upload an encrypted package</li>
-<li><code>GET /package/{recipient}/{package}</code> - Download a package</li>
-<li><code>GET /list/{recipient}</code> - List available packages</li>
-</ul>
-<h3 id="verification">Verification</h3>
-<ul>
-<li><code>GET /verify/{alias}</code> - Verify a certificate is valid</li>
-</ul>
-<h2 id="client-operations">Client Operations</h2>
-<h3 id="surepack-commands">Surepack Commands</h3>
-<ol>
-<li><strong>create</strong> - Generate a new certificate and key pair</li>
-<li><strong>pack</strong> - Create an encrypted surepack from files</li>
-<li><strong>unpack</strong> - Decrypt and extract a surepack</li>
-<li><strong>send</strong> - Upload a surepack to the server</li>
-<li><strong>receive</strong> - Download packages from the server</li>
-<li><strong>list</strong> - Show available packages</li>
-<li><strong>verify</strong> - Verify a certificate</li>
-<li><strong>certify</strong> - Certificate management operations</li>
-<li><strong>delete</strong> - Remove certificates or packages</li>
-<li><strong>gui</strong> - Launch graphical interface</li>
-</ol>
-<h3 id="workflow-example">Workflow Example</h3>
-<pre class="hljs"><code><div><span class="hljs-comment"># Create a new identity</span>
+    <div class="container">
+        <div class="header">
+            <h1>PublicKeyServer & SurePack - Deep Analysis</h1>
+            <p class="intro">Comprehensive technical documentation for the Public Key Server project and its secure file transfer system</p>
+            <div class="nav-menu">
+                <a href="index.html">Documentation Hub</a>
+                <a href="#overview">Overview</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#security">Security</a>
+                <a href="#api">API</a>
+                <a href="#implementation">Implementation</a>
+                <a href="https://github.com/rob-linton/publickeyserver"><svg class="nav-github-icon"><use href="#github-icon"></use></svg>GitHub</a>
+            </div>
+        </div>
+        
+        <section id="overview" class="section">
+            <h2>Overview</h2>
+            <p>The Public Key Server project is a sophisticated secure file transfer system that implements the Anonymous Certificate Enrollment (ACE) protocol. It provides end-to-end encrypted file sharing with anonymous identity capabilities, similar to PGP but with enhanced usability and anonymity features.</p>
+        </section>
+        
+        <section id="architecture" class="section">
+            <h2>Architecture</h2>
+            
+            <h3>Components</h3>
+            <ol>
+                <li><strong>Suredrop (Server)</strong> - REST API server providing certificate management and file relay services</li>
+                <li><strong>Surepack (Client)</strong> - Command-line and GUI client for creating, sending, and receiving encrypted packages</li>
+                <li><strong>ACE Protocol</strong> - Anonymous Certificate Enrollment protocol based loosely on EST (RFC7030)</li>
+            </ol>
+            
+            <h3>Key Technologies</h3>
+            <div class="tech-specs">
+                <ul>
+                    <li><strong>Cryptography:</strong> Bouncy Castle library for cryptographic operations</li>
+                    <li><strong>Classical Encryption:</strong> RSA 2048-bit for key exchange</li>
+                    <li><strong>Post-Quantum Encryption:</strong> Kyber1024 for quantum-resistant key encapsulation</li>
+                    <li><strong>Symmetric Encryption:</strong> AES-256-GCM for file encryption</li>
+                    <li><strong>Hashing:</strong> SHA-512 for signatures and verification</li>
+                    <li><strong>Storage:</strong> Amazon S3 for certificate and package storage</li>
+                    <li><strong>Framework:</strong> ASP.NET Core for the server, .NET for the client</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>Core Features</h2>
+            
+            <h3>1. Anonymous Certificate System</h3>
+            <p>The system generates anonymous aliases using three random words (e.g., <code>crow-mandate-current.publickeyserver.org</code>). Key features:</p>
+            <ul>
+                <li><strong>No Identity Required:</strong> Users can obtain certificates without revealing their identity</li>
+                <li><strong>Automatic Alias Generation:</strong> Three-word phrases ensure uniqueness and memorability</li>
+                <li><strong>Domain-based Validation:</strong> Certificates can be verified by accessing the alias as a URL</li>
+                <li><strong>Optional Identity Binding:</strong> Users can optionally bind certificates to email addresses</li>
+            </ul>
+            
+            <h3>2. Hybrid Encryption System</h3>
+            <p>The project implements a sophisticated multi-layer encryption approach:</p>
+            <pre><code>File → AES-256-GCM → RSA-2048 → Kyber1024 (Post-Quantum)</code></pre>
+            <ul>
+                <li>Files are encrypted with AES-256-GCM using a random 256-bit key</li>
+                <li>The AES key is encrypted with the recipient's RSA public key</li>
+                <li>The RSA-encrypted key is further encrypted with Kyber1024 for quantum resistance</li>
+                <li>Each recipient gets their own encrypted copy of the AES key</li>
+            </ul>
+            
+            <h3>3. Surepack File Format</h3>
+            <p>Surepacks are specially formatted ZIP files containing:</p>
+            <div class="code-structure">
+                <pre><code>surepack.zip/
+├── envelope               <span class="comment"># JSON metadata (recipients, sender, algorithms)</span>
+├── envelope.signature     <span class="comment"># Digital signature of envelope</span>
+├── manifest              <span class="comment"># Encrypted file listing and metadata</span>
+├── manifest.signature    <span class="comment"># Digital signature of manifest</span>
+└── [encrypted blocks]    <span class="comment"># File data split into encrypted chunks</span></code></pre>
+            </div>
+            
+            <h3>4. Certificate Lifecycle</h3>
+            <ul>
+                <li><strong>Short-lived Certificates:</strong> Designed to be temporary and disposable</li>
+                <li><strong>Automatic Enrollment:</strong> Simple POST request with public key</li>
+                <li><strong>Custom Extensions:</strong> Support for arbitrary data in X.509 extensions (OID: 1.3.6.1.4.1.57055)</li>
+                <li><strong>Root CA Management:</strong> Encrypted CA certificate storage with AES-GCM</li>
+            </ul>
+        </section>
+        
+        <section id="security" class="section">
+            <h2>Security Model</h2>
+            
+            <h3>Cryptographic Security</h3>
+            <ol>
+                <li><strong>End-to-End Encryption:</strong> Private keys never leave the client device</li>
+                <li><strong>Perfect Forward Secrecy:</strong> Each package uses a unique AES key</li>
+                <li><strong>Post-Quantum Resistance:</strong> Kyber1024 provides protection against quantum attacks</li>
+                <li><strong>Digital Signatures:</strong> All packages are signed with SHA512withRSA</li>
+                <li><strong>Certificate Validation:</strong> Multi-step validation including root fingerprint verification</li>
+            </ol>
+            
+            <h3>Anonymity Features</h3>
+            <ul>
+                <li><strong>Anonymous Enrollment:</strong> No authentication required for certificate generation</li>
+                <li><strong>Random Aliases:</strong> Three-word combinations provide sufficient entropy</li>
+                <li><strong>Optional Identity:</strong> Users can choose between anonymous or identity-bound certificates</li>
+                <li><strong>No Tracking:</strong> Server doesn't store user information beyond certificates</li>
+            </ul>
+            
+            <h3>Server Security</h3>
+            <div class="highlight-box">
+                <ul>
+                    <li><strong>Encrypted Storage:</strong> CA certificates stored with AES-GCM encryption</li>
+                    <li><strong>AWS Security:</strong> Leverages Amazon S3 security features</li>
+                    <li><strong>Rate Limiting:</strong> Package size and count limits to prevent abuse</li>
+                    <li><strong>Signature Verification:</strong> All API calls require cryptographic signatures</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="api" class="section">
+            <h2>API Endpoints</h2>
+            
+            <h3>Certificate Management</h3>
+            <ul>
+                <li><code>GET /status</code> - Server status and statistics</li>
+                <li><code>GET /cacerts</code> - Retrieve CA certificate chain</li>
+                <li><code>POST /simpleenroll</code> - Enroll a new certificate with provided public key</li>
+                <li><code>GET /cert/{alias}</code> - Retrieve certificate by alias</li>
+                <li><code>GET /identity/{identity}</code> - Retrieve certificate by identity</li>
+                <li><code>DELETE /{alias}</code> - Delete a certificate</li>
+            </ul>
+            
+            <h3>Package Management</h3>
+            <ul>
+                <li><code>POST /package/{recipient}</code> - Upload an encrypted package</li>
+                <li><code>GET /package/{recipient}/{package}</code> - Download a package</li>
+                <li><code>GET /list/{recipient}</code> - List available packages</li>
+            </ul>
+            
+            <h3>Verification</h3>
+            <ul>
+                <li><code>GET /verify/{alias}</code> - Verify a certificate is valid</li>
+            </ul>
+        </section>
+        
+        <section class="section">
+            <h2>Client Operations</h2>
+            
+            <h3>Surepack Commands</h3>
+            <ol>
+                <li><strong>create</strong> - Generate a new certificate and key pair</li>
+                <li><strong>pack</strong> - Create an encrypted surepack from files</li>
+                <li><strong>unpack</strong> - Decrypt and extract a surepack</li>
+                <li><strong>send</strong> - Upload a surepack to the server</li>
+                <li><strong>receive</strong> - Download packages from the server</li>
+                <li><strong>list</strong> - Show available packages</li>
+                <li><strong>verify</strong> - Verify a certificate</li>
+                <li><strong>certify</strong> - Certificate management operations</li>
+                <li><strong>delete</strong> - Remove certificates or packages</li>
+                <li><strong>gui</strong> - Launch graphical interface</li>
+            </ol>
+            
+            <h3>Workflow Example</h3>
+            <pre><code><span class="comment"># Create a new identity</span>
 surepack create -a myalias@publickeyserver.org
 
-<span class="hljs-comment"># Pack files for recipients</span>
-surepack pack -i <span class="hljs-string">"*.pdf"</span> -a recipient1,recipient2 -f myalias -o package.surepack
+<span class="comment"># Pack files for recipients</span>
+surepack pack -i "*.pdf" -a recipient1,recipient2 -f myalias -o package.surepack
 
-<span class="hljs-comment"># Send the package</span>
+<span class="comment"># Send the package</span>
 surepack send -i package.surepack
 
-<span class="hljs-comment"># Recipients can receive</span>
-surepack receive -a recipient1
-</div></code></pre>
-<h2 id="key-differentiators-from-pgp">Key Differentiators from PGP</h2>
-<ol>
-<li><strong>Ease of Use</strong>: No complex key management or web of trust</li>
-<li><strong>Anonymous by Default</strong>: No identity required for basic usage</li>
-<li><strong>Modern Cryptography</strong>: Post-quantum encryption built-in</li>
-<li><strong>Integrated Delivery</strong>: Built-in server for package relay</li>
-<li><strong>Automatic Key Discovery</strong>: Keys retrieved automatically via aliases</li>
-<li><strong>Simplified Validation</strong>: URL-based certificate verification</li>
-</ol>
-<h2 id="implementation-details">Implementation Details</h2>
-<h3 id="file-encryption-process">File Encryption Process</h3>
-<ol>
-<li>Files are compressed (GZIP/Brotli)</li>
-<li>Split into blocks for streaming</li>
-<li>Each block encrypted with AES-256-GCM</li>
-<li>Blocks stored in the surepack with metadata</li>
-</ol>
-<h3 id="certificate-validation">Certificate Validation</h3>
-<ol>
-<li>Retrieve certificate from server</li>
-<li>Verify certificate chain to root CA</li>
-<li>Check root fingerprint matches expected value</li>
-<li>Validate sender and recipient share same root CA</li>
-<li>Verify digital signatures on envelope and manifest</li>
-</ol>
-<h3 id="package-limits-configurable">Package Limits (Configurable)</h3>
-<ul>
-<li>Maximum package size: Configurable (default varies)</li>
-<li>Maximum bucket size: Per-recipient storage limit</li>
-<li>Maximum file count: Prevents resource exhaustion</li>
-</ul>
-<h2 id="security-considerations">Security Considerations</h2>
-<ol>
-<li><strong>Root Key Security</strong>: The root CA private key must be carefully protected</li>
-<li><strong>Password Protection</strong>: Local private keys encrypted with user password</li>
-<li><strong>Network Security</strong>: All communications over HTTPS</li>
-<li><strong>Temporary Storage</strong>: Packages deleted after download</li>
-<li><strong>No Persistent Storage</strong>: Server doesn't retain decrypted data</li>
-</ol>
-<h2 id="future-enhancements">Future Enhancements</h2>
-<p>Based on the codebase analysis, potential improvements could include:</p>
-<ol>
-<li><strong>Multiple Root CAs</strong>: Support for federated trust models</li>
-<li><strong>Revocation Lists</strong>: Certificate revocation mechanisms</li>
-<li><strong>Audit Logging</strong>: Enhanced logging for security monitoring</li>
-<li><strong>Mobile Clients</strong>: iOS/Android implementations</li>
-<li><strong>Browser Extension</strong>: Web-based encryption/decryption</li>
-</ol>
-<h2 id="production-deployment">Production Deployment</h2>
-<p>The reference implementation runs at https://publickeyserver.org with:</p>
-<ul>
-<li>AWS S3 for scalable storage</li>
-<li>ASP.NET Core on Linux servers</li>
-<li>Let's Encrypt for TLS certificates</li>
-<li>Serilog for structured logging</li>
-</ul>
-<h2 id="conclusion">Conclusion</h2>
-<p>The Public Key Server project successfully addresses many of the usability challenges of traditional encryption systems like PGP while maintaining strong security guarantees. Its unique combination of anonymous certificates, post-quantum cryptography, and integrated delivery makes it a compelling solution for secure file transfer in an increasingly surveilled digital world.</p>
-
+<span class="comment"># Recipients can receive</span>
+surepack receive -a recipient1</code></pre>
+        </section>
+        
+        <section class="section">
+            <h2>Key Differentiators from PGP</h2>
+            <ol>
+                <li><strong>Ease of Use:</strong> No complex key management or web of trust</li>
+                <li><strong>Anonymous by Default:</strong> No identity required for basic usage</li>
+                <li><strong>Modern Cryptography:</strong> Post-quantum encryption built-in</li>
+                <li><strong>Integrated Delivery:</strong> Built-in server for package relay</li>
+                <li><strong>Automatic Key Discovery:</strong> Keys retrieved automatically via aliases</li>
+                <li><strong>Simplified Validation:</strong> URL-based certificate verification</li>
+            </ol>
+        </section>
+        
+        <section id="implementation" class="section">
+            <h2>Implementation Details</h2>
+            
+            <h3>File Encryption Process</h3>
+            <ol>
+                <li>Files are compressed (GZIP/Brotli)</li>
+                <li>Split into blocks for streaming</li>
+                <li>Each block encrypted with AES-256-GCM</li>
+                <li>Blocks stored in the surepack with metadata</li>
+            </ol>
+            
+            <h3>Certificate Validation</h3>
+            <ol>
+                <li>Retrieve certificate from server</li>
+                <li>Verify certificate chain to root CA</li>
+                <li>Check root fingerprint matches expected value</li>
+                <li>Validate sender and recipient share same root CA</li>
+                <li>Verify digital signatures on envelope and manifest</li>
+            </ol>
+            
+            <h3>Package Limits (Configurable)</h3>
+            <div class="tech-specs">
+                <ul>
+                    <li>Maximum package size: Configurable (default varies)</li>
+                    <li>Maximum bucket size: Per-recipient storage limit</li>
+                    <li>Maximum file count: Prevents resource exhaustion</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>Security Considerations</h2>
+            <ol>
+                <li><strong>Root Key Security:</strong> The root CA private key must be carefully protected</li>
+                <li><strong>Password Protection:</strong> Local private keys encrypted with user password</li>
+                <li><strong>Network Security:</strong> All communications over HTTPS</li>
+                <li><strong>Temporary Storage:</strong> Packages deleted after download</li>
+                <li><strong>No Persistent Storage:</strong> Server doesn't retain decrypted data</li>
+            </ol>
+        </section>
+        
+        <section class="section">
+            <h2>Future Enhancements</h2>
+            <p>Based on the codebase analysis, potential improvements could include:</p>
+            <ol>
+                <li><strong>Multiple Root CAs:</strong> Support for federated trust models</li>
+                <li><strong>Revocation Lists:</strong> Certificate revocation mechanisms</li>
+                <li><strong>Audit Logging:</strong> Enhanced logging for security monitoring</li>
+                <li><strong>Mobile Clients:</strong> iOS/Android implementations</li>
+                <li><strong>Browser Extension:</strong> Web-based encryption/decryption</li>
+            </ol>
+        </section>
+        
+        <section class="section">
+            <h2>Production Deployment</h2>
+            <p>The reference implementation runs at https://publickeyserver.org with:</p>
+            <div class="tech-specs">
+                <ul>
+                    <li>AWS S3 for scalable storage</li>
+                    <li>ASP.NET Core on Linux servers</li>
+                    <li>Let's Encrypt for TLS certificates</li>
+                    <li>Serilog for structured logging</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>Conclusion</h2>
+            <p>The Public Key Server project successfully addresses many of the usability challenges of traditional encryption systems like PGP while maintaining strong security guarantees. Its unique combination of anonymous certificates, post-quantum cryptography, and integrated delivery makes it a compelling solution for secure file transfer in an increasingly surveilled digital world.</p>
+        </section>
+        
+        <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border-color);">
+            <p style="color: var(--text-secondary);">© 2024 Public Key Server Project | <a href="https://github.com/rob-linton/publickeyserver" class="footer-github-link" style="color: var(--text-secondary); transition: color 0.2s ease;"><svg class="footer-github-icon"><use href="#github-icon"></use></svg>GitHub Repository</a></p>
+        </div>
+    </div>
 </body>
 </html>
