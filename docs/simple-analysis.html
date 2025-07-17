@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>simple-analysis.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="simple-step-by-step-guide-how-surepack-certificate-system-works">Simple Step-by-Step Guide: How SurePack Certificate System Works</h1>
+<h2 id="overview">Overview</h2>
+<p>SurePack is like a digital ID card system where users can get unique, secure identities for encrypted communication. Think of it as getting a special passport that only you can use.</p>
+<hr>
+<h2 id="%F0%9F%94%90-creating-your-digital-identity-client-side">🔐 Creating Your Digital Identity (Client Side)</h2>
+<h3 id="step-1-user-starts-the-process">Step 1: User Starts the Process</h3>
+<ul>
+<li>User runs a simple command: <code>surepack create</code></li>
+<li>Optional: Can add their email address for recovery: <code>surepack create -e john@example.com -t 123456</code></li>
+<li>User enters a password (like a master key for their digital safe)</li>
+</ul>
+<h3 id="step-2-creating-your-keys-like-making-a-lock-and-key">Step 2: Creating Your Keys (Like Making a Lock and Key)</h3>
+<p>The computer creates THREE different types of locks and keys:</p>
+<ol>
+<li><strong>Regular Key (RSA)</strong> - Like a traditional house key</li>
+<li><strong>Future-Proof Key #1 (Kyber)</strong> - Protected against future quantum computers (for encryption)</li>
+<li><strong>Future-Proof Key #2 (Dilithium)</strong> - Protected against future quantum computers (for signatures)</li>
+</ol>
+<p>Think of it as having three different locks on your door - even if someone figures out how to pick one, they still can't get in.</p>
+<h3 id="step-3-sending-your-request">Step 3: Sending Your Request</h3>
+<ul>
+<li>The computer keeps all the PRIVATE keys (like keeping your house keys)</li>
+<li>It sends only the PUBLIC keys to the server (like giving out copies of your locks)</li>
+<li>If you provided an email, it includes the verification code</li>
+</ul>
+<h3 id="step-4-receiving-your-identity">Step 4: Receiving Your Identity</h3>
+<p>The server sends back:</p>
+<ul>
+<li><strong>Your unique name</strong>: Three random words like <code>happy-cloud-tree.example.com</code></li>
+<li><strong>Your certificate</strong>: Like an official ID card signed by the server</li>
+</ul>
+<h3 id="step-5-verifying-everything-is-legitimate">Step 5: Verifying Everything is Legitimate</h3>
+<ul>
+<li>The computer checks that the certificate is real (like checking a driver's license hologram)</li>
+<li>It saves a &quot;fingerprint&quot; of the server's signature for future verification</li>
+</ul>
+<h3 id="step-6-storing-everything-safely">Step 6: Storing Everything Safely</h3>
+<p>Your computer saves:</p>
+<ul>
+<li>Your certificate (public - like your ID card)</li>
+<li>Your three private keys (encrypted with your password - like keys in a safe)</li>
+<li>The server's fingerprint (to verify future communications)</li>
+</ul>
+<p>Everything is stored in a special folder on your computer, protected by your password.</p>
+<hr>
+<h2 id="%F0%9F%96%A5%EF%B8%8F-how-the-server-creates-your-identity">🖥️ How the Server Creates Your Identity</h2>
+<h3 id="step-1-receiving-the-request">Step 1: Receiving the Request</h3>
+<p>The server gets:</p>
+<ul>
+<li>Your public keys (the &quot;locks&quot;)</li>
+<li>Optional: Your email and verification code</li>
+</ul>
+<h3 id="step-2-checking-your-identity-if-email-provided">Step 2: Checking Your Identity (If Email Provided)</h3>
+<p>If you provided an email:</p>
+<ul>
+<li>Server checks if you're allowed to use that email domain</li>
+<li>Verifies your code matches what was sent to your email</li>
+<li>Ensures the code hasn't expired (1-hour time limit)</li>
+<li>Deletes the code after successful verification</li>
+</ul>
+<h3 id="step-3-creating-your-unique-name">Step 3: Creating Your Unique Name</h3>
+<p>The server:</p>
+<ul>
+<li>Randomly picks three words from a dictionary of 10,000 common words</li>
+<li>Creates combinations like <code>happy-cloud-tree</code></li>
+<li>Checks if this name is already taken</li>
+<li>Tries up to 10 times to find a unique name</li>
+</ul>
+<p>Fun fact: Some combinations are rarer than others:</p>
+<ul>
+<li><strong>Legendary</strong>: All three words the same (like <code>love-love-love</code>)</li>
+<li><strong>Epic</strong>: Two words match (like <code>happy-happy-tree</code>)</li>
+<li><strong>Common</strong>: All different words</li>
+</ul>
+<h3 id="step-4-creating-your-certificate">Step 4: Creating Your Certificate</h3>
+<p>The server creates an official certificate that includes:</p>
+<ul>
+<li><strong>Your name</strong>: The three-word alias</li>
+<li><strong>Valid for</strong>: 397 days (about 13 months)</li>
+<li><strong>Your public key</strong>: So others can send you encrypted messages</li>
+<li><strong>Your email</strong>: If provided, for account recovery</li>
+<li><strong>Special data</strong>: Your quantum-resistant public keys</li>
+<li><strong>Server's signature</strong>: Proving it's authentic</li>
+</ul>
+<h3 id="step-5-signing-with-the-master-key">Step 5: Signing with the Master Key</h3>
+<ul>
+<li>The server unlocks its master signing key (kept encrypted)</li>
+<li>Signs your certificate (like a notary stamping a document)</li>
+<li>This signature proves the certificate is genuine</li>
+</ul>
+<h3 id="step-6-storing-and-returning">Step 6: Storing and Returning</h3>
+<p>The server:</p>
+<ul>
+<li>Saves your certificate in two places:
+<ul>
+<li>Main storage: Under your three-word name</li>
+<li>Email storage: Under your email (if provided)</li>
+</ul>
+</li>
+<li>Sends the certificate back to you</li>
+</ul>
+<hr>
+<h2 id="%F0%9F%94%92-why-httpsssl-is-critical">🔒 Why HTTPS/SSL is Critical</h2>
+<p>The server MUST have a valid HTTPS certificate (the green padlock in your browser) because:</p>
+<ol>
+<li><strong>Initial Trust</strong>: Like checking the bank's official seal before opening an account</li>
+<li><strong>Secure Communication</strong>: All data is encrypted during transmission</li>
+<li><strong>Server Authentication</strong>: Proves you're talking to the real server, not an imposter</li>
+<li><strong>Certificate Verification</strong>: When checking if other users are legitimate</li>
+</ol>
+<p>Without HTTPS, it would be like:</p>
+<ul>
+<li>Sending your passport application through regular mail instead of certified mail</li>
+<li>Anyone could intercept and create fake IDs</li>
+<li>You couldn't trust any certificates you receive</li>
+</ul>
+<hr>
+<h2 id="%F0%9F%8E%AF-simple-analogy">🎯 Simple Analogy</h2>
+<p>Think of the whole system like getting a passport:</p>
+<ol>
+<li><strong>You apply</strong> (create command) with your information</li>
+<li><strong>You keep your private documents</strong> (private keys) in your safe at home</li>
+<li><strong>You send copies of public documents</strong> (public keys) to the passport office</li>
+<li><strong>The passport office verifies your identity</strong> (email verification)</li>
+<li><strong>They create your unique passport</strong> (certificate with three-word name)</li>
+<li><strong>They stamp it with their official seal</strong> (digital signature)</li>
+<li><strong>They send it back to you</strong> (return certificate)</li>
+<li><strong>You store it safely</strong> (encrypted storage)</li>
+</ol>
+<p>The HTTPS certificate is like the official government building - you know you're in the right place because you can see the official signs and security guards. Without it, you might accidentally give your information to scammers in a fake office.</p>
+<hr>
+<h2 id="%F0%9F%93%9D-what-you-end-up-with">📝 What You End Up With</h2>
+<p>After the process, you have:</p>
+<ul>
+<li>A unique three-word identity (like <code>happy-cloud-tree.example.com</code>)</li>
+<li>Three types of private keys (locked with your password)</li>
+<li>A certificate that proves your identity</li>
+<li>The ability to:
+<ul>
+<li>Receive encrypted messages that only you can read</li>
+<li>Send signed messages that others can verify came from you</li>
+<li>Communicate securely even if quantum computers are invented</li>
+</ul>
+</li>
+</ul>
+<p>All of this happens in seconds, and you only need to remember your password!</p>
+
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>analysis.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="analysis-how-surepack-certificate-system-works">Analysis: How SurePack Certificate System Works</h1>
+<h1 id="server">Server:</h1>
+<h2 id="certificate-creation-process-in-simpleenroll">Certificate Creation Process in SimpleEnroll</h2>
+<p>The SimpleEnroll function implements a secure certificate enrollment system that creates X.509 certificates signed by a Certificate Authority (CA). Here's a step-by-step breakdown of the process:</p>
+<h3 id="1-initial-request-processing">1. <strong>Initial Request Processing</strong></h3>
+<ul>
+<li>The function accepts a POST request with JSON containing:
+<ul>
+<li><code>key</code>: An RSA 2048-bit public key in PEM format</li>
+<li><code>data</code>: Optional base64-encoded JSON data containing identity information and quantum-resistant keys</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-public-key-validation">2. <strong>Public Key Validation</strong></h3>
+<p>The system first validates the provided public key:</p>
+<pre class="hljs"><code><div>AsymmetricKeyParameter? publickeyRequestor = (AsymmetricKeyParameter)BouncyCastleHelper.fromPEM(key);
+</div></code></pre>
+<p>If the key is invalid or not in proper PEM format, the request is rejected.</p>
+<h3 id="3-identity-verification-process">3. <strong>Identity Verification Process</strong></h3>
+<p>The system supports two modes:</p>
+<ul>
+<li><strong>Anonymous mode</strong>: Users can get certificates without providing identity</li>
+<li><strong>Identity-verified mode</strong>: Users must provide an email address and verification token</li>
+</ul>
+<p>For identity verification:</p>
+<ol>
+<li>The user provides an email address (identity) and a verification token</li>
+<li>The system checks if anonymous enrollment is allowed (<code>GLOBALS.Anonymous</code>)</li>
+<li>If identity is required, it validates the email domain against allowed domains</li>
+<li>The system looks for a token file in S3: <code>{origin}/tokens/{identity}.token</code></li>
+<li>Token validation includes:
+<ul>
+<li>Checking if the token matches the stored token</li>
+<li>Verifying the token hasn't expired (1-hour validity)</li>
+<li>Ensuring the identity in the token file matches the provided identity</li>
+</ul>
+</li>
+<li>Upon successful validation, the token file is deleted</li>
+</ol>
+<h3 id="4-unique-alias-generation">4. <strong>Unique Alias Generation</strong></h3>
+<p>The system generates a unique three-word alias using a sophisticated algorithm:</p>
+<ul>
+<li>Selects three random words from a dictionary of ~10,000 common English words</li>
+<li>Format: <code>word1-word2-word3.{origin}</code> (e.g., <code>happy-cloud-tree.example.com</code>)</li>
+<li>Includes a rarity system:
+<ul>
+<li><strong>Legendary</strong>: All three words are the same (1/10,000 chance)</li>
+<li><strong>Epic</strong>: Two words match (10/10,000 chance)</li>
+<li><strong>Rare/Uncommon/Common</strong>: Based on probability distribution</li>
+</ul>
+</li>
+<li>Checks S3 to ensure the alias doesn't already exist</li>
+<li>Retries up to 10 times if collisions occur</li>
+</ul>
+<h3 id="5-certificate-authority-key-retrieval">5. <strong>Certificate Authority Key Retrieval</strong></h3>
+<p>The system retrieves the CA's private key for signing:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">byte</span>[] cakeysBytes = System.IO.File.ReadAllBytes(<span class="hljs-string">$"subcakeys.<span class="hljs-subst">{origin}</span>.pem"</span>);
+<span class="hljs-keyword">byte</span>[] cakeysDecrypted = BouncyCastleHelper.DecryptWithKey(cakeysBytes, GLOBALS.password.ToBytes(), GLOBALS.origin.ToBytes());
+</div></code></pre>
+<ul>
+<li>The CA keys are stored encrypted using AES-GCM</li>
+<li>Decryption requires the server password and origin as additional authenticated data</li>
+</ul>
+<h3 id="6-x509-certificate-creation">6. <strong>X.509 Certificate Creation</strong></h3>
+<p>The certificate is created with these specifications:</p>
+<ul>
+<li><strong>Subject DN</strong>: <code>CN={alias}</code> (the three-word alias)</li>
+<li><strong>Issuer DN</strong>: <code>CN={origin}</code> (the CA's domain)</li>
+<li><strong>Serial Number</strong>: Random 64-bit integer</li>
+<li><strong>Validity Period</strong>: 397 days (just over 13 months)</li>
+<li><strong>Subject Alternative Names</strong>:
+<ul>
+<li>DNS name: The alias</li>
+<li>RFC822 name: The email address (if provided)</li>
+</ul>
+</li>
+<li><strong>Key Usage</strong>: KeyEncipherment only</li>
+<li><strong>Basic Constraints</strong>: CA:FALSE (not a CA certificate)</li>
+<li><strong>Custom Extension</strong> (OID 1.3.6.1.4.1.57055): Contains the base64-encoded data including:
+<ul>
+<li>Quantum-resistant keys (Kyber for encryption, Dilithium for signatures)</li>
+<li>Identity information</li>
+</ul>
+</li>
+<li><strong>Signature Algorithm</strong>: SHA512withRSA</li>
+</ul>
+<h3 id="7-certificate-storage">7. <strong>Certificate Storage</strong></h3>
+<p>The signed certificate is stored in S3:</p>
+<ul>
+<li>Primary location: <code>{origin}/cert/{alias}.pem</code></li>
+<li>If identity provided: <code>{origin}/identity/{identity}/{alias}.pem</code></li>
+</ul>
+<h3 id="8-response">8. <strong>Response</strong></h3>
+<p>The system returns:</p>
+<ul>
+<li><code>alias</code>: The generated three-word alias</li>
+<li><code>origin</code>: The CA's domain</li>
+<li><code>publickey</code>: The user's public key (echoed back)</li>
+<li><code>certificate</code>: The signed X.509 certificate in PEM format</li>
+</ul>
+<h2 id="importance-of-valid-ssl-certificate-on-hosted-domain">Importance of Valid SSL Certificate on Hosted Domain</h2>
+<p>The valid SSL certificate on the hosted domain is <strong>critically important</strong> for several reasons:</p>
+<ol>
+<li>
+<p><strong>Trust Chain Establishment</strong>: The domain's SSL certificate establishes the initial trust relationship. When clients connect to retrieve certificates, they can verify they're talking to the legitimate certificate authority.</p>
+</li>
+<li>
+<p><strong>Man-in-the-Middle Protection</strong>: Without HTTPS secured by a valid SSL certificate, attackers could intercept certificate enrollment requests and issue fraudulent certificates.</p>
+</li>
+<li>
+<p><strong>Identity Verification</strong>: The domain in the SSL certificate becomes part of the certificate hierarchy. All issued certificates have the domain as their issuer, creating a verifiable chain of trust.</p>
+</li>
+<li>
+<p><strong>API Security</strong>: All API endpoints (enrollment, retrieval, verification) are protected by HTTPS, ensuring:</p>
+<ul>
+<li>Confidentiality of public keys during transmission</li>
+<li>Integrity of certificates being downloaded</li>
+<li>Authentication of the certificate authority server</li>
+</ul>
+</li>
+<li>
+<p><strong>Token Protection</strong>: Identity verification tokens are transmitted over HTTPS, preventing interception and replay attacks.</p>
+</li>
+<li>
+<p><strong>Certificate Validation</strong>: The system includes a <code>VerifyAliasAsync</code> method that retrieves and validates certificates over HTTPS. This process relies on the SSL certificate to ensure the validation request reaches the authentic CA.</p>
+</li>
+</ol>
+<p>The system essentially creates a two-tier PKI where:</p>
+<ul>
+<li>The domain's SSL certificate (from a trusted CA) establishes web trust</li>
+<li>The custom CA certificate (self-signed but verified through the SSL-protected API) establishes application-level trust</li>
+</ul>
+<p>This design allows the system to bootstrap trust from the web PKI into a custom PKI for secure communications, making the valid SSL certificate a fundamental security requirement.</p>
+<h1 id="client">Client</h1>
+<h2 id="client-side-certificate-creation-process-createcs">Client-Side Certificate Creation Process (Create.cs)</h2>
+<p>The client-side certificate creation process is a sophisticated implementation that combines traditional RSA cryptography with quantum-resistant algorithms. Here's a step-by-step breakdown:</p>
+<h3 id="1-command-line-interface">1. <strong>Command-Line Interface</strong></h3>
+<p>The client uses a command-line verb system:</p>
+<pre class="hljs"><code><div>[<span class="hljs-meta">Verb(<span class="hljs-meta-string">"create"</span>, HelpText = <span class="hljs-meta-string">"Create an alias."</span>)</span>]
+</div></code></pre>
+<p>Options include:</p>
+<ul>
+<li><code>-e</code> or <code>--email</code>: Optional email address to associate with the alias</li>
+<li><code>-t</code> or <code>--token</code>: Email validation token (required if email is provided)</li>
+</ul>
+<h3 id="2-key-generation-process">2. <strong>Key Generation Process</strong></h3>
+<p>The client generates three different key pairs for comprehensive security:</p>
+<h4 id="a-rsa-key-pair-classical-cryptography">a) <strong>RSA Key Pair (Classical Cryptography)</strong></h4>
+<pre class="hljs"><code><div>AsymmetricCipherKeyPair keyPair = BouncyCastleHelper.GenerateKeyPair(<span class="hljs-number">2048</span>);
+</div></code></pre>
+<ul>
+<li>Generates a 2048-bit RSA key pair</li>
+<li>Used for traditional encryption and digital signatures</li>
+<li>Compatible with existing PKI infrastructure</li>
+</ul>
+<h4 id="b-kyber-key-pair-quantum-resistant-encryption">b) <strong>Kyber Key Pair (Quantum-Resistant Encryption)</strong></h4>
+<pre class="hljs"><code><div>AsymmetricCipherKeyPair KyberKeyPair = BouncyCastleQuantumHelper.GenerateKyberKeyPair();
+</div></code></pre>
+<ul>
+<li>Uses Kyber1024 parameters (highest security level)</li>
+<li>Provides quantum-resistant encryption capabilities</li>
+<li>Based on Module Learning with Errors (MLWE) problem</li>
+<li>NIST-approved post-quantum cryptography standard</li>
+</ul>
+<h4 id="c-dilithium-key-pair-quantum-resistant-signatures">c) <strong>Dilithium Key Pair (Quantum-Resistant Signatures)</strong></h4>
+<pre class="hljs"><code><div>AsymmetricCipherKeyPair DilithiumKeyPair = BouncyCastleQuantumHelper.GenerateDilithiumKeyPair();
+</div></code></pre>
+<ul>
+<li>Uses Dilithium5 parameters (highest security level)</li>
+<li>Provides quantum-resistant digital signatures</li>
+<li>Based on Module Learning with Errors and Short Integer Solution problems</li>
+<li>NIST-approved post-quantum cryptography standard</li>
+</ul>
+<h3 id="3-data-payload-preparation">3. <strong>Data Payload Preparation</strong></h3>
+<p>The client creates a structured payload containing:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> data = <span class="hljs-keyword">new</span> CustomExtensionData{
+    KyberKey = Convert.ToBase64String(KyberPublicKey),
+    DilithiumKey = Convert.ToBase64String(DilithiumPublicKey),
+    Email = opts.Email ?? <span class="hljs-keyword">string</span>.Empty,
+    Token = opts.Token ?? <span class="hljs-keyword">string</span>.Empty
+};
+</div></code></pre>
+<p>This data is:</p>
+<ol>
+<li>Serialized to JSON</li>
+<li>Encoded to UTF-8 bytes</li>
+<li>Base64-encoded for transmission</li>
+</ol>
+<h3 id="4-certificate-request-submission">4. <strong>Certificate Request Submission</strong></h3>
+<p>The client sends a POST request to the server's <code>/simpleenroll</code> endpoint:</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"key"</span>: <span class="hljs-string">"RSA public key in PEM format"</span>,
+    <span class="hljs-attr">"data"</span>: <span class="hljs-string">"Base64-encoded JSON containing quantum keys and identity info"</span>
+}
+</div></code></pre>
+<h3 id="5-server-response-processing">5. <strong>Server Response Processing</strong></h3>
+<p>The server returns:</p>
+<ul>
+<li><code>alias</code>: The unique three-word identifier</li>
+<li><code>certificate</code>: The signed X.509 certificate</li>
+<li><code>origin</code>: The certificate authority's domain</li>
+<li><code>publickey</code>: Echo of the submitted public key</li>
+</ul>
+<h3 id="6-local-storage-of-cryptographic-materials">6. <strong>Local Storage of Cryptographic Materials</strong></h3>
+<p>The client stores all cryptographic materials securely:</p>
+<h4 id="a-certificate-storage">a) <strong>Certificate Storage</strong></h4>
+<pre class="hljs"><code><div>Storage.StoreCert(<span class="hljs-keyword">alias</span>, j.Certificate);
+</div></code></pre>
+<ul>
+<li>Stored as PEM file: <code>{alias}.pem</code></li>
+<li>Location: <code>~/.local/share/surepack/aliases/</code> (Linux) or equivalent</li>
+</ul>
+<h4 id="b-private-key-storage">b) <strong>Private Key Storage</strong></h4>
+<p>Each private key is encrypted before storage:</p>
+<pre class="hljs"><code><div>Storage.StorePrivateKey(<span class="hljs-string">$"<span class="hljs-subst">{<span class="hljs-keyword">alias</span>}</span>.rsa"</span>, privateKeyPem, Globals.Password);
+Storage.StorePrivateKey(<span class="hljs-string">$"<span class="hljs-subst">{<span class="hljs-keyword">alias</span>}</span>.kyber"</span>, kyberPrivateKeyPem, Globals.Password);
+Storage.StorePrivateKey(<span class="hljs-string">$"<span class="hljs-subst">{<span class="hljs-keyword">alias</span>}</span>.dilithium"</span>, dilithiumPrivateKeyPem, Globals.Password);
+</div></code></pre>
+<p><strong>Encryption mechanism:</strong></p>
+<ul>
+<li>Uses AES-GCM encryption</li>
+<li>Key: User's password (converted to bytes)</li>
+<li>Nonce: Domain name from alias (provides uniqueness)</li>
+<li>Each key type stored separately: <code>.rsa</code>, <code>.kyber</code>, <code>.dilithium</code></li>
+</ul>
+<h3 id="7-certificate-verification">7. <strong>Certificate Verification</strong></h3>
+<p>After receiving the certificate, the client immediately verifies it:</p>
+<pre class="hljs"><code><div>(<span class="hljs-keyword">bool</span> valid, <span class="hljs-keyword">byte</span>[] rootFingerprint) = <span class="hljs-keyword">await</span> BouncyCastleHelper.VerifyAliasAsync(domain, <span class="hljs-keyword">alias</span>, <span class="hljs-string">""</span>);
+</div></code></pre>
+<p>This verification process:</p>
+<ol>
+<li>Retrieves the CA certificates from the server</li>
+<li>Validates the certificate chain</li>
+<li>Checks certificate validity dates</li>
+<li>Verifies the CA's signing authority</li>
+<li>Returns the root CA's fingerprint</li>
+</ol>
+<h3 id="8-root-fingerprint-storage">8. <strong>Root Fingerprint Storage</strong></h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">string</span> rootFingerprintHex = Convert.ToBase64String(rootFingerprint);
+Storage.StorePrivateKey(<span class="hljs-string">$"<span class="hljs-subst">{<span class="hljs-keyword">alias</span>}</span>.root"</span>, rootFingerprintHex, Globals.Password);
+</div></code></pre>
+<ul>
+<li>The root CA's fingerprint is stored encrypted</li>
+<li>Used for future certificate validations</li>
+<li>Provides trust anchor for the custom PKI</li>
+</ul>
+<h2 id="security-features-and-considerations">Security Features and Considerations</h2>
+<h3 id="1-hybrid-cryptography-approach">1. <strong>Hybrid Cryptography Approach</strong></h3>
+<p>The system implements a &quot;belt and suspenders&quot; approach:</p>
+<ul>
+<li><strong>RSA</strong>: Current standard, widely supported</li>
+<li><strong>Kyber</strong>: Quantum-resistant encryption</li>
+<li><strong>Dilithium</strong>: Quantum-resistant signatures</li>
+</ul>
+<p>This ensures security against both current and future (quantum) threats.</p>
+<h3 id="2-local-key-generation">2. <strong>Local Key Generation</strong></h3>
+<p>All private keys are generated locally on the client:</p>
+<ul>
+<li>Private keys never leave the client device</li>
+<li>Only public keys are sent to the server</li>
+<li>Ensures true end-to-end security</li>
+</ul>
+<h3 id="3-password-based-encryption">3. <strong>Password-Based Encryption</strong></h3>
+<p>Private keys are encrypted using the user's password:</p>
+<ul>
+<li>Protects keys at rest</li>
+<li>Password never transmitted to server</li>
+<li>Each key encrypted with unique nonce (domain-based)</li>
+</ul>
+<h3 id="4-certificate-chain-validation">4. <strong>Certificate Chain Validation</strong></h3>
+<p>The client performs thorough validation:</p>
+<ul>
+<li>Verifies the entire certificate chain</li>
+<li>Checks certificate validity periods</li>
+<li>Validates CA signing authority</li>
+<li>Ensures domain name consistency</li>
+</ul>
+<h3 id="5-storage-organization">5. <strong>Storage Organization</strong></h3>
+<pre class="hljs"><code><div>~/.local/share/surepack/
+├── aliases/
+│   ├── {alias}.pem          (certificate)
+│   ├── {alias}.rsa          (encrypted RSA private key)
+│   ├── {alias}.kyber        (encrypted Kyber private key)
+│   ├── {alias}.dilithium    (encrypted Dilithium private key)
+│   └── {alias}.root         (encrypted root fingerprint)
+└── settings.json
+</div></code></pre>
+<h3 id="6-error-handling-and-user-experience">6. <strong>Error Handling and User Experience</strong></h3>
+<ul>
+<li>Progress reporting for UI integration</li>
+<li>Comprehensive error messages</li>
+<li>Password retry mechanism</li>
+<li>Graceful failure handling</li>
+</ul>
+<h2 id="importance-of-ssl-certificate-client-perspective">Importance of SSL Certificate (Client Perspective)</h2>
+<p>From the client's perspective, the server's valid SSL certificate is crucial for:</p>
+<ol>
+<li>
+<p><strong>Initial Trust Bootstrap</strong>: The HTTPS connection validates the server's identity before any certificate enrollment</p>
+</li>
+<li>
+<p><strong>Secure Key Transmission</strong>: The RSA public key and quantum public keys are transmitted over HTTPS, preventing interception</p>
+</li>
+<li>
+<p><strong>Token Security</strong>: Email verification tokens are protected during transmission</p>
+</li>
+<li>
+<p><strong>Certificate Retrieval</strong>: When verifying certificates, the client relies on HTTPS to ensure authentic CA certificates</p>
+</li>
+<li>
+<p><strong>Man-in-the-Middle Prevention</strong>: Without HTTPS, an attacker could intercept the enrollment request and issue fraudulent certificates</p>
+</li>
+</ol>
+<p>The client's <code>VerifyAliasAsync</code> method specifically makes HTTPS calls to retrieve and validate certificates, making the SSL certificate a fundamental security requirement for the entire PKI system to function securely.</p>
+
+</body>
+</html>
