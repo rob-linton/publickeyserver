@@ -18,10 +18,15 @@ public class Program
 		//Globals.Domain = settings.Domain;
 		Globals.Password = settings.Password;
 		
+		// Special handling for --help and --version to show overall help
+		if (args.Length == 1 && (args[0] == "--help" || args[0] == "-h" || args[0] == "--version"))
+		{
+			// Don't modify args, let the parser handle it directly
+		}
 		// if the first parameter does has a - then insert the word "gui"
 		// this is a hack to allow the gui to be run without the word "gui"
 		// or if there are no parameters then run the gui
-		if ((args.Length > 0 && args[0].StartsWith("-")) || args.Length == 0)
+		else if ((args.Length > 0 && args[0].StartsWith("-")) || args.Length == 0)
 		{
 			List<string> newArgs = new();
 			newArgs.Add("gui");
@@ -31,7 +36,7 @@ public class Program
 
 		// now check to see if a surepack file was passed in on the command line
 		// if so, then we need to open it
-		if (args.Length > 0)
+		if (args.Length > 0 && args[0] != "--help" && args[0] != "-h" && args[0] != "--version")
 		{
 			if (args[0].EndsWith(".surepack"))
 			{
