@@ -59,31 +59,33 @@ class ViewMenu
                 },null,null)
             }),
 			new MenuBarItem ("_Help", new MenuItem [] {
-				  new MenuItem ("_About", "", () => { 
+                new MenuItem ("_User Manual", "", () => { 
+                    try {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "https://rob-linton.github.io/publickeyserver/HELP.html",
+                            UseShellExecute = true
+                        });
+                    } catch {
+                        new DialogMessage("Please visit: https://rob-linton.github.io/publickeyserver/HELP.html", "Help");
+                    }
+                }),
+                new MenuItem ("_Documentation Hub", "", () => { 
+                    try {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "https://rob-linton.github.io/publickeyserver/",
+                            UseShellExecute = true
+                        });
+                    } catch {
+                        new DialogMessage("Please visit: https://rob-linton.github.io/publickeyserver/", "Help");
+                    }
+                }),
+				new MenuItem ("--------------------------------", "", () => {  
+                }),
+                new MenuItem ("_About SurePack", "", () => { 
                     ShowAbout(); 
-                }),
-				/*
-				new MenuItem ("_Update", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("-------------", "", () => {  
-                }),
-                new MenuItem ("_Overview", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Aliases", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_SurePacks", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Encryption", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				new MenuItem ("_Key Servers", "", () => { 
-                    Application.RequestStop (); 
-                }),
-				*/
+                },null,null,Key.F1),
             }),
         });
 	}
@@ -106,12 +108,26 @@ class ViewMenu
 	public static void ShowAbout()
 	{
 		string message = 
-@"
-    SurePack is a secure (and optionally anonymous) package delivery service that uses the SureDrop protocol.    
-Version 1.0.0
-";
+$@"SurePack {Globals.version}
+Secure File Transfer with Post-Quantum Cryptography
 
-		MessageBox.ErrorQuery("About", message, "Ok");
+SurePack is a secure (and optionally anonymous) package delivery 
+service that uses the SureDrop protocol with military-grade encryption.
+
+FEATURES:
+✓ End-to-End Encryption (AES-256-GCM)
+✓ Post-Quantum Cryptography (Kyber1024 + Dilithium5)
+✓ Anonymous Transfer Option
+✓ Perfect Forward Secrecy
+✓ Zero-Knowledge Server Architecture
+
+GETTING HELP:
+📚 Documentation: https://rob-linton.github.io/publickeyserver/
+📖 User Manual: https://rob-linton.github.io/publickeyserver/HELP.html
+
+Press F1 at any time for help.";
+
+		MessageBox.Query("About SurePack", message, "Ok");
 	}
 
 	public static void OpenSurepack(string file)

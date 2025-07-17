@@ -228,7 +228,7 @@ public class Storage
 			}
 			else
 			{
-				throw new Exception($"Incorrect password");
+				throw new Exception($"Incorrect password. Need help? Visit: https://rob-linton.github.io/publickeyserver/HELP.html#troubleshooting");
 			}
 		}
 		return plainText.FromBytes();

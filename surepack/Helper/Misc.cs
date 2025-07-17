@@ -203,7 +203,9 @@ public class Misc
 
 			if (!String.IsNullOrEmpty(details))
 				Console.Write($"{details}\n");
+			
 			Console.ResetColor();
+			Console.WriteLine("\nNeed help? Visit: https://rob-linton.github.io/publickeyserver/HELP.html");
 		}
 
 		// log it to a file by writing it
@@ -350,6 +352,9 @@ public class Misc
 			LogLine($"SUREPACK {Globals.version} (publickeyserver.org)");
 			LogLine("Post Quantum Cryptography (PQC) using the Crystal Kyber and Dilithium algorithms");
 			LogLine("Acknowledgement to the BouncyCastle C# Crypto library");
+			LogLine("");
+			LogLine("📚 Help Center: https://rob-linton.github.io/publickeyserver/");
+			LogLine("📖 SurePack Manual: https://rob-linton.github.io/publickeyserver/HELP.html");
 			LogLine("===================================================================================================\n");
 		}
 	}

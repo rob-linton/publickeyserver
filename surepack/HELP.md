@@ -433,7 +433,8 @@ These options are available for all commands:
 3. **Anonymous Transfers**: For maximum anonymity, create aliases without email association
 4. **Key Storage**: Private keys are stored in:
    - Windows: `%LOCALAPPDATA%\surepack\aliases\`
-   - Linux/Mac: `~/.local/share/surepack/aliases/`
+   - macOS: `~/Library/Application Support/surepack/aliases/`
+   - Linux: `~/.local/share/surepack/aliases/`
 
 ---
 
@@ -458,5 +459,8 @@ These options are available for all commands:
 ## Need More Help?
 
 - Run `surepack <command> --help` for detailed help on any command
-- Visit [publickeyserver.org](https://publickeyserver.org) for documentation
-- Report issues at [github.com/publickeyserver/surepack](https://github.com/publickeyserver/surepack) 
+- Run `surepack about` for version info and quick reference
+- Visit the [Help Center](https://rob-linton.github.io/publickeyserver/) for comprehensive documentation
+- Read the [SurePack User Manual](https://rob-linton.github.io/publickeyserver/HELP.html) online
+- Visit [publickeyserver.org](https://publickeyserver.org) for downloads
+- Report issues at [github.com/rob-linton/publickeyserver/issues](https://github.com/rob-linton/publickeyserver/issues) 

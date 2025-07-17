@@ -194,7 +194,10 @@ If you have multiple aliases, it will automatically find the right one.
 ## 🔐 Security Notes
 
 ### Your Private Keys
-- Stored in: `~/.local/share/surepack/aliases/` (Linux/Mac) or `%LOCALAPPDATA%\surepack\aliases\` (Windows)
+- Stored in:
+  - **Windows**: `%LOCALAPPDATA%\surepack\aliases\`
+  - **macOS**: `~/Library/Application Support/surepack/aliases/`
+  - **Linux**: `~/.local/share/surepack/aliases/`
 - Protected by your password
 - **Never share your private keys!**
 

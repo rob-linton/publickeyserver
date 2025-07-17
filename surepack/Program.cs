@@ -78,7 +78,7 @@ public class Program
 
 		var opts = parser.ParseArguments<Options, PackOptions, UnpackOptions, CreateOptions, CertifyOptions, ListOptions, SendOptions, ReceiveOptions, VerifyOptions, GuiOptions, DeleteOptions, AboutOptions>(args);
 
-		return opts.MapResult(
+		var result = opts.MapResult(
 		(CreateOptions opts) 	=> Verbs.Create.Execute(opts).Result,
 		(PackOptions opts) 		=> Verbs.Pack.Execute(opts).Result,
 		(UnpackOptions opts) 	=> Verbs.Unpack.Execute(opts).Result,
@@ -90,7 +90,14 @@ public class Program
 		(GuiOptions opts) 		=> Verbs.Gui.Execute(opts).Result,
 		(DeleteOptions opts) 		=> Verbs.Delete.Execute(opts).Result,
 		(AboutOptions opts) 		=> Verbs.About.Execute(opts).Result,
-		errors => 1);
+		errors => {
+			Console.WriteLine("\nFor detailed help and examples, visit:");
+			Console.WriteLine("📚 Help Center: https://rob-linton.github.io/publickeyserver/");
+			Console.WriteLine("📖 User Manual: https://rob-linton.github.io/publickeyserver/HELP.html");
+			return 1;
+		});
+
+		return result;
 	}
 
     static async Task<int> Main(string[] args)
@@ -102,6 +109,7 @@ public class Program
 		{
 			Console.WriteLine("An error occurred: ");
 			Console.WriteLine(e.Message);
+			Console.WriteLine("\nFor help, visit: https://rob-linton.github.io/publickeyserver/HELP.html");
 			return 1;
 		}
 
