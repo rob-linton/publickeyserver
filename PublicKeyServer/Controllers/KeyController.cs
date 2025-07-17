@@ -345,6 +345,7 @@ namespace publickeyserver
 					string index = System.IO.File.ReadAllText("wwwroot/index.html");
 					index = index.Replace("{CERTIFICATE}", "");
 					index = index.Replace("{ORIGIN}", GLOBALS.origin);
+					index = index.Replace("{METAPEM}", "");
 					
 					// Get the root CA signature
 					try
@@ -383,6 +384,7 @@ namespace publickeyserver
 					string index = System.IO.File.ReadAllText("wwwroot/index.html");
 					index = index.Replace("{CERTIFICATE}", "");
 					index = index.Replace("{ORIGIN}", GLOBALS.origin);
+					index = index.Replace("{METAPEM}", "");
 					
 					// Get the root CA signature
 					try
@@ -554,6 +556,10 @@ namespace publickeyserver
 				{
 					index2 = index2.Replace("{ROOTCA}", "");
 				}
+				
+				// Embed the PEM certificate as a meta tag
+				string pemMetaTag = $"    <meta name=\"certificate-pem\" content=\"{System.Net.WebUtility.HtmlEncode(cert)}\" />\n";
+				index2 = index2.Replace("{METAPEM}", pemMetaTag);
 				
 				return new ContentResult()
 				{
