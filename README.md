@@ -205,3 +205,35 @@ The reference implementation runs at https://publickeyserver.org with:
 ## Conclusion
 
 The Public Key Server project successfully addresses many of the usability challenges of traditional encryption systems like PGP while maintaining strong security guarantees. Its unique combination of anonymous certificates, post-quantum cryptography, and integrated delivery makes it a compelling solution for secure file transfer in an increasingly surveilled digital world.
+
+## Technical Comparison Highlights
+
+* Post-quantum encryption with Kyber1024 - protecting against future quantum threats  
+* Zero-knowledge server architecture - server can't decrypt your files
+* Perfect forward secrecy - each file uses unique encryption keys
+* Human-friendly aliases - no more complex key fingerprints
+* Integrated delivery network - no separate file transfer needed
+* No key management hassles - automatic key discovery via aliases
+* Anonymous by default - no identity required unless you want it
+
+
+## License
+
+This project is licensed under the **PublicKeyServer Non-Monetization Open Source License**.
+
+### Key Points:
+- ✅ **Free for personal and commercial use**
+- ✅ **Use in businesses and enterprises**
+- ✅ **Open source - view, modify, and share the code**
+- ✅ **Educational use (all institutions)**
+- ✅ **Create derivative works**
+- ✅ **Contribute improvements back**
+- ❌ **Cannot sell or monetize the software**
+- ❌ **Cannot charge fees for access or use**
+- ❌ **Must remain free for all users**
+
+Commercial use is allowed and encouraged! You just can't make money from it.
+
+For special monetization permissions, please contact the project maintainers.
+
+See the [LICENSE](LICENSE) file for full license terms and conditions.

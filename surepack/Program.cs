@@ -1,4 +1,16 @@
-﻿#pragma warning disable 1998
+﻿/*
+ * Copyright (c) 2025 PublicKeyServer Contributors
+ * 
+ * This work is licensed under the PublicKeyServer Non-Monetization Open Source License.
+ * 
+ * You may use, copy, modify, and distribute this work for any purpose, including
+ * commercial purposes, provided you do not monetize it or charge any fees.
+ * The software must remain free for all users.
+ * 
+ * See the LICENSE file in the root directory for complete license terms.
+ */
+
+#pragma warning disable 1998
 
 using CommandLine;
 using suredrop.Verbs;

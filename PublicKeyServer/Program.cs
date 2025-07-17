@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2025 PublicKeyServer Contributors
+ * 
+ * This work is licensed under the PublicKeyServer Non-Monetization Open Source License.
+ * 
+ * You may use, copy, modify, and distribute this work for any purpose, including
+ * commercial purposes, provided you do not monetize it or charge any fees.
+ * The software must remain free for all users.
+ * 
+ * See the LICENSE file in the root directory for complete license terms.
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using dotenv.net;
 using System.IO;
+using System.Text.Json;
 
 namespace publickeyserver
 { 
