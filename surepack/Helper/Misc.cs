@@ -283,6 +283,19 @@ public class Misc
 		}
 	}
 	// --------------------------------------------------------------------------------------------------------
+	// log an informational message
+	public static void LogInfo(string message)
+	{
+		File.AppendAllLines("output.log", new string[] { message });
+		message = "[ i ]  " + message;
+		Globals.UpdateProgressSource(message);
+		
+		if (Globals.Verbose > 0)
+		{
+			Console.WriteLine(SanitizeForWindows(message));
+		}
+	}
+	// --------------------------------------------------------------------------------------------------------
 	// log a cross check mark
 	public static void LogCross(string message)
 	{

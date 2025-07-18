@@ -258,7 +258,7 @@ class Unpack
 						byte[] decryptedEncryptedKey = BouncyCastleHelper.DecryptWithKey(encryptedKey, kyberSecret, envelope.From.ToLower().ToBytes());
 
 
-						Misc.LogLine("- Decrypting key...");
+						Misc.LogInfo("Decrypting key...");
 						byte[] key = BouncyCastleHelper.DecryptWithPrivateKey(decryptedEncryptedKey, keyPair.Private);
 
 						//
@@ -266,7 +266,7 @@ class Unpack
 						//
 
 						// now decrypt the manifest
-						Misc.LogLine("- Decrypting manifest...");
+						Misc.LogInfo("Decrypting manifest...");
 
 						byte[] nonce = envelope.From.ToLower().ToBytes();
 						byte[] manifestJsonBytes = BouncyCastleHelper.DecryptWithKey(manifestBytes, key, nonce);

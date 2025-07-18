@@ -128,7 +128,8 @@ class Pack
 			// validate the sender
 			//
 
-			Misc.LogLine($"\n- Validating sender alias  ->  {opts.From}");
+			Misc.LogLine("");
+			Misc.LogInfo($"Validating sender alias  ->  {opts.From}");
 			
 			string fromDomain = Misc.GetDomain(opts.From);
 			(bool valid, byte[] fromFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(fromDomain, opts.From, "");
@@ -165,7 +166,8 @@ class Pack
 				int index = 1;
 				foreach (string filePath in relativePaths)
 				{
-					Misc.LogLine($"\n  surepacking {filePath}");
+					Misc.LogLine("");
+					Misc.LogInfo($"Packing {filePath}");
 
 					List<string> blockList = new List<string>();
 
@@ -292,7 +294,7 @@ class Pack
 
 				string manifestJson = JsonSerializer.Serialize(manifest);
 
-				Misc.LogLine("- Encrypting the manifest...");
+				Misc.LogInfo("Encrypting the manifest...");
 
 				// encrypt the manifest
 				byte[] encryptedManifest = BouncyCastleHelper.EncryptWithKey(manifestJson.ToBytes(), key, nonce);
@@ -302,7 +304,7 @@ class Pack
 				//
 
 				// now loop through each of the aliases and add them to the envelope
-				Misc.LogLine("- Addressing envelope...");
+				Misc.LogInfo("Addressing envelope...");
 				if (opts.InputAliases != null)
 				{
 					foreach (string alias in opts.InputAliases)
@@ -313,7 +315,7 @@ class Pack
 							
 
 							// validate the alias
-							Misc.LogLine($"- Validating recipient alias  ->  {alias}");
+							Misc.LogInfo($"Validating recipient alias  ->  {alias}");
 							string domain = Misc.GetDomain(alias);
 							(bool aliasValid, byte[] toFingerprint) = await BouncyCastleHelper.VerifyAliasAsync(domain, alias, "");
 
@@ -386,7 +388,7 @@ class Pack
 
 								// add the encrypted key to the envelope
 								recipients.Add(new Recipient { Alias = alias, Key = sEncryptedEncryptedKey, KyberKey = sCipherText });
-								Misc.LogLine($"- Added alias {alias}");
+								Misc.LogInfo($"Added alias {alias}");
 							}
 						}
 						catch (Exception ex)
@@ -416,13 +418,13 @@ class Pack
 				string envelopeJson = JsonSerializer.Serialize(envelope);
 				
 
-				Misc.LogLine("- Signing the envelope...");
+				Misc.LogInfo("Signing the envelope...");
 				
 				// sign the manifest
 				byte[] envelopeHash = BouncyCastleHelper.GetHashOfString(envelopeJson);
 				byte[] envelopeSignature = BouncyCastleHelper.SignData(envelopeHash, privateKey.Private);
 
-				Misc.LogLine("- Signing the manifest...");
+				Misc.LogInfo("Signing the manifest...");
 				
 				// sign the manifest
 				byte[] manifestHash = BouncyCastleHelper.GetHashOfBytes(encryptedManifest);
