@@ -419,6 +419,45 @@
             fill: currentColor;
         }
         
+        .coffee-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--accent-warning);
+            color: var(--bg-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--accent-warning);
+            z-index: 100;
+        }
+        
+        .coffee-button:hover {
+            background-color: transparent;
+            color: var(--accent-warning);
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+        
+        .coffee-icon {
+            font-size: 1.2em;
+        }
+        
+        @media (max-width: 768px) {
+            .coffee-button {
+                position: static;
+                margin: 10px auto 20px;
+                width: fit-content;
+                display: flex;
+            }
+        }
+        
         .nav-help-btn {
             background-color: var(--bg-secondary);
             border-color: var(--accent-success) !important;
@@ -575,6 +614,10 @@
 {METAPEM}
 </head>
 <body>
+    <a href="https://buymeacoffee.com/rob.linton" class="coffee-button" target="_blank" rel="noopener noreferrer">
+        <span class="coffee-icon">☕</span>
+        Buy me a coffee
+    </a>
     <div class="container">
         <div class="header">
             <div class="header-content">
@@ -876,9 +919,9 @@ surepack create -e yourname@example.com -t 123456</pre>
             
             <h3>Where Your Keys Are Stored</h3>
             <ul>
-                <li><strong>Windows:</strong> <code>%APPDATA%\SureDrop</code></li>
-                <li><strong>macOS:</strong> <code>~/Library/Application Support/SureDrop</code></li>
-                <li><strong>Linux:</strong> <code>~/.suredrop</code></li>
+                <li><strong>Windows:</strong> <code>%LOCALAPPDATA%\surepack</code></li>
+                <li><strong>macOS:</strong> <code>~/Library/Application Support/surepack</code></li>
+                <li><strong>Linux:</strong> <code>~/.local/share/surepack</code></li>
             </ul>
             
             <div class="warning-box">
