@@ -147,16 +147,18 @@
         
         .download-item {
             background-color: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--accent-primary);
             padding: 15px;
             border-radius: 6px;
             transition: all 0.2s ease;
             position: relative;
+            box-shadow: 0 0 0 1px var(--border-color);
         }
         
         .download-item:hover {
-            border-color: var(--accent-primary);
+            border-color: var(--accent-success);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(88, 166, 255, 0.15);
         }
         
         .download-item::before {
@@ -458,6 +460,60 @@
             }
         }
         
+        .security-note {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--accent-primary);
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .security-note::before {
+            content: "🍎";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3em;
+            opacity: 0.1;
+        }
+        
+        .security-note h4 {
+            margin: 0 0 10px 0;
+            color: var(--accent-primary);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .security-note h4::before {
+            content: "ℹ️";
+            font-size: 1.2em;
+        }
+        
+        .security-note p {
+            margin: 0;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .security-note code {
+            background-color: var(--bg-tertiary);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .coffee-mention {
+            color: var(--accent-warning);
+            font-style: italic;
+        }
+        
         .nav-help-btn {
             background-color: var(--bg-secondary);
             border-color: var(--accent-success) !important;
@@ -467,6 +523,32 @@
         .nav-help-btn:hover {
             background-color: var(--bg-tertiary);
             color: var(--text-bright) !important;
+        }
+        
+        .nav-downloads-btn {
+            background-color: var(--bg-secondary);
+            border-color: var(--accent-primary) !important;
+            color: var(--accent-primary) !important;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            padding-left: 28px !important;
+        }
+        
+        .nav-downloads-btn::before {
+            content: "⬇";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.6;
+            font-size: 1.3em;
+        }
+        
+        .nav-downloads-btn:hover {
+            background-color: var(--accent-primary);
+            color: var(--bg-primary) !important;
+            transform: translateY(-1px);
         }
         
         .root-signature-section {
@@ -634,7 +716,7 @@
             </div>
             <div class="nav-menu">
                 <a href="#how-it-works">How It Works</a>
-                <a href="#downloads">Downloads</a>
+                <a href="#downloads" class="nav-downloads-btn">Downloads</a>
                 <a href="#quick-start">Quick Start</a>
                 <a href="#user-manual">User Manual</a>
                 <a href="#security">Security</a>
@@ -767,6 +849,12 @@
                 
                 <div class="warning-box">
                     <strong>Note:</strong> On macOS and Linux, you may need to make the file executable: <code>chmod +x surepack</code>
+                </div>
+                
+                <div class="security-note">
+                    <h4>macOS Security Notice</h4>
+                    <p>On Mac, you may need to go to <strong>Settings → Privacy & Security → Security</strong> and allow <code>surepack</code> to run from an unidentified developer. 
+                    <span class="coffee-mention">If y'all buy me enough coffees ☕, I'll save up for the certificate to sign these!</span></p>
                 </div>
             </div>
         </section>
