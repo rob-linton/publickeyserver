@@ -92,8 +92,8 @@ public class Program
 		(AboutOptions opts) 		=> Verbs.About.Execute(opts).Result,
 		errors => {
 			Console.WriteLine("\nFor detailed help and examples, visit:");
-			Console.WriteLine("📚 Help Center: https://rob-linton.github.io/publickeyserver/");
-			Console.WriteLine("📖 User Manual: https://rob-linton.github.io/publickeyserver/HELP.html");
+			Console.WriteLine(Misc.SanitizeForWindows("📚 Help Center: https://rob-linton.github.io/publickeyserver/"));
+			Console.WriteLine(Misc.SanitizeForWindows("📖 User Manual: https://rob-linton.github.io/publickeyserver/HELP.html"));
 			return 1;
 		});
 

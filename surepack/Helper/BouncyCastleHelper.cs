@@ -218,7 +218,7 @@ public class BouncyCastleHelper
 				}
 				Misc.LogCheckMark($"Parent has authority to sign the child {i + 1} of {chain.Length}");
 
-				Misc.LogLine($"  Certificate {i + 1} of {chain.Length} is valid: {parent.SubjectDN}");
+				Misc.LogCheckMark($"Certificate {i + 1} of {chain.Length} is valid: {parent.SubjectDN}");
             }
 
             // get the fingerprint of the root certificate

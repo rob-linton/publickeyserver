@@ -14,6 +14,29 @@ public class Misc
 {
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
+	/// Replaces Unicode characters with ASCII equivalents for Windows compatibility.
+	/// </summary>
+	/// <param name="input">The input string that may contain Unicode characters.</param>
+	/// <returns>A string with Unicode characters replaced by ASCII equivalents on Windows.</returns>
+	public static string SanitizeForWindows(string input)
+	{
+		// Only apply replacements on Windows
+		if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+		{
+			// Replace common Unicode characters with ASCII equivalents
+			input = input.Replace("\u2713", "V");  // Checkmark ✓ -> V
+			input = input.Replace("\u2717", "X");  // Cross ✗ -> X
+			input = input.Replace("\u2714", "V");  // Heavy checkmark ✔ -> V
+			input = input.Replace("\u2718", "X");  // Heavy cross ✘ -> X
+			input = input.Replace("\U0001F4DA", "[i]");  // Books emoji 📚 -> [i]
+			input = input.Replace("\U0001F4D6", "[i]");  // Open book emoji 📖 -> [i]
+			input = input.Replace("\U0001F4A1", "TIP:");  // Lightbulb emoji 💡 -> TIP:
+			// Add more replacements as needed
+		}
+		return input;
+	}
+	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
 	/// Retrieves the alias from the given alias and domain string.
 	/// </summary>
 	/// <param name="aliasAndDomain">The alias and domain string.</param>
@@ -156,19 +179,19 @@ public class Misc
 	{
 		File.AppendAllLines("output.log", new string[] { message });	
 		if (Globals.Verbose > 0)
-			Console.WriteLine(message);
+			Console.WriteLine(SanitizeForWindows(message));
 	}
 	public static void WriteLine(string message)
 	{
 		File.AppendAllLines("output.log", new string[] { message });
 		if (Globals.Verbose >= 0)
-			Console.WriteLine(message);
+			Console.WriteLine(SanitizeForWindows(message));
 	}
 	public static void LogLine1(string message)
 	{
 		File.AppendAllLines("output.log", new string[] { message });
 		if (Globals.Verbose > 1)
-			Console.WriteLine(message);
+			Console.WriteLine(SanitizeForWindows(message));
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
@@ -182,7 +205,7 @@ public class Misc
 		if (Globals.Verbose > 2)
 		{
 			Console.WriteLine("--------------------------------------------------------------------------------");
-			Console.WriteLine(message);
+			Console.WriteLine(SanitizeForWindows(message));
 			Console.WriteLine("--------------------------------------------------------------------------------");
 		}
 	}
@@ -199,10 +222,10 @@ public class Misc
 		if (Globals.Verbose > 0)
 		{
 			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine($"\n{message}\n");
+			Console.WriteLine(SanitizeForWindows($"\n{message}\n"));
 
 			if (!String.IsNullOrEmpty(details))
-				Console.Write($"{details}\n");
+				Console.Write(SanitizeForWindows($"{details}\n"));
 			
 			Console.ResetColor();
 			Console.WriteLine("\nNeed help? Visit: https://rob-linton.github.io/publickeyserver/HELP.html");
@@ -224,10 +247,10 @@ public class Misc
 	{
 		// Always print error messages directly to console, regardless of verbose setting
 		Console.ForegroundColor = ConsoleColor.Red;
-		Console.WriteLine($"\n{message}\n");
+		Console.WriteLine(SanitizeForWindows($"\n{message}\n"));
 		
 		if (!String.IsNullOrEmpty(details))
-			Console.WriteLine($"{details}\n");
+			Console.WriteLine(SanitizeForWindows($"{details}\n"));
 		
 		Console.ResetColor();
 		Console.WriteLine("\nNeed help? Visit: https://rob-linton.github.io/publickeyserver/HELP.html");
@@ -244,7 +267,7 @@ public class Misc
 	public static void LogChar(string message)
 	{
 		if (Globals.Verbose > 0)
-			Console.Write(message);
+			Console.Write(SanitizeForWindows(message));
 	}
 	// --------------------------------------------------------------------------------------------------------
 	public static void LogCheckMark(string message)
@@ -256,7 +279,7 @@ public class Misc
 		
 		if (Globals.Verbose > 0)
 		{
-			Console.WriteLine(message);
+			Console.WriteLine(SanitizeForWindows(message));
 		}
 	}
 	// --------------------------------------------------------------------------------------------------------
@@ -271,7 +294,7 @@ public class Misc
 		{
 			// print it in red
 			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine(message);
+			Console.WriteLine(SanitizeForWindows(message));
 			Console.ResetColor();
 		}
 	}
@@ -285,7 +308,7 @@ public class Misc
 			string col3padded = col3 + "                                                        ";
 			string col4padded = col4 + "                                                        ";
 
-			Console.WriteLine(col1padded.Substring(0, 3) + " " + col2padded.Substring(0, 80) + "  " + col3padded.Substring(0, 10) + "  " + col4padded.Substring(0, 20));
+			Console.WriteLine(SanitizeForWindows(col1padded.Substring(0, 3) + " " + col2padded.Substring(0, 80) + "  " + col3padded.Substring(0, 10) + "  " + col4padded.Substring(0, 20)));
 		}
 	}
 	// --------------------------------------------------------------------------------------------------------
@@ -377,6 +400,8 @@ public class Misc
 			LogLine("");
 			LogLine("📚 Help Center: https://rob-linton.github.io/publickeyserver/");
 			LogLine("📖 SurePack Manual: https://rob-linton.github.io/publickeyserver/HELP.html");
+			LogLine("");
+			LogLine("💡 Tip: To run with minimal output, use -v 0 (e.g., surepack pack -v 0 ...)");
 			LogLine("===================================================================================================\n");
 		}
 	}
