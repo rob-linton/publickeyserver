@@ -47,12 +47,12 @@ class List
 				}
 				catch (Exception ex)
 				{
-					Misc.LogError("Unable to validate alias", ex.Message);
+					Misc.LogCriticalError("Unable to validate alias", ex.Message);
 				}
 			}
 			catch (Exception ex)
 			{
-				Misc.LogError("Unable to validate alias", ex.Message);
+				Misc.LogCriticalError("Unable to validate alias", ex.Message);
 			}
 		}
 

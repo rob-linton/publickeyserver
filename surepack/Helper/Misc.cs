@@ -215,6 +215,28 @@ public class Misc
 	}
 	// --------------------------------------------------------------------------------------------------------
 	/// <summary>
+	/// Logs a critical error message that is always displayed regardless of verbosity setting.
+	/// This should be used for exception handlers to ensure users always see error messages.
+	/// </summary>
+	/// <param name="message">The error message.</param>
+	/// <param name="details">Optional details about the error (e.g., exception message).</param>
+	public static void LogCriticalError(string message, string details = "")
+	{
+		// Always print error messages directly to console, regardless of verbose setting
+		Console.ForegroundColor = ConsoleColor.Red;
+		Console.WriteLine($"\n{message}\n");
+		
+		if (!String.IsNullOrEmpty(details))
+			Console.WriteLine($"{details}\n");
+		
+		Console.ResetColor();
+		Console.WriteLine("\nNeed help? Visit: https://rob-linton.github.io/publickeyserver/HELP.html");
+		
+		// Also log it to the error log file
+		File.AppendAllLines("error.log", new string[] { message, details });
+	}
+	// --------------------------------------------------------------------------------------------------------
+	/// <summary>
 	/// Logs a character to the console if the verbose level is greater than 0.
 	/// </summary>
 	/// <param name="opts">The options object.</param>
@@ -479,10 +501,24 @@ public class Misc
 		}
 		else
 		{
-			Misc.LogLine($"Files: {path} / *");
-
-			// get the files
-			files = Directory.GetFiles(path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+			// Check if the path is a file or directory
+			if (File.Exists(path))
+			{
+				// It's a single file
+				Misc.LogLine($"Single file: {path}");
+				files = new string[] { path };
+			}
+			else if (Directory.Exists(path))
+			{
+				// It's a directory
+				Misc.LogLine($"Directory: {path} / *");
+				files = Directory.GetFiles(path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+			}
+			else
+			{
+				// Path doesn't exist
+				throw new FileNotFoundException($"The specified path does not exist: {path}");
+			}
 		}
 
 		return files;

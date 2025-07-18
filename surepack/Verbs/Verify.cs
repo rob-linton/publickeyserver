@@ -58,7 +58,7 @@ class Verify
 			progress?.Report(statusUpdate);
 			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 
-			Misc.LogError("Unable to verify email", ex.Message);
+			Misc.LogCriticalError("Unable to verify email", ex.Message);
 			return 1;
 		}
 		

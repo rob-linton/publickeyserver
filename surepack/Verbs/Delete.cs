@@ -95,7 +95,7 @@ class Delete
 			}
 			catch { }
 
-			Misc.LogError("Unable to validate alias", ex.Message);
+			Misc.LogCriticalError("Unable to validate alias", ex.Message);
 			return 1;
 		}
 		finally

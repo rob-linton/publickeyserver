@@ -466,7 +466,7 @@ class Pack
 			progress?.Report(new StatusUpdate { Status = ex.Message });
 			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 
-			Misc.LogError("Unable to pack files", ex.Message);
+			Misc.LogCriticalError("Unable to pack files", ex.Message);
 			return 1;
 		}
 

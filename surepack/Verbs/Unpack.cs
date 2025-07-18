@@ -373,7 +373,7 @@ class Unpack
 			progress?.Report(new StatusUpdate { Status = ex.Message });
 			await System.Threading.Tasks.Task.Delay(1); // DO NOT REMOVE-REQUIRED FOR UX
 
-			Misc.LogError("Error unpacking package", ex.Message);
+			Misc.LogCriticalError("Error unpacking package", ex.Message);
 			return 1;
 		}
 	}

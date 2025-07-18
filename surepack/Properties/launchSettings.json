@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "surepack pack": {
+      "commandName": "Project",
+      "commandLineArgs": "pack \r\n-i test.txt \r\n-a graduated-scales-reprints.publickeyserver.org \r\n-f guilty-para-benefit.publickeyserver.org \r\n-o test-out",
+      "workingDirectory": "C:\\Users\\Developer\\Downloads\\test"
+    },
+    "surepack list": {
+      "commandName": "Project",
+      "commandLineArgs": "list"
+    }
+  }
+}

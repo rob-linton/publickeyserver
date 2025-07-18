@@ -210,7 +210,7 @@ class Send
 			}
 			catch { }
 
-			Misc.LogError("Error sending package", ex.Message);
+			Misc.LogCriticalError("Error sending package", ex.Message);
 			return 1;
 		}
 		return 0;

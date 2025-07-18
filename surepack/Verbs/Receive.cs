@@ -350,7 +350,7 @@ class Receive
 			}
 			catch { }
 
-			Misc.LogError("Error receiving package", ex.Message);
+			Misc.LogCriticalError("Error receiving package", ex.Message);
 			return 1;
 		}
 		finally

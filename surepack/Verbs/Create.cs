@@ -176,7 +176,7 @@ class Create
 			}
 			catch { }
 
-			Misc.LogError("Unable to create alias", ex.Message);
+			Misc.LogCriticalError("Unable to create alias", ex.Message);
 			return 1;
 		}
 
